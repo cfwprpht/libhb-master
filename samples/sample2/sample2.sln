@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample2", "sample2\sample2.vcxproj", "{8B42047D-661B-4783-ACC4-3A78F3AFE9F8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libhb", "..\libhb\libhb.vcxproj", "{CD08BCE8-FAF4-4C7D-B3D5-ABA8248360C1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libUtil", "..\libhb\libUtil\libUtil.vcxproj", "{09C2CD47-F62A-4B81-9170-DCB07E27AE2C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libSceSampleUtil", "..\..\common\source\sampleutil\libSceSampleUtil.vcxproj", "{30A1B994-C2C6-485F-911B-FB4674366DA8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ORBIS = Debug|ORBIS
+		Debug|PSVita = Debug|PSVita
+		Debug|x64 = Debug|x64
+		Release|ORBIS = Release|ORBIS
+		Release|PSVita = Release|PSVita
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8B42047D-661B-4783-ACC4-3A78F3AFE9F8}.Debug|ORBIS.ActiveCfg = Debug|ORBIS
+		{8B42047D-661B-4783-ACC4-3A78F3AFE9F8}.Debug|ORBIS.Build.0 = Debug|ORBIS
+		{8B42047D-661B-4783-ACC4-3A78F3AFE9F8}.Debug|PSVita.ActiveCfg = Debug|ORBIS
+		{8B42047D-661B-4783-ACC4-3A78F3AFE9F8}.Debug|x64.ActiveCfg = Debug|ORBIS
+		{8B42047D-661B-4783-ACC4-3A78F3AFE9F8}.Release|ORBIS.ActiveCfg = Release|ORBIS
+		{8B42047D-661B-4783-ACC4-3A78F3AFE9F8}.Release|ORBIS.Build.0 = Release|ORBIS
+		{8B42047D-661B-4783-ACC4-3A78F3AFE9F8}.Release|PSVita.ActiveCfg = Release|ORBIS
+		{8B42047D-661B-4783-ACC4-3A78F3AFE9F8}.Release|x64.ActiveCfg = Release|ORBIS
+		{CD08BCE8-FAF4-4C7D-B3D5-ABA8248360C1}.Debug|ORBIS.ActiveCfg = Debug|ORBIS
+		{CD08BCE8-FAF4-4C7D-B3D5-ABA8248360C1}.Debug|ORBIS.Build.0 = Debug|ORBIS
+		{CD08BCE8-FAF4-4C7D-B3D5-ABA8248360C1}.Debug|PSVita.ActiveCfg = Debug|ORBIS
+		{CD08BCE8-FAF4-4C7D-B3D5-ABA8248360C1}.Debug|x64.ActiveCfg = Debug|ORBIS
+		{CD08BCE8-FAF4-4C7D-B3D5-ABA8248360C1}.Release|ORBIS.ActiveCfg = Release|ORBIS
+		{CD08BCE8-FAF4-4C7D-B3D5-ABA8248360C1}.Release|ORBIS.Build.0 = Release|ORBIS
+		{CD08BCE8-FAF4-4C7D-B3D5-ABA8248360C1}.Release|PSVita.ActiveCfg = Release|ORBIS
+		{CD08BCE8-FAF4-4C7D-B3D5-ABA8248360C1}.Release|x64.ActiveCfg = Release|ORBIS
+		{09C2CD47-F62A-4B81-9170-DCB07E27AE2C}.Debug|ORBIS.ActiveCfg = Debug|ORBIS
+		{09C2CD47-F62A-4B81-9170-DCB07E27AE2C}.Debug|ORBIS.Build.0 = Debug|ORBIS
+		{09C2CD47-F62A-4B81-9170-DCB07E27AE2C}.Debug|PSVita.ActiveCfg = Debug|ORBIS
+		{09C2CD47-F62A-4B81-9170-DCB07E27AE2C}.Debug|x64.ActiveCfg = Debug|ORBIS
+		{09C2CD47-F62A-4B81-9170-DCB07E27AE2C}.Release|ORBIS.ActiveCfg = Release|ORBIS
+		{09C2CD47-F62A-4B81-9170-DCB07E27AE2C}.Release|ORBIS.Build.0 = Release|ORBIS
+		{09C2CD47-F62A-4B81-9170-DCB07E27AE2C}.Release|PSVita.ActiveCfg = Release|ORBIS
+		{09C2CD47-F62A-4B81-9170-DCB07E27AE2C}.Release|x64.ActiveCfg = Release|ORBIS
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Debug|ORBIS.ActiveCfg = Debug|ORBIS
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Debug|ORBIS.Build.0 = Debug|ORBIS
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Debug|PSVita.ActiveCfg = Debug|PSVita
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Debug|PSVita.Build.0 = Debug|PSVita
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Debug|x64.ActiveCfg = Debug|x64
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Debug|x64.Build.0 = Debug|x64
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Release|ORBIS.ActiveCfg = Release|ORBIS
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Release|ORBIS.Build.0 = Release|ORBIS
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Release|PSVita.ActiveCfg = Release|PSVita
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Release|PSVita.Build.0 = Release|PSVita
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Release|x64.ActiveCfg = Release|x64
+		{30A1B994-C2C6-485F-911B-FB4674366DA8}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
