@@ -14,6 +14,7 @@
 */
 
 #include "application.h"
+#include <algorithm>
 
 // AV Player.
 common::Util::AvPlayer player;
@@ -23,28 +24,6 @@ ssi::Button LibHomebrew::Application::input = ssi::kButtonNone;
 ResourceManager resManager;
 Config LibHomebrew::Application::conf;
 
-bool LibHomebrew::Application::useTitle = false;
-bool LibHomebrew::Application::useTime = false;
-bool LibHomebrew::Application::useBanner = false;
-bool LibHomebrew::Application::multiLine = false;
-bool LibHomebrew::Application::useScreenShot = false;
-bool LibHomebrew::Application::useCursor = false;
-bool LibHomebrew::Application::useVid = false;
-bool LibHomebrew::Application::close = false;
-bool LibHomebrew::Application::start = true;
-char *LibHomebrew::Application::title;
-char *LibHomebrew::Application::banner;
-char *LibHomebrew::Application::videoPath;
-Position LibHomebrew::Application::titlePos = Position(0.0, 0.0);
-Position LibHomebrew::Application::timePos = Position(0.0, 0.0);
-Position LibHomebrew::Application::bannerPos = Position(0.0, 0.0);
-Color LibHomebrew::Application::titleColor = LIGHT_BLUE;;
-Color LibHomebrew::Application::timeColor = RED2;
-Color LibHomebrew::Application::bannerColor = YELLOW;
-float LibHomebrew::Application::titleSize = CHAR_N;
-float LibHomebrew::Application::timeSize = CHAR_S;
-float LibHomebrew::Application::bannerSize = 0.08;
-
 // Console informations.
 static char *sandBoxDirectory;
 static char messageBuffer[1045];
@@ -53,6 +32,27 @@ static char timeBuffer[16];
 static char timeBuffer2[16];
 static bool verbose   = false;
 static bool isPlaying = false;
+
+// Static Application variables.
+char *LibHomebrew::Application::title;
+char *LibHomebrew::Application::banner;
+char *LibHomebrew::Application::videoPath;
+bool LibHomebrew::Application::useTime       = false;
+bool LibHomebrew::Application::multiLine     = false;
+bool LibHomebrew::Application::useScreenShot = false;
+bool LibHomebrew::Application::useCursor     = false;
+bool LibHomebrew::Application::useVid        = false;
+bool LibHomebrew::Application::useTitle      = false;
+bool LibHomebrew::Application::useBanner     = false;
+Position LibHomebrew::Application::titlePos  = Position(0.0, 0.0);
+Position LibHomebrew::Application::timePos   = Position(0.0, 0.0);
+Position LibHomebrew::Application::bannerPos = Position(0.0, 0.0);
+Color LibHomebrew::Application::titleColor   = LIGHT_BLUE;;
+Color LibHomebrew::Application::timeColor    = RED2;
+Color LibHomebrew::Application::bannerColor  = YELLOW;
+float LibHomebrew::Application::titleSize    = CHAR_N;
+float LibHomebrew::Application::timeSize     = CHAR_S;
+float LibHomebrew::Application::bannerSize   = 0.08;
 
 // Effect fun.
 float posX;
@@ -164,8 +164,12 @@ int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsCon
 			input = ssi::kButtonCircle;
 		} else if (padContext->isButtonPressed(ssi::kButtonCross, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonCross;
-			// Update All Forms and Objects.
-			/* Not implemented yet */
+			if (useVid & isPlaying) {
+				if (player.isPlaying()) {
+					player.stop();
+					isPlaying = false;
+				}
+			}
 		} else if (padContext->isButtonPressed(ssi::kButtonR1, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonR1;
 		} else if (padContext->isButtonPressed(ssi::kButtonR2, ssi::kButtonEventPatternAny)) {
@@ -181,6 +185,8 @@ int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsCon
 			input = ssi::kButtonL3;
 		} else if (padContext->isButtonPressed(ssi::kButtonTouchPad, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonTouchPad;
+		} else if (padContext->isButtonPressed(ssi::kButtonOptions, ssi::kButtonEventPatternAny)) {
+			input = ssi::kButtonOptions;
 		} else input = ssi::kButtonNone;
 	}
 	return SCE_OK;
@@ -261,6 +267,10 @@ int LibHomebrew::Application::initialize(void) {
 		titlePos = Position(getCenteredPosX(strlen(titleBuffer)), MARGIN_Y);
 	}
 
+	// Set start and close flags.
+	start = true;
+	close = false;
+
 	// Get Freedom for this Process.
 	int uid = Sys::getuid();
 #ifdef FW_405
@@ -281,9 +291,6 @@ int LibHomebrew::Application::initialize(void) {
 int LibHomebrew::Application::update(void) {
 	int ret = 0;
 	(void)ret;
-
-	// Shall we close the App ?
-	if (close) Sys::open("/let/me/out/here/", O_RDONLY, 0);
 
 	//E Update SampleUtil
 	//J SampleUtilの更新
@@ -349,12 +356,7 @@ int LibHomebrew::Application::update(void) {
 		if (player.isPlaying()) {
 			ret = player.update();
 			SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-			if (input == ssi::kButtonCross) {
-				player.stop();
-				isPlaying = false;
-				input = ssi::kButtonNone;
-			}
-		} else { player.stop(); isPlaying = false; }
+		}
 	} else if (input == ssi::kButtonR1) {
 		if (useVid) {
 			Play();
@@ -391,7 +393,7 @@ void LibHomebrew::Application::render(void) {
 		if (useBanner) {
 			if (bannerEffect) {
 				if (bannerCount != interval) {
-					drawStringf(Position(0.043, 0.043), bannerSize, DARK_GRAY_SHATTERED, banner);
+					drawStringf(Position(bannerPos.getX() + 0.043, bannerPos.getY() + 0.043), bannerSize, DARK_GRAY_SHATTERED, banner);
 					drawStringf(bannerPos, bannerSize, bannerColor, banner);
 				}
 			}
@@ -400,6 +402,13 @@ void LibHomebrew::Application::render(void) {
 		// Print Message Buffer if data present.
 		if (!multiLine) {
 			if (strlen(Console::singleCenterBuff) > 0) drawStringf(Position(getCenteredPosX(strlen(Console::singleCenterBuff)), 0.50), Console::singleCenterBuff);
+		}
+
+		// Draw external forms.
+		if (drawFuncs.size() > 0) {
+			for (std::vector<void (*)()>::iterator it = drawFuncs.begin(); it != drawFuncs.end(); it++) {
+				(*it)();
+			}
 		}
 
 		// Draw cursor.
@@ -453,7 +462,27 @@ int LibHomebrew::Application::finalize(void) {
 }
 
 // Just a shorter symbol.
-sce::SampleUtil::Graphics::GraphicsContext *LibHomebrew::Application::Graphics(void) { return getGraphicsContext(); }
+G::GraphicsContext *LibHomebrew::Application::Graphics(void) { return getGraphicsContext(); }
+
+// Internal shorter Symbol for drawing a Rectagnel.
+void LibHomebrew::Application::drawRect(float x, float y, float width, float height, Color color) {
+	sprite->drawRect(Graphics(), Position(x, y), Size(width, height), color);
+}
+
+// Internal shorter Symbol for drawing a Rectagnel.
+void LibHomebrew::Application::drawRect(Position pos, Size size, Color color) {
+	sprite->drawRect(Graphics(), pos, size, color);
+}
+
+// Internal shorter Symbol for drawing a Rectagnel.
+void LibHomebrew::Application::fillRect(float x, float y, float width, float height, Color color) {
+	sprite->fillRect(Graphics(), Position(x, y), Size(width, height), color);
+}
+
+// Internal shorter Symbol for drawing a Rectagnel.
+void LibHomebrew::Application::fillRect(Position pos, Size size, Color color) {
+	sprite->fillRect(Graphics(), pos, size, color);
+}
 
 // Internal Draw String.
 int LibHomebrew::Application::drawStringf(float x, float y, float size, Color color, const char *format, ...) {
@@ -464,7 +493,22 @@ int LibHomebrew::Application::drawStringf(float x, float y, float size, Color co
 	va_start(args, format);
 	n = vsnprintf(buf, sizeof(buf), format, args);
 	Position pos = Position(x, y);
-	if (sprite != NULL) sprite->drawDebugString(Graphics(), pos, size, color, buf);
+	if (sprite != NULL) sprite->drawDebugString(Application::Graphics(), pos, size, color, buf);
+	va_end(args);
+
+	return n;
+}
+
+// Internal Draw String.
+int LibHomebrew::Application::drawStringf(float x, float y, float size, const char *format, ...) {
+	char buf[256];
+	int n;
+
+	va_list args;
+	va_start(args, format);
+	n = vsnprintf(buf, sizeof(buf), format, args);
+	Position pos = Position(x, y);
+	if (sprite != NULL) sprite->drawDebugString(Application::Graphics(), pos, size, WHITE, buf);
 	va_end(args);
 
 	return n;
@@ -573,6 +617,7 @@ int LibHomebrew::Application::exec(void) {
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
 
 	while (1) {
+		if (close) break;
 		ret = update();
 		if (ret != SCE_OK) break;
 		render();
@@ -581,11 +626,22 @@ int LibHomebrew::Application::exec(void) {
 	ret = finalize();
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
 
+	// Dirty but since we can't exit to gui, we simple try to open a non existing path via syscall symbol.
+	Sys::open("/let/me/out/here/", O_RDONLY, 0);
+
 	return 0;
 }
 
 // Add User Main Entry to the Application to run after initializing.
 void LibHomebrew::Application::Add(void *usrLoop) { UsrEntry = reinterpret_cast<void *(*)(void*)>(usrLoop); }
+
+// Add a external Draw function to the Applications drawing loop.
+void LibHomebrew::Application::AddDraw(void (*drawEvent)()) { drawFuncs.push_back(drawEvent); }
+
+// Remove a external Draw function from the Applications drawing loop.
+void LibHomebrew::Application::RemoveDraw(void (*drawEvent)()) {
+	drawFuncs.erase(std::remove(drawFuncs.begin(), drawFuncs.end(), drawEvent), drawFuncs.end());
+}
 
 // Set Application Title Text.
 void LibHomebrew::Application::Title(const char *_title) { title = strdup(_title); }
@@ -647,7 +703,7 @@ void LibHomebrew::Application::UseScreenShot(bool state) { useScreenShot = state
 // Enable to play a mp4.
 void LibHomebrew::Application::UseVideo(bool state) { useVid = state; }
 
-// 
+// Set the Vide path.
 void LibHomebrew::Application::Video(const char *path) { videoPath = strdup(path); }
 
 // Closing the Application.

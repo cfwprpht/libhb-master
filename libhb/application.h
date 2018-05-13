@@ -52,6 +52,7 @@ using namespace LibHomebrew::Loot;
 using namespace LibHomebrew::PS4IO;
 using namespace common::Util;
 using namespace common::Configuration;
+namespace G = sce::SampleUtil::Graphics;
 
 namespace LibHomebrew {
 	class Application : public sce::SampleUtil::SampleSkeleton {
@@ -97,6 +98,8 @@ namespace LibHomebrew {
 		virtual void render(void);
 		int          exec(void);		
 		void         Add(void *usrLoop);
+		void         AddDraw(void (*drawEvent)());
+		void         RemoveDraw(void(*drawEvent)());
 		void         Title(const char *title);
 		void         TitlePos(Position pos);
 		void         TitlePos(float x, float y);
@@ -121,48 +124,52 @@ namespace LibHomebrew {
 		void         Close(void);
 		ssi::Button  Input(void);
 		void         ClearInput(void);
+		void         drawRect(float x, float y, float width, float height, Color color);
+		void         fillRect(float x, float y, float width, float height, Color color);
+		void         drawRect(Position pos, Size size, Color color);
+		void         fillRect(Position pos, Size size, Color color);
+		int          drawStringf(float x, float y, float size, Color color, const char *format, ...);
+		int          drawStringf(float x, float y, Color color, const char *format, ...);
+		int          drawStringf(float x, float y, float size, const char *format, ...);
+		int          drawStringf(Position pos, float size, Color color, const char *format, ...);
+		int          drawStringf(Position pos, Color color, const char *format, ...);
+		int          drawStringf(float x, float y, const char *format, ...);
+		int          drawStringf(Position pos, const char *format, ...);
+		float        getCenteredPosX(int len);
+		Position     CenterForm(float x, float y);
+		G::GraphicsContext *Graphics(void);
 
 	private:
-		ssg::SpriteRenderer*          sprite;
-		ssg::Collada::ColladaLoader*  pLoader;
-		static bool                   useTitle;
-		static bool                   useTime;
-		static bool                   useBanner;
-		static bool                   multiLine;
-		static bool                   useScreenShot;
-		static bool                   useCursor;
-		static bool                   start;
-		static bool                   close;
-		static bool                   useVid;
-		static char                   *title;
-		static char                   *banner;
-		static char                   *videoPath;
-		static Position               titlePos;
-		static Position               timePos;
-		static Position               bannerPos;
-		static Color                  titleColor;
-		static Color                  timeColor;
-		static Color                  bannerColor;
-		static float                  titleSize;
-		static float                  timeSize;
-		static float                  bannerSize;
-		static ssi::Button            input;
-
-		int drawStringf(float x, float y, float size, Color color, const char *format, ...);
-		int drawStringf(float x, float y, Color color, const char *format, ...);
-		int drawStringf(Position pos, float size, Color color, const char *format, ...);
-		int drawStringf(Position pos, Color color, const char *format, ...);
-		int drawStringf(float x, float y, const char *format, ...);
-		int drawStringf(Position pos, const char *format, ...);
-		float getCenteredPosX(int len);
-		sce::SampleUtil::Graphics::GraphicsContext *Graphics(void);
+		ssg::SpriteRenderer*           sprite;
+		ssg::Collada::ColladaLoader*   pLoader;
+		static bool                    useTitle;
+		static bool                    useTime;
+		static bool                    useBanner;
+		static bool                    multiLine;
+		static bool                    useScreenShot;
+		static bool                    useCursor;
+		bool                           start;
+		bool                           close;
+		static bool                    useVid;
+		static char                    *title;
+		static char                    *banner;
+		static char                    *videoPath;
+		static Position                titlePos;
+		static Position                timePos;
+		static Position                bannerPos;
+		static Color                   titleColor;
+		static Color                   timeColor;
+		static Color                   bannerColor;
+		static float                   titleSize;
+		static float                   timeSize;
+		static float                   bannerSize;
+		static ssi::Button             input;
+		std::vector<void (*)()>        drawFuncs;
+		std::vector<UserInfo*>         usersInfo;
+		
 		int userEventHandler(SceUserServiceEvent *event);
 		int onLogin(SceUserServiceUserId userId);
-		int onLogout(SceUserServiceUserId userId);
-		Position CenterForm(float x, float y);
-		void Play(void);
-
-	private:
-		std::vector<UserInfo*> usersInfo;
+		int onLogout(SceUserServiceUserId userId);		
+		void Play(void);		
 	};
 }

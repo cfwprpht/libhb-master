@@ -70,7 +70,7 @@
 static inline __attribute__((always_inline)) uint64_t cr0_read(void) {
 	uint64_t cr0;
 
-	__asm__ volatile (
+	asm volatile (
 		"movq %0, %%cr0"
 		: "=r" (cr0)
 		: : "memory"
@@ -80,22 +80,22 @@ static inline __attribute__((always_inline)) uint64_t cr0_read(void) {
 }
 
 static inline __attribute__((always_inline)) void cr0_write(uint64_t cr0) {
-	__asm__ volatile (
+	asm volatile (
 		"movq %%cr0, %0"
 		: : "r" (cr0)
 		: "memory"
 		);
 }
 
-static inline void wbinvd(void) { __asm__ volatile("wbinvd"); }
+static inline void wbinvd(void) { asm volatile("wbinvd"); }
 
-static inline void disable_interrupts(void) { __asm__ volatile("cli"); }
+static inline void disable_interrupts(void) { asm volatile("cli"); }
 
-static inline void enable_interrupts(void) { __asm__ volatile("sti"); }
+static inline void enable_interrupts(void) { asm volatile("sti"); }
 
 static inline uint64_t read_flags(void) {
 	uint64_t flags;
-	__asm__ volatile("pushf; pop %0;" : "=r" (flags));
+	asm volatile("pushf; pop %0;" : "=r" (flags));
 	return flags;
 }
 
@@ -107,7 +107,7 @@ static inline uint64_t intr_disable(void) {
 
 static inline void intr_restore(uint64_t flags) {
 	// TODO should only IF be or'd in?
-	__asm__ volatile("push %0; popf;" : : "rm" (flags) : "memory");
+	asm volatile("push %0; popf;" : : "rm" (flags) : "memory");
 }
 
 typedef int              vm_prot_t;
@@ -251,63 +251,63 @@ typedef struct ksym_t {
 	void        *kern_base;
 	uintptr_t   dmap_base;
 
-	void        *(*malloc)(unsigned long size, void *type, int flags);
-	void(*free)(void *addr, void *type);
-	void(*memcpy)(void *dst, const void *src, size_t len);
-	void        *(*memset)(void * ptr, int value, size_t num);
-	int(*memcmp)(const void * ptr1, const void * ptr2, size_t num);
-	int(*printf)(const char *fmt, ...);
-	int(*sprintf)(char *str, const	char *format, ...);
-	int(*snprintf)(char *str, size_t size, const char *format, ...);
-	int(*vprintf)(const char *format, va_list ap);
-	int(*vsnprintf)(char *str, size_t size, const char *format, va_list ap);
-	int(*copyin)(const void *uaddr, void *kaddr, size_t len);
-	int(*copyout)(const void *kaddr, void *uaddr, size_t len);
-	int(*copyinstr)(const void *uaddr, void *kaddr, size_t len, size_t *done);
-	int(*copystr)(const void *kfaddr, void *kdaddr, size_t len, size_t *done);
-	size_t(*strlen)(const char *str);
-	int(*kthread_add)(void(*func)(void *), void *arg, struct proc *procp, struct thread **newtdpp, int flags, int pages, const char *fmt, ...);
-	vm_offset_t(*kmem_alloc_contig)(vm_map_t map, vm_size_t size, int flags, vm_paddr_t low, vm_paddr_t high, unsigned long alignment, unsigned long boundary, vm_memattr_t memattr);
-	void(*kmem_free)(vm_map_t, vm_offset_t, vm_size_t);
-	vm_paddr_t(*pmap_extract)(pmap_t pmap, vm_offset_t va);
-	void(*pmap_protect)(pmap_t pmap, uint64_t sva, uint64_t eva, uint8_t pr);
-	int(*sys_sendto)(void *td, SendToArgs sargs);
-	int(*proc_rwmem)(struct proc *p, struct uio *uio);
-	void(*sx_init_flags)(struct sx *sx, const char *description, int opts);
-	void(*sx_xlock)(struct sx *sx);
-	void(*sx_xunlock)(struct sx *sx);
-	void(*sx_destroy)(struct sx *sx);
-	int(*fpu_kern_enter)(struct thread *td, void *ctx, unsigned int flags);
-	int(*fpu_kern_leave)(struct thread *td, void *ctx);
-	void(*sched_pin)(void);
-	void(*sched_unpin)(void);
-	void(*sched_switch)(struct thread *td, struct thread *newtd, int flags);
-	void(*sched_bind)(struct thread *td, int cpu);
-	int(*sflash_pread_for_vtrm)(void);                        // Incomplete
-	int(*sflash_pwrite_for_vtrm)(void);                       // Incomplete
-	int(*sflash_erase_for_vtrm)(uint64_t off);                // Incomplete
-	int(*sceSblVtrmRestore)();                                // Incomplete
-	void(*smp_rendezvous)(smp_rendezvous_callback_t, smp_rendezvous_callback_t, smp_rendezvous_callback_t, void *);
-	void(*smp_no_rendevous_barrier)(void *);  // yes...it is misspelled :)
-	int(*sceSblSsDecryptSealedKey)(void *encryptedSealedKey, void *decryptedSealedKey);
+	void *(*malloc)(unsigned long size, void *type, int flags);
+	void (*free)(void *addr, void *type);
+	void (*memcpy)(void *dst, const void *src, size_t len);
+	void *(*memset)(void * ptr, int value, size_t num);
+	int (*memcmp)(const void * ptr1, const void * ptr2, size_t num);
+	int (*printf)(const char *fmt, ...);
+	int (*sprintf)(char *str, const	char *format, ...);
+	int (*snprintf)(char *str, size_t size, const char *format, ...);
+	int (*vprintf)(const char *format, va_list ap);
+	int (*vsnprintf)(char *str, size_t size, const char *format, va_list ap);
+	int (*copyin)(const void *uaddr, void *kaddr, size_t len);
+	int (*copyout)(const void *kaddr, void *uaddr, size_t len);
+	int (*copyinstr)(const void *uaddr, void *kaddr, size_t len, size_t *done);
+	int (*copystr)(const void *kfaddr, void *kdaddr, size_t len, size_t *done);
+	size_t (*strlen)(const char *str);
+	int (*kthread_add)(void(*func)(void *), void *arg, struct proc *procp, struct thread **newtdpp, int flags, int pages, const char *fmt, ...);
+	vm_offset_t (*kmem_alloc_contig)(vm_map_t map, vm_size_t size, int flags, vm_paddr_t low, vm_paddr_t high, unsigned long alignment, unsigned long boundary, vm_memattr_t memattr);
+	void (*kmem_free)(vm_map_t, vm_offset_t, vm_size_t);
+	vm_paddr_t (*pmap_extract)(pmap_t pmap, vm_offset_t va);
+	void (*pmap_protect)(pmap_t pmap, uint64_t sva, uint64_t eva, uint8_t pr);
+	int (*sys_sendto)(void *td, SendToArgs sargs);
+	int (*proc_rwmem)(struct proc *p, struct uio *uio);
+	void (*sx_init_flags)(struct sx *sx, const char *description, int opts);
+	void (*sx_xlock)(struct sx *sx);
+	void (*sx_xunlock)(struct sx *sx);
+	void (*sx_destroy)(struct sx *sx);
+	int (*fpu_kern_enter)(struct thread *td, void *ctx, unsigned int flags);
+	int (*fpu_kern_leave)(struct thread *td, void *ctx);
+	void (*sched_pin)(void);
+	void (*sched_unpin)(void);
+	void (*sched_switch)(struct thread *td, struct thread *newtd, int flags);
+	void (*sched_bind)(struct thread *td, int cpu);
+	int (*sflash_pread_for_vtrm)(void);                        // Incomplete
+	int (*sflash_pwrite_for_vtrm)(void);                       // Incomplete
+	int (*sflash_erase_for_vtrm)(uint64_t off);                // Incomplete
+	int (*sceSblVtrmRestore)();                                // Incomplete
+	void (*smp_rendezvous)(smp_rendezvous_callback_t, smp_rendezvous_callback_t, smp_rendezvous_callback_t, void *);
+	void (*smp_no_rendevous_barrier)(void *);  // yes...it is misspelled :)
+	int (*sceSblSsDecryptSealedKey)(void *encryptedSealedKey, void *decryptedSealedKey);
 #ifdef FW_405
-	int(*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey);
+	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey);
 #elif defined FW_455
-	int(*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey);
+	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey);
 #elif defined FW_500 || FW_501 || FW_505
-	int(*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey, unsigned char *v3);
+	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey, unsigned char *v3);
 #endif
-	int(*sceSblSsGenerateSealedKey)(void *encryptedSealedKey);  // ?
-	int(*kernel_sysctl)(struct thread *td, int *name, u_int namelen, void *oldVal, size_t *oldlenp, void *newVal, size_t newlen, size_t *retval, int flags);
-	int(*kernel_sysctlbyname)(struct thread *td, char *name, void *oldVal, size_t *oldlenp, void *newVal, size_t newlen, size_t *retval, int flags);
-	int64_t(*icc_nvs_read)(size_t bank_id, size_t block_id, size_t offset, size_t size, uint8_t *data_ptr);
-	int(*icc_nvs_write)(size_t bank_id, size_t block_id, size_t offset, size_t size, uint8_t *data_ptr);
-	int(*gpu_devid_is_9924)();
-	void        *(*gc_get_fw_info)();
-	int(*sleepq_broadcast)(void *wchan, int flags, int pri, int queue);
-	void(*sleepq_lock)(void *wchan);
-	void(*sleepq_release)(void *wchan);
-	void(*sleepq_remove)(struct thread *td, void *wchan);
+	int (*sceSblSsGenerateSealedKey)(void *encryptedSealedKey);  // ?
+	int (*kernel_sysctl)(struct thread *td, int *name, u_int namelen, void *oldVal, size_t *oldlenp, void *newVal, size_t newlen, size_t *retval, int flags);
+	int (*kernel_sysctlbyname)(struct thread *td, char *name, void *oldVal, size_t *oldlenp, void *newVal, size_t newlen, size_t *retval, int flags);
+	int64_t (*icc_nvs_read)(size_t bank_id, size_t block_id, size_t offset, size_t size, uint8_t *data_ptr);
+	int (*icc_nvs_write)(size_t bank_id, size_t block_id, size_t offset, size_t size, uint8_t *data_ptr);
+	int (*gpu_devid_is_9924)();
+	void *(*gc_get_fw_info)();
+	int (*sleepq_broadcast)(void *wchan, int flags, int pri, int queue);
+	void (*sleepq_lock)(void *wchan);
+	void (*sleepq_release)(void *wchan);
+	void (*sleepq_remove)(struct thread *td, void *wchan);
 } KernSym;
 
 /* Global Accessor. */
@@ -317,7 +317,7 @@ extern KernSym lv2;
 static inline int curcpu(void) {
 	int cpuid;
 	// TODO ensure offsetof(struct pcpu, pc_cpuid) == 0x34 on all fw
-	__asm__ volatile ("mov %0, gs:0x34;" : "=r" (cpuid));
+	asm volatile ("mov %0, gs:0x34;" : "=r" (cpuid));
 	return cpuid;
 }
 

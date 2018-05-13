@@ -44,17 +44,6 @@ KernSym lv2;
 	//eprintf("Direct map base = %llx\n", lv2.dmap_base);
 }*/
 
-/* Get Kernel base address. */
-void lv2_getkernbase() {
-#ifdef FW_405
-	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x30EB30];
-#elif defined FW_455
-	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x3095D0];
-#elif defined FW_500 || FW_501 || FW_505
-	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[];
-#endif
-}
-
 /* Resolve some real Kernel functions. */
 void lv2_resolve() {
 #define r(name, offset) name = (void *)(lv2.kern_base + offset)
@@ -233,7 +222,13 @@ int lv2_patch_pmap_check(void) {
 /* Initialize lv2, map functions. */
 int lv2_init(void) {
 	// Resolve Kernel base.
-	lv2_getkernbase();
+#ifdef FW_405
+	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x30EB30];
+#elif defined FW_455
+	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x3095D0];
+#elif defined FW_500 || FW_501 || FW_505
+	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[];
+#endif
 
 	// Resolve Symbols.
 	lv2_resolve();

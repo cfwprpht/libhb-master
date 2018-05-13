@@ -74,6 +74,12 @@ void LibHomebrew::Console::SingleLine(const char *msg, ...) {
 	va_end(args);                                                     // Close the variable argument list.
 }
 
+// Add a Line Break.
+void LibHomebrew::Console::LineBreak(void) {
+	memset(singleCenterBuff, 0, sizeof(singleCenterBuff));
+	sprintf(singleCenterBuff, "\n");
+}
+
 // Clear a single, centered message.
 void LibHomebrew::Console::SingleLineClear(void) { memset(singleCenterBuff, 0, sizeof(singleCenterBuff)); }
 

@@ -73,3 +73,12 @@ Added definations:
  
 ## Update 10:
  Finished Application class.
+ 
+## Update 11:
+ Fixed missalign of the shader for the Banner.
+ Added Abbility to stop a video when running by pressing button X.
+ Added Functions drawRect() and fillRect() to the applications class. You can now draw from outside the Application code.
+ Wrote a 3 lines Button sample.
+ Added Functions AddDraw() and RemoveDraw() to the App class.
+ Added compilled samples for FW 4.55.
+ Added a LineBreak() function to the static console class.

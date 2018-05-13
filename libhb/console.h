@@ -32,6 +32,7 @@ namespace LibHomebrew {
 		static void WriteWarning(const char *msg, ...);
 		static void SingleLine(const char *msg, ...);
 		static void SingleLineClear(void);
+		static void LineBreak(void);
 		static void WriteColor(uint32_t color, const char *msg, ...);
 	};
 	class KConsole {
