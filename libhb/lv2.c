@@ -77,6 +77,7 @@ void lv2_resolve() {
 	//r(lv2.sflash_pwrite_for_vtrm, __sflash_pwrite_for_vtrm);
 	//r(lv2.sflash_erase_for_vtrm, __sflash_erase_for_vtrm);
 	r(lv2.sceSblSsDecryptSealedKey, __sceSblSsDecryptSealedKey);
+	r(lv2.getSealedKeySecret, __getSealedKeySecret);
 	r(lv2.kernel_pmap_store, __kernel_pmap_store);
 	r(lv2.kmem_alloc_contig, __kmem_alloc_contig);
 	r(lv2.kmem_free, __kmem_free);

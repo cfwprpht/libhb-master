@@ -59,12 +59,6 @@
     <ClCompile Include="lv2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="kconsole.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="x86-64.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -128,12 +122,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="kconsole.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="x86-64.h">

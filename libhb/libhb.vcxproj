@@ -38,6 +38,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\common\include</AdditionalIncludeDirectories>
+      <CppExceptions>false</CppExceptions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>-lSceUserService_stub_weak;-lSceSystemService_stub_weak</AdditionalDependencies>
@@ -72,9 +73,6 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
     <ClCompile Include="application.cpp" />
     <ClCompile Include="console.cpp" />
     <ClCompile Include="file_info.cpp" />
-    <ClCompile Include="kconsole.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
-    </ClCompile>
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="lv2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
@@ -88,9 +86,6 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
     <ClCompile Include="swiss_knife.cpp" />
     <ClCompile Include="syscall.cpp" />
     <ClCompile Include="syscalls.cpp" />
-    <ClCompile Include="test.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
-    </ClCompile>
     <ClCompile Include="tty.cpp" />
     <ClCompile Include="unjail.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
@@ -115,7 +110,6 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
     <ClInclude Include="elf_common.h" />
     <ClInclude Include="file_info.h" />
     <ClInclude Include="fw.h" />
-    <ClInclude Include="kconsole.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="lv2.h" />
     <ClInclude Include="magics.h" />
@@ -128,7 +122,6 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
     <ClInclude Include="swiss_knife.h" />
     <ClInclude Include="syscall.h" />
     <ClInclude Include="syscalls.h" />
-    <ClInclude Include="test.h" />
     <ClInclude Include="tty.h" />
     <ClInclude Include="unjail.h" />
     <ClInclude Include="x86-64.h" />

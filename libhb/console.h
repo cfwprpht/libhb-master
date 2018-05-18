@@ -22,6 +22,10 @@
 
 namespace LibHomebrew {
 	class Console {
+	private:
+		// A Thread to run in background, which will be used to run the Reader Function in it.
+		static ScePthread   reader;
+
 	public:
 		static char singleCenterBuff[128];
 
@@ -34,15 +38,7 @@ namespace LibHomebrew {
 		static void SingleLineClear(void);
 		static void LineBreak(void);
 		static void WriteColor(uint32_t color, const char *msg, ...);
-	};
-	class KConsole {
-	private:
-		// A Thread to run in background, which will be used to run the Reader Function in it.
-		ScePthread   reader;
-
-	public:
-		KConsole();
-		~KConsole();
-		void Close(void);
+		static void KConsoleOn(void);
+		static void KConsoleOff(void);
 	};
 }

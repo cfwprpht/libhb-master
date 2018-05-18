@@ -33,6 +33,7 @@ namespace LibHomebrew {
 			static size_t ArraySize(char *array);
 			static String ToHexString(void *bytes, int len);
 			static String ToHexString(byte *bytes, int len);
+			static void Hexify(String *data);
 			static byte *ToBytes(const char *hexString);
 			static uint8_t hexCharToUint(char ch);
 			static void hexStrToBin(const char *pHexStr, uint8_t *pBinBuf, size_t binBufSize);

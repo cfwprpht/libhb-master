@@ -60,6 +60,26 @@ String LibHomebrew::Loot::SwissKnife::ToHexString(byte *data, int len) {
 	return str;
 }
 
+// Hexify a Hex String. Add 0x to every two hex values.
+void LibHomebrew::Loot::SwissKnife::Hexify(String *data) {
+	// Work string.
+	String hexifyed;
+
+	// The Hex delimeter.
+	String hex = "0x";
+
+	// Now loop over the string and generate a new hexifeyed one.
+	for (int i = 0; i < data->size(); i += 2) {
+		hexifyed += hex;
+		hexifyed += data[i];
+		hexifyed += data[i + 1];
+		if ((i + 2) != data->size()) hexifyed += " ";
+	}
+
+	// Overwrite the string with the result now.
+	*data = hexifyed;
+}
+
 /* Convert a hex string to byte array. */
 byte *LibHomebrew::Loot::SwissKnife::ToBytes(const char *hexString) {
 	String toByte(hexString);
@@ -272,7 +292,10 @@ String LibHomebrew::Loot::SwissKnife::GetUsb(void) {
 		FILE *check = fopen("/mnt/usb0/ghse7ihbredguwezs.txt", "wb");
 		if (check) {
 			fclose(check);
-			if (verbose) Console::WriteLine("got usb0.\n");
+			if (verbose) {
+				Console::WriteLine("got usb0.\n");
+				Console::LineBreak();
+			}
 			Sys::unlink("/mnt/usb0/ghse7ihbredguwezs.txt");
 			usb_path = String("/mnt/usb0/");
 			break;

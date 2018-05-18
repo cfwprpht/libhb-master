@@ -20,15 +20,11 @@
 #include <_types.h>
 
 // Including the pure C kernel console source header.
-extern "C" {
-#include "kconsole.h"
-}
+/*extern "C" {
+#include "../kern_console_sample/kern_console_sample/kern_con_sample.h"
+}*/
 
-// Kernel Console Userland Buffer. It's set up here to ensure it's really a userland buffer.
-static char kcon_usrld_buffer[264];
-static char kcon_usrld_error_buffer[264];
-static char kcon_usrld_warning_buffer[264];
-
+ScePthread LibHomebrew::Console::reader;
 char LibHomebrew::Console::singleCenterBuff[128];
 
 // Thread flags.
@@ -65,23 +61,12 @@ void LibHomebrew::Console::WriteWarning(const char *msg, ...) {
 	va_end(args);                                             // Close the variable argument list.
 }
 
-// Write a single, centered message to the screen.
-void LibHomebrew::Console::SingleLine(const char *msg, ...) {
-	va_list args;                                                     // Initialize a variable list.
-	va_start(args, msg);                                              // Get the args into a type specific list.
-	memset(singleCenterBuff, 0, sizeof(singleCenterBuff));
-	vsnprintf(singleCenterBuff, sizeof(singleCenterBuff), msg, args); // Format the string.
-	va_end(args);                                                     // Close the variable argument list.
-}
-
 // Add a Line Break.
 void LibHomebrew::Console::LineBreak(void) {
-	memset(singleCenterBuff, 0, sizeof(singleCenterBuff));
-	sprintf(singleCenterBuff, "\n");
+	char buf[3];                                              // Initialize a buffer.
+	sprintf(buf, "%s", "\n");                                 // Add the Linebreak.
+	TTY::onScreenPrintf(buf);                                 // Push buffer to tty.
 }
-
-// Clear a single, centered message.
-void LibHomebrew::Console::SingleLineClear(void) { memset(singleCenterBuff, 0, sizeof(singleCenterBuff)); }
 
 // Write a Line with your own color.
 void LibHomebrew::Console::WriteColor(uint32_t color, const char *msg, ...) {
@@ -93,24 +78,52 @@ void LibHomebrew::Console::WriteColor(uint32_t color, const char *msg, ...) {
 	va_end(args);                                             // Close the variable argument list.
 }
 
+// Write a single, centered message to the screen.
+void LibHomebrew::Console::SingleLine(const char *msg, ...) {
+	va_list args;                                                     // Initialize a variable list.
+	va_start(args, msg);                                              // Get the args into a type specific list.
+	memset(singleCenterBuff, 0, sizeof(singleCenterBuff));
+	vsnprintf(singleCenterBuff, sizeof(singleCenterBuff), msg, args); // Format the string.
+	va_end(args);                                                     // Close the variable argument list.
+}
+
+// Clear a single, centered message.
+void LibHomebrew::Console::SingleLineClear(void) { memset(singleCenterBuff, 0, sizeof(singleCenterBuff)); }
+
 // The actual Reader function. Checks the C char buffer from kconsole source for data and writes it out to the userland console.
-void *Reader(void *) {
+/*void *Reader(void *) {
 	LibHomebrew::Console::WriteLine("Hello from the Reader Thread !\n");
+
+	// Set up Buffers and clear them.
+	char msg[264];
+	char errmsg[264];
+	char warnmsg[264];
+	memset(&msg, 0, sizeof(msg));
+	memset(&errmsg, 0, sizeof(errmsg));
+	memset(&warnmsg, 0, sizeof(warnmsg));
+
+	// Loop over the buffers.
 	while (!stopThread) {
-		if (strlen(kcon_usrld_buffer) > 0) {
+		if (isMsgPresent() > 0) {
 			LibHomebrew::Console::WriteLine("Got message.\n");
-			LibHomebrew::Console::WriteLine(kcon_usrld_buffer);
-			memset(kcon_usrld_buffer, 0, sizeof(kcon_usrld_buffer));
+			getMsg(msg);
+			LibHomebrew::Console::WriteLine(msg);
+			LibHomebrew::Console::LineBreak();
+			memset(&msg, 0, sizeof(msg));
 		}
-		if (strlen(kcon_usrld_error_buffer) > 0) {
+		if (isErrorMsgPresent() > 0) {
 			LibHomebrew::Console::WriteLine("Got error.\n");
-			LibHomebrew::Console::WriteError(kcon_usrld_error_buffer);
-			memset(kcon_usrld_error_buffer, 0, sizeof(kcon_usrld_error_buffer));
+			getErrorMsg(errmsg);
+			LibHomebrew::Console::WriteError(errmsg);
+			LibHomebrew::Console::LineBreak();
+			memset(&errmsg, 0, sizeof(errmsg));
 		}
-		if (strlen(kcon_usrld_warning_buffer) > 0) {
+		if (isWarningMsgPresent() > 0) {
 			LibHomebrew::Console::WriteLine("Got warning.\n");
-			LibHomebrew::Console::WriteWarning(kcon_usrld_warning_buffer);
-			memset(kcon_usrld_warning_buffer, 0, sizeof(kcon_usrld_warning_buffer));
+			getWarningMsg(warnmsg);
+			LibHomebrew::Console::WriteWarning(warnmsg);
+			LibHomebrew::Console::LineBreak();
+			memset(&warnmsg, 0, sizeof(warnmsg));
 		}
 	}
 	isRunning = false;
@@ -119,17 +132,7 @@ void *Reader(void *) {
 }
 
 // Instance Initializer.
-LibHomebrew::KConsole::KConsole() { 
-	// Clear Buffer.
-	memset(kcon_usrld_buffer, 0, sizeof(kcon_usrld_buffer));
-	memset(kcon_usrld_error_buffer, 0, sizeof(kcon_usrld_error_buffer));
-	memset(kcon_usrld_warning_buffer, 0, sizeof(kcon_usrld_warning_buffer));
-	
-	// Point the Kernel Console Buffer, which we use to write into userland, to our userland one.
-	kcon_buffer         = kcon_usrld_buffer;
-	kcon_error_buffer   = kcon_usrld_error_buffer;
-	kcon_warning_buffer = kcon_usrld_warning_buffer;
-
+void LibHomebrew::Console::KConsoleOn(void) {
 	// Setup The Reader Thread.
 	if (scePthreadCreate(&reader, NULL, Reader, NULL, "KConsoleReader") != SCE_OK) {
 		Console::WriteError("Couldn't start KConsole Reader Thread.\n");
@@ -142,12 +145,9 @@ LibHomebrew::KConsole::KConsole() {
 }
 
 // Instance Deinitializer.
-LibHomebrew::KConsole::~KConsole() { 
-	LibHomebrew::Console::WriteLine("Stopping Reader Thread.\n");
+void LibHomebrew::Console::KConsoleOff(void) { 
+	Console::WriteLine("Stopping Reader Thread.\n");
 	if (isRunning) stopThread = true;
-	while (isRunning) { /* Nothing to do here, just wait for the Thread to be exited cracefully. */ }
-	for (int i = 0; i < 50; i++) { /* Give the Thread function some milli secs to return. */ }
-}
-
-// Closing the Instance.
-void LibHomebrew::KConsole::Close(void) { this->~KConsole(); }
+	while (isRunning) { /* Nothing to do here, just wait for the Thread to be exited cracefully.  }
+	for (int i = 0; i < 50; i++) { /* Give the Thread function some milli secs to return.  }
+}*/

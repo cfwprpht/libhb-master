@@ -17,6 +17,8 @@ PS4 LibHomebrew
  where also crapped from the Net. The File System Dumper i ported to use LibHomebrew is the one from wildcard.
  For sure also Credits goes out to flatz, querty and xerpi. For fpkg, fself, webkit exploit, kernel exploit,.....
  Oh and not to forget The DarkProgrammer for testing and pointing me onto bugs.
+ SpecterDev for his syscall 11 implementation. Various devs i don't know the name now and which where included into the unjail and system whide patches.
+ 
 
 
 ## Updates:
@@ -82,3 +84,9 @@ Added definations:
  Added Functions AddDraw() and RemoveDraw() to the App class.
  Added compilled samples for FW 4.55.
  Added a LineBreak() function to the static console class.
+ 
+## Update 12:
+ Fixed Console::LineBreak().
+ Added a sample "SaveDataMasterKeyDumper" on how to use libHB with your own kernel function.
+ Moved the pkgs and the samples into the libhb-master.rar archive. Can be downloaded on the releases button.
+ Will look into the FileSystem Dumper and fix it as next.
