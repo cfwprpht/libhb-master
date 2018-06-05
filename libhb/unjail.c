@@ -95,16 +95,16 @@ void *unjail455(struct thread *td) {
 
 // Unjail 500
 void *unjail500(struct thread *td) {
-	/*struct ucred* cred;
+	struct ucred* cred;
 	struct filedesc* fd;
 
 	fd = td->td_proc->p_fd;
 	cred = td->td_proc->p_ucred;
 
-	void* kernel_base = &((uint8_t*)__readmsr(0xC0000082))[-0x3095D0];
+	void* kernel_base = &((uint8_t*)__readmsr(0xC0000082))[0x1C0];
 	uint8_t* kernel_ptr = (uint8_t*)kernel_base;
-	void** got_prison0 = (void**)&kernel_ptr[0x10399B0];
-	void** got_rootvnode = (void**)&kernel_ptr[0x21AFA30];
+	void** got_prison0 = (void**)&kernel_ptr[0x10986A0];
+	void** got_rootvnode = (void**)&kernel_ptr[0x22C19F0];
 
 	cred->cr_uid = 0;
 	cred->cr_ruid = 0;
@@ -133,7 +133,7 @@ void *unjail500(struct thread *td) {
 
 // Unjail 505
 void *unjail505(struct thread *td) {
-	/*struct ucred* cred;
+	struct ucred* cred;
 	struct filedesc* fd;
 
 	fd = td->td_proc->p_fd;
