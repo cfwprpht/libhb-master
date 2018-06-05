@@ -30,3 +30,6 @@ void *unjail455(struct thread *td);
 
 // Unjail patches for FW 5.XX.
 void *unjail500(struct thread *td);
+
+//unjail patches for FW 5.05.
+void *unjail505(struct thread *td);
