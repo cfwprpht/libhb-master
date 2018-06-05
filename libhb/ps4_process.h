@@ -29,6 +29,8 @@ namespace LibHomebrew {
 			static int Kexec(void *buffer);
 			static int Freedom405(void);
 			static int Freedom455(void);
+			static int Freedom500(void);
+			static int Freedom505(void);
 			static void Reboot(void);
 			static void Verbose(bool state);
 		};
