@@ -352,6 +352,7 @@
 
 #elif defined FW_500 || FW_501 || FW_505
 
+#define __Xfast_syscall                                 0x1C0
 #define __printf                                        0x435C70
 #define __copyin                                        0x1EA600
 #define __copyout                                       0x1EA520
