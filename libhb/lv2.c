@@ -228,9 +228,9 @@ int lv2_init(void) {
 #elif defined FW_455
 	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x3095D0];
 #elif defined FW_500 || FW_501
-	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x1C0];
+	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x00001C0];
 #elif defined FW_505
-	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x1C0];
+	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x00001C0];
 #endif
 
 	// Resolve Symbols.
