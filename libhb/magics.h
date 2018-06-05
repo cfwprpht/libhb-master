@@ -420,7 +420,7 @@
 #define __strtol                                        0x218760
 #define __disable_console_output                        0x19ECEB0
 #define __prison0                                       0x10986A0                         
-#define __rootvnode                                     0x
+#define __rootvnode                                     0x22C19F0 // 5.01 rootvnode // 0x22c1a70 5.05 - RootVNode
 #define __pml4pml4i                                     0x22CB4E0
 #define __dmpml4i                                       0x22CB4E4
 #define __dmpdpi                                        0x22CB4E8
