@@ -294,7 +294,9 @@ typedef struct ksym_t {
 	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey);
 #elif defined FW_455
 	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey);
-#elif defined FW_500 || FW_501 || FW_505
+#elif defined FW_500 || FW_501
+	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey, unsigned char *v3);
+#elif defined FW_505
 	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey, unsigned char *v3);
 #endif
 	int (*sceSblSsGenerateSealedKey)(void *encryptedSealedKey);  // ?
