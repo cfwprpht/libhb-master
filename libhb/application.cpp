@@ -277,8 +277,10 @@ int LibHomebrew::Application::initialize(void) {
 	if (uid != 0) Proc::Freedom405();
 #elif defined FW_455
 	if (uid != 0) Proc::Freedom455();
-#elif defined FW_500 || FW_501 || FW_505
+#elif defined FW_500 || FW_501
 	if (uid != 0) Proc::Freedom500();
+#elif defined FW_505
+	if (uid != 0) Proc::Freedom505();
 #endif
 	// Resolve Current Directory.
 
