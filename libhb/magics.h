@@ -19,79 +19,80 @@
 
 #ifdef FW_355
 
-#define __printf 0x1df550
-#define __copyin 0x3b96e0
-#define __copyout 0x3b9660
-#define __copyinstr 0x3b9a50
-#define __kmem_alloc_contig 0x337ea0
-#define __kmem_free 0x33bca0
-#define __pmap_extract 0x3afd70
-#define __pmap_protect 0x3b1f50
-#define __sched_pin 0x1ced60
-#define __sched_unpin 0x1cedc0
-#define __smp_rendezvous 0x1e7810
-#define __smp_no_rendevous_barrier 0x1e75d0
-#define __icc_query_nowait 0x3ed450
-#define __kernel_map 0x196acc8
-#define __sysent 0xeed880
-#define __kernel_pmap_store 0x19bd628
-#define __Starsha_UcodeInfo 0x1869fa0
+#define __printf                                        0x1df550
+#define __copyin                                        0x3b96e0
+#define __copyout                                       0x3b9660
+#define __copyinstr                                     0x3b9a50
+#define __kmem_alloc_contig                             0x337ea0
+#define __kmem_free                                     0x33bca0
+#define __pmap_extract                                  0x3afd70
+#define __pmap_protect                                  0x3b1f50
+#define __sched_pin                                     0x1ced60
+#define __sched_unpin                                   0x1cedc0
+#define __smp_rendezvous                                0x1e7810
+#define __smp_no_rendevous_barrier                      0x1e75d0
+#define __icc_query_nowait                              0x3ed450
+#define __kernel_map                                    0x196acc8
+#define __sysent                                        0xeed880
+#define __kernel_pmap_store                             0x19bd628
+#define __Starsha_UcodeInfo                             0x1869fa0
 
-#define __pml4pml4i 0x19bd618
-#define __dmpml4i 0x19bd61c
-#define __dmpdpi 0x19bd620
+#define __pml4pml4i                                     0x19bd618
+#define __dmpml4i                                       0x19bd61c
+#define __dmpdpi                                        0x19bd620
 
 #elif defined FW_370
 
-#define __printf 0x1df620
-#define __copyin 0x3b97d0
-#define __copyout 0x3b9750
-#define __copyinstr 0x3b9b40
-#define __kmem_alloc_contig 0x337f70
-#define __kmem_free 0x33bd70
-#define __pmap_extract 0x3afe60
-#define __pmap_protect 0x3b2040
-#define __sched_pin 0x1cee30
-#define __sched_unpin 0x1cee90
-#define __smp_rendezvous 0x1e78e0
-#define __smp_no_rendevous_barrier 0x1e76a0
-#define __icc_query_nowait 0x3ed7f0
-#define __kernel_map 0x1976cc8
-#define __sysent 0xef6d90
-#define __kernel_pmap_store 0x19c9628
-#define __Starsha_UcodeInfo 0
-#define __gpu_devid_is_9924 0x443a20
-#define __gc_get_fw_info 0x44b5a0
+#define __printf                                        0x1df620
+#define __copyin                                        0x3b97d0
+#define __copyout                                       0x3b9750
+#define __copyinstr                                     0x3b9b40
+#define __kmem_alloc_contig                             0x337f70
+#define __kmem_free                                     0x33bd70
+#define __pmap_extract                                  0x3afe60
+#define __pmap_protect                                  0x3b2040
+#define __sched_pin                                     0x1cee30
+#define __sched_unpin                                   0x1cee90
+#define __smp_rendezvous                                0x1e78e0
+#define __smp_no_rendevous_barrier                      0x1e76a0
+#define __icc_query_nowait                              0x3ed7f0
+#define __kernel_map                                    0x1976cc8
+#define __sysent                                        0xef6d90
+#define __kernel_pmap_store                             0x19c9628
+#define __Starsha_UcodeInfo                             0
+#define __gpu_devid_is_9924                             0x443a20
+#define __gc_get_fw_info                                0x44b5a0
 
-#define __pml4pml4i 0x19c9618
-#define __dmpml4i 0x19c961c
-#define __dmpdpi 0x19c9620
+#define __pml4pml4i                                     0x19c9618
+#define __dmpml4i                                       0x19c961c
+#define __dmpdpi                                        0x19c9620
 
 #elif defined FW_400 || FW_401
 
-#define __printf 0x347450
-#define __copyin 0x286cc0
-#define __copyout 0x286c40
-#define __copyinstr 0x287030
-#define __kmem_alloc_contig 0x275da0
-#define __kmem_free 0x369580
-#define __pmap_extract 0x3eeed0
-#define __pmap_protect 0x3f1120
-#define __sched_pin 0x1d1120
-#define __sched_unpin 0x1d1180
-#define __smp_rendezvous 0x34a020
-#define __smp_no_rendevous_barrier 0x349de0
-#define __icc_query_nowait 0x46c5a0
-#define __kernel_map 0x1fe71b8
-#define __sysent 0xf17790
-#define __kernel_pmap_store 0x200c310
-#define __Starsha_UcodeInfo 0x18dafb0
+#define __printf                                        0x347450
+#define __copyin                                        0x286cc0
+#define __copyout                                       0x286c40
+#define __copyinstr                                     0x287030
+#define __kmem_alloc_contig                             0x275da0
+#define __kmem_free                                     0x369580
+#define __pmap_extract                                  0x3eeed0
+#define __pmap_protect                                  0x3f1120
+#define __sched_pin                                     0x1d1120
+#define __sched_unpin                                   0x1d1180
+#define __smp_rendezvous                                0x34a020
+#define __smp_no_rendevous_barrier                      0x349de0
+#define __icc_query_nowait                              0x46c5a0
+#define __kernel_map                                    0x1fe71b8
+#define __sysent                                        0xf17790
+#define __kernel_pmap_store                             0x200c310
+#define __Starsha_UcodeInfo                             0x18dafb0
 
-#define __pml4pml4i 0x200c300
-#define __dmpml4i 0x200c304
-#define __dmpdpi 0x200c308
+#define __pml4pml4i                                     0x200c300
+#define __dmpml4i                                       0x200c304
+#define __dmpdpi                                        0x200c308
 
 #elif defined FW_405
+<<<<<<< HEAD
 #define __Xfast_syscall				     		        0x30EB30
 #define __aslr_initialize_process_status                0x212660
 #define __aslr_gen_pseudo_random_number                 0x212750
@@ -108,9 +109,15 @@
 #define __eap_internal_key                              0x23DC000
 #define __copyin					     			    0x286DF0
 #define __copyout					     			    0x286D70
+=======
+#define __Xfast_syscall				     		                  0x30EB30
+#define __copyin					     			                    0x286DF0
+#define __copyout					     			                    0x286D70
+>>>>>>> origin/master
 #define __copyinstr                                     0x287160
+#define	__UART_ENABLE 	                                0x186b0a0
 #define __copystr                                       0x2871F0
-#define __printf			     					    0x347580
+#define __printf			     					                    0x347580
 #define __device_printf                                 0x3FADB0
 #define __vprintf                                       0x3475F0
 #define __sprintf                                       0x347790
@@ -120,6 +127,7 @@
 #define __kvprintf                                      0x347A00
 #define __cnputc                                        0x14D20
 #define __cnputs                                        0x15190
+<<<<<<< HEAD
 #define __strlen     								    0x1D3640
 #define __strlcpy                                       0x1934E0
 #define __strdup                                        0x21640
@@ -174,6 +182,15 @@
 #define __memcmp	     						        0x29CD10
 #define __memmove                                       0x339440
 #define __kmem_alloc     						        0x369500
+=======
+#define __strlen     								                    0x1D3640
+#define __malloc     								                    0x1D1700
+#define __free	     								                    0x1D18D0
+#define __memcpy	     						                      0x286CF0
+#define __memset	     							                    0x1ECB10
+#define __memcmp	     						                      0x29CD10
+#define __kmem_alloc     						                    0x369500
+>>>>>>> origin/master
 #define __kmem_free                                     0x3696b0
 #define __kmem_alloc_contig                             0x275ed0
 #define __pmap_extract                                  0x3ef000
@@ -186,6 +203,7 @@
 #define ___sleep                                        0x8A2E0
 #define __smp_rendezvous                                0x34a150
 #define __smp_no_rendevous_barrier                      0x349f10
+<<<<<<< HEAD
 #define __kthread_add					     		    0x1C9890
 #define __sx_init_flags					     		    0x27AAF0
 #define __sx_xlock						     		    0x27AC20
@@ -216,6 +234,31 @@
 #define __wakeup 	     							    0x8A7C0
 #define __mi_switch 						     	    0x8A840
 #define __eventlog_write_crash			     		    0x259180
+=======
+#define __kernel_pmap_store                             0x200c310
+#define __kthread_add					     		                  0x1C9890
+#define __sx_init_flags					     		                0x27AAF0
+#define __sx_xlock						     		                  0x27AC20
+#define __sx_xunlock					     		                  0x27ADB0
+#define __sx_destroy                                    0x27AB60
+#define __fpu_kern_enter		     				                0x39A120
+#define __fpu_kern_leave		     				                0x39A220
+#define __vm_map_lock_read		     				              0x43DF10
+#define __vm_map_lookup_entry	     				              0x43E470
+#define __vm_map_unlock_read	     				              0x43DF60
+#define __vmspace_free			     			                  0x43DB70
+#define __vmspace_acquire_ref     				              0x43DD40
+#define __proc_rwmem		     					                  0x0ABBB0
+#define __bzero			     						                    0x286C30
+#define __pagezero 		     						                  0x286C50
+#define __bcmp			     						                    0x286C80
+#define __bcopy			     						                    0x286CA0
+#define __casuword32	     				                      0x286E70
+#define __kick_proc0      					                    0x2168E0
+#define __wakeup 	     							                    0x8A7C0
+#define __mi_switch 						     	                  0x8A840
+#define __eventlog_write_crash			     		            0x259180
+>>>>>>> origin/master
 #define __metadbg_perform_dump_on_panic                 0x71BAE0
 #define __savectx                                       0x90B40
 #define __savectx2                                      0x90BD0
@@ -379,6 +422,7 @@
 #define __pfs_create_file                               0x1D9A50
 #define __pfs_create_link                               0x1D9B60
 #define __pfs_find_node                                 0x1D9D00
+<<<<<<< HEAD
 #define __pfs_fileno_alloc                              0x548E0
 #define __dump_pfs                                      0x65FFC2
 #define __dump_sign                                     0x660120
@@ -395,6 +439,11 @@
 #define __sceSblPfsSetKey			     			    0x600640
 #define __sceSblPfsClearKey		     				    0x6007C0
 #define __sceSblKeymgrClearKey                          0x5FEE10
+=======
+#define __sceSblPfsKeymgrGenEKpfsForGDGPAC     		      0x5FFE80
+#define __sceSblPfsSetKey			     			                0x600640
+#define __sceSblPfsClearKey		     				              0x6007C0
+>>>>>>> origin/master
 #define __sceSblACMgrIsAllowedSystemLevelDebugging      0x360570
 #define __sceSblACMgrIsSystemUcred                      0x35FE10
 #define __sceSblACMgrIsSyscoreProcess                   0x35FF80
@@ -422,17 +471,18 @@
 #define __sceSblAuthMgrSmSpawn                          0x606E00
 #define __sceSblServiceSpawn                            0x607140
 #define ___sceSblAuthMgrSmVerifyPupExpiration           0x606F40
-#define __sceSblAuthMgrIsLoadable2	     			    0x614A80
-#define __sceSblAuthMgrVerifyHeader	     		        0x614AE0
-#define __sceSblAuthMgrGetSelfInfo     			 	    0x615360
-#define __sceSblAuthMgrSmStart     				  	    0x6153F0
-#define __sceSblKeymgrSmCallfunc	     			    0x5FF500
-#define __sceSblServiceMailbox	     				    0x606F40
-#define __sceSblServiceCrypt     					    0x5F7820
-#define __sceSblServiceCryptAsync				        0x5F79B0
+#define __sceSblAuthMgrIsLoadable2	     			          0x614A80
+#define __sceSblAuthMgrVerifyHeader	     		            0x614AE0
+#define __sceSblAuthMgrGetSelfInfo     			 	          0x615360
+#define __sceSblAuthMgrSmStart     				  	          0x6153F0
+#define __sceSblKeymgrSmCallfunc	     			            0x5FF500
+#define __sceSblServiceMailbox	     				            0x606F40
+#define __sceSblServiceCrypt     					              0x5F7820
+#define __sceSblServiceCryptAsync				                0x5F79B0
 #define __sceSblSsGenerateSealedKey                     0x5FB4D0
 #define __getSealedKeySecret                            0x5FB630
 #define __sceSblSsDecryptSealedKey                      0x5FB800
+<<<<<<< HEAD
 #define __sceSblSsMemcmpConsttime                       0x600EB0
 #define __sceSblSsMemset                                0x600F10
 #define __sceSblVtrmBackup 				                0x61AD9E
@@ -586,12 +636,48 @@
 #define __Fips186Prng 				                    0x183F40
 #define __RsaesPkcs1v15Enc2048		     			    0x44C1C0
 #define __RsaesPkcs1v15Dec2048CRT     				    0x1E82A0
+=======
+#define __sceSblSsMemcmpConsttime                       0x600F10
+#define __sceSblVtrmRestore 				                    0x61ADE0
+#define __sceSblVtrmBackup 				                      0x61AD9E
+#define __SceDaAtcev                                    0x37BDC0
+#define __SceHidAuth                                    0x5D3330
+#define __SceSflash           		     		              0x4B090
+#define __sflash_pwrite_for_vtrm 	     			            0x4B380
+#define __sflash_pread_for_vtrm  		     		            0x4B3F0
+#define __sflash_erase_for_vtrm                         0x4B520
+#define __VtrmUtilLockInitialize 	     			            0x6182E0
+#define __VtrmUtilLockFinialize 	     			            0x618300
+#define __vtrm_pread				                            0x6181E0
+#define __vtrm_pwrite 				                          0x618209
+#define __genNewActDat			     				                0x61E9F0
+#define __AesCbcCfb128Encrypt	     		 		              0x19D650
+#define __AesCbcCfb128Decrypt	     		 	 	              0x19D880
+#define __AesEncKeySet 		     			                    0x463950
+#define __AesDecKeySet 		     			                    0x464050
+#define __AesEncrypt  		     			                    0x4640A0
+#define __AesDecrypt  		     			                    0x4640E0
+#define __Sha256HmacFinal	     			                    0x3367B0
+#define __Sha256Hash     	     			                    0x3368E0
+#define __Sha256Hmac      	     			                  0x3369B0
+#define __Sha256OneBlk   	     			                    0x333810
+#define __Sha256FinalCore 	     			                  0x336300
+#define __Sha256Init     	     			                    0x3364C0
+#define __Sha256Transform	     			                    0x336510
+#define __Sha256Final          				                  0x336670
+#define __Sha256HmacInit       				                  0x3366C0
+#define __sceSblRngGetRandomNumber				              0x61B690
+#define __Fips186Prng 				                          0x183F40
+#define __RsaesPkcs1v15Enc2048		     			            0x44C1C0
+#define __RsaesPkcs1v15Dec2048CRT     				          0x1E82A0
+>>>>>>> origin/master
 #define __Starsha_UcodeInfo                             0
 #define __gpu_devid_is_9924                             0x4b9030
 #define __gc_get_fw_info                                0x4a19a0
 #define __pml4pml4i                                     0x200c300
 #define __dmpml4i                                       0x200c304
 #define __dmpdpi                                        0x200c308
+<<<<<<< HEAD
 #define __sysent		     				            0xF17790
 #define __allproc	     					            0x1FE3498
 #define __prison0						                0xF26010
@@ -602,6 +688,18 @@
 #define __fpu_kern_ctx					                0x235C6C0
 #define __mini_syscore_self_binary 		                0x136B3E8
 #define __sbl_driver_mapped_pages  		                0x234ED68
+=======
+#define __sysent		     				                        0xF17790
+#define __allproc	     					                        0x1FE3498
+#define __disable_console_output		                    0x186B0A0
+#define __prison0						                            0xF26010
+#define __kernel_map					                          0x1FE71B8
+#define __rootvnode					     	                      0x206D250
+#define __M_TEMP				     		                        0x134B730
+#define __fpu_kern_ctx					                        0x235C6C0
+#define __mini_syscore_self_binary 		                  0x136B3E8
+#define __sbl_driver_mapped_pages  		                  0x234ED68
+>>>>>>> origin/master
 #define __sbl_keymgr_key_rbtree	                        0x2370058
 #define __gs_is_update_bio_ioprio                       0x6A8090
 
@@ -692,6 +790,7 @@
 #define __delete_unrhdr                                 0x0
 #define __sceSblSrtcSetTime                             0x0
 
+<<<<<<< HEAD
 #elif defined FW_455
 #define __Xfast_syscall				     		        0x3095D0
 #define __aslr_initialize_process_status                0x2E67A0
@@ -707,10 +806,49 @@
 #define __bootparam_is_main_on_standby                  0x430590
 #define __bootparam_get_eap_part_key                    0x6337D0
 #define __eap_internal_key                              0x258CCD0
+=======
+#define __Xfast_syscall				     		                  0x3095D0
+>>>>>>> origin/master
 #define __printf                                        0x17F30
 #define __copyin                                        0x14A890
 #define __copyout                                       0x14A7B0
 #define __copyinstr                                     0x14AD00
+<<<<<<< HEAD
+=======
+#define	__UART_ENABLE 	                                0x1997BC8
+
+#define __copystr                                       0x2871F0
+#define __strlen     								                    0x1D3640
+#define __vprintf                                       0x3475F0
+#define __sprintf                                       0x347790
+#define __snprintf                                      0x347860
+#define __vsnprintf                                     0x347900
+#define __vsnrprintf                                    0x347990
+#define __sx_init_flags					     		                0x27AAF0
+#define __sx_xlock						     		                  0x27AC20
+#define __sx_xunlock					     		                  0x27ADB0
+#define __sx_destroy                                    0x27AB60
+#define __malloc     								                    0x1D1700
+#define __free	     								                    0x1D18D0
+#define __memcpy	     						                      0x286CF0
+#define __memset	     							                    0x1ECB10
+#define __memcmp	     						                      0x29CD10
+#define __sleepq_broadcast                              0x15FB70
+#define __sleepq_remove                                 0x15FC30
+#define __sleepq_release                                0x15ED50
+#define __sleepq_lock                                   0x15ECD0
+#define __sched_pin                                     0x1d1250
+#define __sched_unpin                                   0x1d12B0
+#define __sched_switch                                  0x1D0040
+#define __sched_bind                                    0x1D1120
+#define __fpu_kern_enter		     				                0x39A120
+#define __fpu_kern_leave		     				                0x39A220
+#define __icc_nvs_write                                 0x46EFB0
+#define __icc_nvs_read                                  0x470590
+#define __kthread_add					     		                  0x1C9890
+#define __proc_rwmem		     					                  0x0ABBB0
+
+>>>>>>> origin/master
 #define __kmem_alloc_contig                             0x250320
 #define __kmem_free                                     0x16EEA0
 #define __pmap_kextract                                 0x41DF40
@@ -1154,6 +1292,7 @@
 #define __bd_sched_private_done                         0x5FD8A0
 #define __bd_sched_adjust_bio_completed                 0x5FDB60
 
+<<<<<<< HEAD
 /*--------------------------------------------------------------------
                           Need fix
 --------------------------------------------------------------------*/
@@ -1305,6 +1444,11 @@
 #define __bootparam_get_eap_part_key                    0x651F70
 #define __eap_internal_key                              0x2790C90
 #define DT_HASH_SEGMENT                                 0xB5EE20
+=======
+#elif defined FW_500 || FW_501
+
+#define __Xfast_syscall                                 0x1C0
+>>>>>>> origin/master
 #define __printf                                        0x435C70
 #define __vprintf                                       0x435CE0
 #define __snprintf                                      0x435F80
@@ -2208,6 +2352,7 @@
 #define __bcopy                                         0xAB0
 #define __strtol                                        0x218760
 #define __prison0                                       0x10986A0                         
+<<<<<<< HEAD
 #define __rootvnode                                     0x22C1A70
 #define __pml4pml4i                                     0x22CB4E0
 #define __dmpml4i                                       0x22CB564  // Thanks to #J0nni3
@@ -2521,5 +2666,43 @@ Need fix
 #define __kproc_kthread_add                             0x0
 #define __gbase_samu_mailbox_writer                     0x0
 #define __gbase_samu_mailbox_reader                     0x0
+=======
+#define __rootvnode                                     0x22C19F0 // 5.00/1  rootvnode
+#define __pml4pml4i                                     0x22CB4E0
+#define __dmpml4i                                       0x22CB4E4
+#define __dmpdpi                                        0x22CB4E8
+#define __sceSblSsDecryptSealedKey                      0x61F2A0
+#define __getSealedKeySecret                            0x61F420
+#define	__UART_ENABLE 	                                0		// offset is 0 due to mira have uart auto enabled in autorun patches.
+
+#elif defined FW_505
+
+#define __Xfast_syscall                                 0x00001C0
+#define __prison0                                       0x10986a0
+#define __rootvnode                                     0x22C1A70
+#define __pml4pml4i                                     0x22CB560 // Pending verification
+#define __dmpml4i                                       0x22CB564
+#define __dmpdpi                                        0x22CB568
+#define __printf                                        0x0436040
+#define __copyin                                        0x01EA710
+#define __copyout                                       0x01EA630
+#define __copyinstr                                     0x01EAB40
+#define __kmem_alloc_contig                             0x00F1C90
+#define __kmem_free                                     0x00FCE50
+#define __pmap_extract                                  0x02E0570
+#define __pmap_protect                                  0x02E3090
+#define __sched_pin                                     0x031FF40
+#define __sched_unpin                                   0x031FF50
+#define __smp_rendezvous                                0x01B85B0
+#define __smp_no_rendevous_barrier                      0x01B8366
+#define __icc_query_nowait                              0x0044020
+#define __kernel_map                                    0x1AC60E0
+#define __sysent                                        0x107C610
+#define __kernel_pmap_store                             0x22CB570
+#define __Starsha_UcodeInfo                             0
+#define __gpu_devid_is_9924                             0x4DE010
+#define __gc_get_fw_info                                0x4D37A0
+#define	__UART_ENABLE 	                                0		// offset is 0 due to mira have uart auto enabled in autorun patches.
+>>>>>>> origin/master
 
 #endif

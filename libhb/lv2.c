@@ -906,13 +906,26 @@ int lv2_patch_pmap_check(void) {
 /* Initialize lv2, map functions. */
 int lv2_init(void) {
 	// Resolve Kernel base.
+<<<<<<< HEAD
 	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-__Xfast_syscall];
+=======
+#ifdef FW_405
+	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x30EB30];
+#elif defined FW_455
+	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x3095D0];
+#elif defined FW_500 || FW_501
+	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x00001C0];
+#elif defined FW_505
+	lv2.kern_base = &((uint8_t*)__readmsr(0xC0000082))[-0x00001C0];
+#endif
+>>>>>>> origin/master
 
 	// Resolve Symbols.
 	lv2_resolve();
 
 	return 0;
 }
+<<<<<<< HEAD
 
 /* Initialize Kernel Console Functions. */
 void kconsole_init(void) {
@@ -930,3 +943,5 @@ void kconsole_init(void) {
 		kconInitialized          = 1;
 	}
 }
+=======
+>>>>>>> origin/master
