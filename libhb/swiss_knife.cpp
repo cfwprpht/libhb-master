@@ -21,6 +21,7 @@
 #include "ps4_directory.h"
 #include "ps4_file.h"
 #include <net.h>
+#include <libnetctl.h>
 #include <sampleutil.h>
 
 using namespace LibHomebrew::PS4IO;
@@ -60,24 +61,37 @@ String LibHomebrew::Loot::SwissKnife::ToHexString(byte *data, int len) {
 	return str;
 }
 
+/* Generate a time String and retur nit. */
+String LibHomebrew::Loot::SwissKnife::GetTimeString(void) {
+	char timeBuffer[16];
+	memset(timeBuffer, 0, sizeof(timeBuffer));
+	time_t t;
+	Time *tm;
+	time(&t);
+	tm = localtime(&t);
+	strftime(timeBuffer, sizeof(timeBuffer), "%H_%M_%S", tm);
+	String result = timeBuffer;
+	return result;
+}
+
 // Hexify a Hex String. Add 0x to every two hex values.
-void LibHomebrew::Loot::SwissKnife::Hexify(String *data) {
+String LibHomebrew::Loot::SwissKnife::Hexify(String data) {
 	// Work string.
-	String hexifyed;
+	String hexifyed = "";
 
 	// The Hex delimeter.
 	String hex = "0x";
 
 	// Now loop over the string and generate a new hexifeyed one.
-	for (int i = 0; i < data->size(); i += 2) {
+	for (int i = 0; i < data.size(); i += 2) {
 		hexifyed += hex;
 		hexifyed += data[i];
 		hexifyed += data[i + 1];
-		if ((i + 2) != data->size()) hexifyed += " ";
+		if ((i + 2) != data.size()) hexifyed += " ";
 	}
 
-	// Overwrite the string with the result now.
-	*data = hexifyed;
+	// Return result.
+	return hexifyed;
 }
 
 /* Convert a hex string to byte array. */
@@ -311,6 +325,24 @@ String LibHomebrew::Loot::SwissKnife::GetUsb(void) {
 		}
 	}
 	return usb_path;
+}
+
+/* Get Local IP Address. */
+char *LibHomebrew::Loot::SwissKnife::GetLocalIP(void) {
+	char *ret = nullptr;
+	int res;
+	SceNetCtlInfo info;
+
+	res = sceNetCtlInit();
+	if (res < 0) return ret;		
+	
+	res = sceNetCtlGetInfo(SCE_NET_CTL_INFO_IP_ADDRESS, &info);
+	if (res < 0) return ret;		
+	ret = strdup(info.ip_address);
+
+	sceNetCtlTerm();
+
+	return ret;
 }
 
 /*------------------------------------

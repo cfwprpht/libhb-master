@@ -19,12 +19,20 @@
 #include <sstream>
 #include <_types.h>
 #include <_pthread.h>
+#include <sampleutil.h>
+
+namespace ssi = sce::SampleUtil::Input;
 
 namespace LibHomebrew {
 	class Console {
 	private:
-		// A Thread to run in background, which will be used to run the Reader Function in it.
-		static ScePthread   reader;
+		static bool stopThread;
+		static ScePthread reader;
+		static ScePthread writer;
+		static ssi::Button input;
+
+		static void *Reader(void *);
+		static void *Writer(void *);
 
 	public:
 		static char singleCenterBuff[128];
@@ -34,11 +42,12 @@ namespace LibHomebrew {
 		static void WriteLine(const char *msg, ...);
 		static void WriteError(const char *msg, ...);
 		static void WriteWarning(const char *msg, ...);
-		static void SingleLine(const char *msg, ...);
+		static void SingleLine(const char *msg, ...);		
+		static void WriteColor(uint32_t color, const char *msg, ...);
 		static void SingleLineClear(void);
 		static void LineBreak(void);
-		static void WriteColor(uint32_t color, const char *msg, ...);
-		static void KConsoleOn(void);
-		static void KConsoleOff(void);
+		static void SetUserInput(ssi::Button usrIn);
+		static bool RunKConsole(bool rw);
+		static void StopKConsole(void);
 	};
 }

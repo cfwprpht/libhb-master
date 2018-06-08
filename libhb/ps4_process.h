@@ -27,8 +27,11 @@ namespace LibHomebrew {
 			static bool LoadExec(const char *path, char *const *argv);
 			static int Kexec(const char *path);
 			static int Kexec(void *buffer);
-			static int Freedom405(void);
-			static int Freedom455(void);
+			static int Freedom(void);
+			static int EnableSUDO(void);
+			static int DisableSUDO(void);
+			static int DisableProcASLR(void);
+			static int EnableBrowser(void);
 			static void Reboot(void);
 			static void Verbose(bool state);
 		};

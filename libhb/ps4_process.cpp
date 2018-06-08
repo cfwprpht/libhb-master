@@ -24,7 +24,6 @@ extern "C" {
 #include "unjail.h"
 }
 
-
 using namespace LibHomebrew::PS4IO;
 
 bool LibHomebrew::Loot::Proc::verbose = false;
@@ -75,15 +74,33 @@ int LibHomebrew::Loot::Proc::Kexec(void *buffer) {
 }
 
 // Unjail, root, full access and more for this process.
-int LibHomebrew::Loot::Proc::Freedom405(void) {
+int LibHomebrew::Loot::Proc::Freedom(void) {
 	struct thread td;
-	return Sys::kexec((void *)&unjail405, &td);
+	return Sys::kexec((void *)&unjail, &td);
 }
 
-// Unjail, root, full access and more for this process.
-int LibHomebrew::Loot::Proc::Freedom455(void) {
+// Enable SUDO. DevKit ID and Allow Map of SELF patch.
+int LibHomebrew::Loot::Proc::EnableSUDO(void) {
 	struct thread td;
-	return Sys::kexec((void *)&unjail455, &td);
+	return Sys::kexec((void *)&enableSUDO, &td);
+}
+
+// Disable SUDO.
+int LibHomebrew::Loot::Proc::DisableSUDO(void) {
+	struct thread td;
+	return Sys::kexec((void *)&disableSUDO, &td);
+}
+
+// Disable Process ASLR.
+int LibHomebrew::Loot::Proc::DisableProcASLR(void) {
+	struct thread td;
+	return Sys::kexec((void *)&disableProcessASLR, &td);
+}
+
+// Permanet enable the Browser on non Activated Consoles.
+int LibHomebrew::Loot::Proc::EnableBrowser(void) {
+	struct thread td;
+	return Sys::kexec((void *)&enableBrowser, &td);
 }
 
 // Reboot the Console.

@@ -26,13 +26,13 @@ int Sys::create(const char *pathname, int mode) { return syscall(8, pathname, mo
 int Sys::link(const char *oldname, const char *newname) { return syscall(9, oldname, newname); }
 int Sys::unlink(const char *pathname) { return syscall(10, pathname); }
 int Sys::kexec(void* func, void *user_arg) { return syscall(11, func, user_arg); }
-off_t Sys::lseek(int fd, off_t offset, int origin) { return syscall(19, fd, offset, origin); }
 int Sys::getpid() { return syscall(20); }
 int Sys::mount(const char *type, const char *dir, int flags, void *data) { return syscall(21, type, dir, flags, data); }
 int Sys::unmount(const char *dir, int flags) { return syscall(22, dir, flags); }
 int Sys::getuid() { return syscall(24); }
 int Sys::kill(int pid, int signum) { return syscall(37, pid, signum); }
 int Sys::ioctl(int fd, unsigned long com, void *data) { return syscall(54, fd, com, data); }
+int Sys::readlink(const char *path, char *buf, int bufsiz) { return syscall(58, path, buf, bufsiz); }
 int Sys::msync(void *addr, size_t len, int flags) { return syscall(65, addr, len, flags); }
 int Sys::munmap(void *addr, size_t len) { return syscall(73, addr, len); }
 int Sys::mprotect(void *addr, size_t len, int prot) { return syscall(74, addr, len, prot); }
@@ -46,7 +46,10 @@ int Sys::fstat(int fd, struct stat *sb) { return syscall(189, fd, sb); }
 int Sys::mlock(void *addr, size_t len) { return syscall(203, addr, len); }
 int Sys::munlock(void *addr, size_t len) { return syscall(204, addr, len); }
 int Sys::getdents(int fd, char *buf, size_t count) { return syscall(272, fd, buf, count); }
+int Sys::nmount(struct iovec *iov, uint32_t niov, int flags) { return syscall(378, iov, niov, flags); }
 void *Sys::mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset) { return reinterpret_cast<void *>(syscall(477, addr, len, prot, flags, fd, offset)); }
+off_t Sys::lseek(int fd, off_t offset, int origin) { return syscall(478, fd, offset, origin); }
+int Sys::fstatat(int fd, const char *path, struct stat *buf, int flag) { return syscall(493, fd, path, buf, flag); }
 int Sys::registryCommand(int command) { return syscall(532, command); }
 int Sys::createEventFlag(const char *name) { return syscall(538, name); }
 int Sys::destroyEventFlag(int eventFlag) { return syscall(539, eventFlag); }

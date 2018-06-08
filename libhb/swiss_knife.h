@@ -33,7 +33,8 @@ namespace LibHomebrew {
 			static size_t ArraySize(char *array);
 			static String ToHexString(void *bytes, int len);
 			static String ToHexString(byte *bytes, int len);
-			static void Hexify(String *data);
+			static String GetTimeString(void);
+			static String Hexify(String data);
 			static byte *ToBytes(const char *hexString);
 			static uint8_t hexCharToUint(char ch);
 			static void hexStrToBin(const char *pHexStr, uint8_t *pBinBuf, size_t binBufSize);
@@ -49,6 +50,7 @@ namespace LibHomebrew {
 			static int strNumLast(const char *str);
 			static char *intostr(int num);
 			static String GetUsb(void);
+			static char *GetLocalIP(void);
 			static long FileSize(FILE *stream);
 			static off_t FileSize(const char *path);			
 			static bool PathExists(const char *path);

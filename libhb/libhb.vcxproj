@@ -90,9 +90,6 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
     <ClCompile Include="unjail.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
     </ClCompile>
-    <ClCompile Include="x86-64.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\source\sampleutil\libSceSampleUtil.vcxproj">
@@ -124,7 +121,6 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
     <ClInclude Include="syscalls.h" />
     <ClInclude Include="tty.h" />
     <ClInclude Include="unjail.h" />
-    <ClInclude Include="x86-64.h" />
   </ItemGroup>
   <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

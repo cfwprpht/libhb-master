@@ -47,6 +47,7 @@ bool LibHomebrew::Application::useBanner     = false;
 Position LibHomebrew::Application::titlePos  = Position(0.0, 0.0);
 Position LibHomebrew::Application::timePos   = Position(0.0, 0.0);
 Position LibHomebrew::Application::bannerPos = Position(0.0, 0.0);
+Position LibHomebrew::Application::shaderPos = Position(0.0, 0.0);
 Color LibHomebrew::Application::titleColor   = LIGHT_BLUE;;
 Color LibHomebrew::Application::timeColor    = RED2;
 Color LibHomebrew::Application::bannerColor  = YELLOW;
@@ -142,13 +143,17 @@ int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsCon
 		} else if (padContext->isButtonDown(ssi::kButtonDown, ssi::kButtonEventPatternAny)) {
 
 		} else if (padContext->isButtonDown(ssi::kButtonLeft, ssi::kButtonEventPatternAny)) {
-
+			input = ssi::kButtonLeft;
+			Console::SetUserInput(ssi::kButtonLeft);
 		} else if (padContext->isButtonDown(ssi::kButtonRight, ssi::kButtonEventPatternAny)) {
-
+			input = ssi::kButtonRight;
+			Console::SetUserInput(ssi::kButtonRight);
 		} else if (padContext->isButtonPressed(ssi::kButtonSquare, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonSquare;
+			Console::SetUserInput(ssi::kButtonSquare);
 		} else if (padContext->isButtonPressed(ssi::kButtonTriangle, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonTriangle;
+			Console::SetUserInput(ssi::kButtonTriangle);
 			if (useScreenShot) {
 				String out = SwissKnife::GetUsb();
 				String time(timeBuffer2);
@@ -162,8 +167,10 @@ int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsCon
 			}
 		} else if (padContext->isButtonPressed(ssi::kButtonCircle, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonCircle;
+			Console::SetUserInput(ssi::kButtonCircle);
 		} else if (padContext->isButtonPressed(ssi::kButtonCross, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonCross;
+			Console::SetUserInput(ssi::kButtonCross);
 			if (useVid & isPlaying) {
 				if (player.isPlaying()) {
 					player.stop();
@@ -172,22 +179,33 @@ int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsCon
 			}
 		} else if (padContext->isButtonPressed(ssi::kButtonR1, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonR1;
+			Console::SetUserInput(ssi::kButtonR1);
 		} else if (padContext->isButtonPressed(ssi::kButtonR2, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonR2;
+			Console::SetUserInput(ssi::kButtonR2);
 		} else if (padContext->isButtonPressed(ssi::kButtonR3, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonR3;
+			Console::SetUserInput(ssi::kButtonR3);
 			TTY::clear();
 		} else if (padContext->isButtonPressed(ssi::kButtonL1, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonL1;
+			Console::SetUserInput(ssi::kButtonL1);
 		} else if (padContext->isButtonPressed(ssi::kButtonL2, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonL2;
+			Console::SetUserInput(ssi::kButtonL2);
 		} else if (padContext->isButtonPressed(ssi::kButtonL3, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonL3;
+			Console::SetUserInput(ssi::kButtonL3);
 		} else if (padContext->isButtonPressed(ssi::kButtonTouchPad, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonTouchPad;
+			Console::SetUserInput(ssi::kButtonTouchPad);
 		} else if (padContext->isButtonPressed(ssi::kButtonOptions, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonOptions;
-		} else input = ssi::kButtonNone;
+			Console::SetUserInput(ssi::kButtonOptions);
+		} else {
+			input = ssi::kButtonNone;
+			Console::SetUserInput(ssi::kButtonNone);
+		}		
 	}
 	return SCE_OK;
 }
@@ -273,14 +291,10 @@ int LibHomebrew::Application::initialize(void) {
 
 	// Get Freedom for this Process.
 	int uid = Sys::getuid();
-#ifdef FW_405
-	if (uid != 0) Proc::Freedom405();
-#elif defined FW_455
-	if (uid != 0) Proc::Freedom455();
-#elif defined FW_500 || FW_501 || FW_505
-	if (uid != 0) Proc::Freedom500();
-#endif
+	if (uid != 0) Proc::Freedom();
+
 	// Resolve Current Directory.
+
 
 	// Clear SplashScreen.
 	sceSystemServiceHideSplashScreen();
@@ -395,7 +409,7 @@ void LibHomebrew::Application::render(void) {
 		if (useBanner) {
 			if (bannerEffect) {
 				if (bannerCount != interval) {
-					drawStringf(Position(bannerPos.getX() + 0.043, bannerPos.getY() + 0.043), bannerSize, DARK_GRAY_SHATTERED, banner);
+					drawStringf(shaderPos, bannerSize, DARK_GRAY_SHATTERED, banner);
 					drawStringf(bannerPos, bannerSize, bannerColor, banner);
 				}
 			}
@@ -680,6 +694,12 @@ void LibHomebrew::Application::BannerPos(Position pos) { bannerPos = pos; }
 
 // Set the position of the Banner.
 void LibHomebrew::Application::BannerPos(float x, float y) { bannerPos = Position(x, y); }
+
+// Set the position of Shader Banner.
+void LibHomebrew::Application::ShaderPos(Position pos) { shaderPos = pos; }
+
+// Set the position of the Shader for the banner.
+void LibHomebrew::Application::ShaderPos(float x, float y) { shaderPos = Position(x, y); }
 
 // Set Banner size.
 void LibHomebrew::Application::BannerSize(float size) { bannerSize = size; }

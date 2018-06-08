@@ -19,17 +19,24 @@
 #include <sstream>
 #include <_types.h>
 
-// Including the pure C kernel console source header.
-/*extern "C" {
-#include "../kern_console_sample/kern_console_sample/kern_con_sample.h"
-}*/
+extern "C" {
+#include "lv2.h"
+}
 
-ScePthread LibHomebrew::Console::reader;
+// Buffer for the singlen centered message.
 char LibHomebrew::Console::singleCenterBuff[128];
 
-// Thread flags.
-static bool stopThread = false;
-static bool isRunning = false;
+// Internal flag. Used to stop the reader thread gracefully.
+bool LibHomebrew::Console::stopThread = false;
+
+// The Reader Thread.
+ScePthread LibHomebrew::Console::reader;
+
+// The Writer Thread.
+ScePthread LibHomebrew::Console::writer;
+
+// The User Button Input.
+ssi::Button LibHomebrew::Console::input;
 
 // Write a Line to the screen.
 void LibHomebrew::Console::WriteLine(const char *msg, ...) {
@@ -90,64 +97,124 @@ void LibHomebrew::Console::SingleLine(const char *msg, ...) {
 // Clear a single, centered message.
 void LibHomebrew::Console::SingleLineClear(void) { memset(singleCenterBuff, 0, sizeof(singleCenterBuff)); }
 
-// The actual Reader function. Checks the C char buffer from kconsole source for data and writes it out to the userland console.
-/*void *Reader(void *) {
-	LibHomebrew::Console::WriteLine("Hello from the Reader Thread !\n");
+// Sets the user input into the console class.
+void LibHomebrew::Console::SetUserInput(ssi::Button usrIn) { input = usrIn; }
 
+// The Reader Thread Function to run in.
+void *LibHomebrew::Console::Reader(void *) {
 	// Set up Buffers and clear them.
-	char msg[264];
-	char errmsg[264];
-	char warnmsg[264];
-	memset(&msg, 0, sizeof(msg));
-	memset(&errmsg, 0, sizeof(errmsg));
-	memset(&warnmsg, 0, sizeof(warnmsg));
+	char msg[1024];
+	char errmsg[1024];
+	char warnmsg[1024];
+	memset(msg, 0, sizeof(msg));
+	memset(errmsg, 0, sizeof(errmsg));
+	memset(warnmsg, 0, sizeof(warnmsg));
 
 	// Loop over the buffers.
 	while (!stopThread) {
-		if (isMsgPresent() > 0) {
-			LibHomebrew::Console::WriteLine("Got message.\n");
-			getMsg(msg);
-			LibHomebrew::Console::WriteLine(msg);
-			LibHomebrew::Console::LineBreak();
-			memset(&msg, 0, sizeof(msg));
+		if (kconsole.getMsg(msg) > 0) {
+			Console::WriteLine(msg);
+			memset(msg, 0, sizeof(msg));
 		}
-		if (isErrorMsgPresent() > 0) {
-			LibHomebrew::Console::WriteLine("Got error.\n");
-			getErrorMsg(errmsg);
-			LibHomebrew::Console::WriteError(errmsg);
-			LibHomebrew::Console::LineBreak();
-			memset(&errmsg, 0, sizeof(errmsg));
+		if (kconsole.getErrorMsg(errmsg) > 0) {
+			Console::WriteError(errmsg);
+			memset(errmsg, 0, sizeof(errmsg));
 		}
-		if (isWarningMsgPresent() > 0) {
-			LibHomebrew::Console::WriteLine("Got warning.\n");
-			getWarningMsg(warnmsg);
-			LibHomebrew::Console::WriteWarning(warnmsg);
-			LibHomebrew::Console::LineBreak();
-			memset(&warnmsg, 0, sizeof(warnmsg));
+		if (kconsole.getWarningMsg(warnmsg) > 0) {
+			Console::WriteWarning(warnmsg);
+			memset(warnmsg, 0, sizeof(warnmsg));
 		}
 	}
-	isRunning = false;
-	LibHomebrew::Console::WriteLine("ByBy from the Reader Thread !\n");
 	return 0;
 }
 
-// Instance Initializer.
-void LibHomebrew::Console::KConsoleOn(void) {
+// The Reader Thread Function to run in.
+void *LibHomebrew::Console::Writer(void *) {
+	// Set up Buffer and clear.
+	char msg[10];
+	memset(msg, 0, sizeof(msg));
+
+	// Loop over user input.
+	while (!stopThread) {
+		// If user made a input.
+		if (input != ssi::kButtonNone) {
+			// Switch the input and set the buffer.
+			ssi::Button caseSwitch = input;
+			input = ssi::kButtonNone;
+			switch (caseSwitch) {
+				case ssi::kButtonCross:
+					sprintf(msg, "%s", "CROSS");
+					break;
+				case ssi::kButtonTriangle:
+					sprintf(msg, "%s", "TRIANGLE");
+					break;
+				case ssi::kButtonCircle:
+					sprintf(msg, "%s", "CIRCLE");
+					break;
+				case ssi::kButtonSquare:
+					sprintf(msg, "%s", "SQUARE");
+					break;
+				case ssi::kButtonL1:
+					sprintf(msg, "%s", "L1");
+					break;
+				case ssi::kButtonL2:
+					sprintf(msg, "%s", "L2");
+					break;
+				case ssi::kButtonL3:
+					sprintf(msg, "%s", "L3");
+					break;
+				case ssi::kButtonR1:
+					sprintf(msg, "%s", "R1");
+					break;
+				case ssi::kButtonR2:
+					sprintf(msg, "%s", "R2");
+					break;
+				case ssi::kButtonR3:
+					sprintf(msg, "%s", "R3");
+					break;
+				case ssi::kButtonLeft:
+					sprintf(msg, "%s", "LEFT");
+					break;
+				case ssi::kButtonRight:
+					sprintf(msg, "%s", "RIGHT");
+					break;
+				case ssi::kButtonTouchPad:
+					sprintf(msg, "%s", "TOUCHPAD");
+					break;
+				case ssi::kButtonOptions:
+					sprintf(msg, "%s", "OPTIONS");
+					break;
+				default:
+					break;
+			}
+
+			// Overload the message to the kernel console now and clear the buffer then.
+			if (strlen(msg) > 0) {
+				kconsole.setMsg(msg);
+				memset(msg, 0, sizeof(msg));
+			}
+		}
+	}
+	return 0;
+}
+
+// Run Kernel Console Reader Thread.
+bool LibHomebrew::Console::RunKConsole(bool rw) {
+	// Initialize Kernel Console.
+	kconsole_init();
+	
 	// Setup The Reader Thread.
 	if (scePthreadCreate(&reader, NULL, Reader, NULL, "KConsoleReader") != SCE_OK) {
 		Console::WriteError("Couldn't start KConsole Reader Thread.\n");
-		isRunning = false;
-	} else {
-		stopThread = false;
-		isRunning = true;
-		Console::WriteLine("KCon Reader Thread startet.\n");
+		return false;
+	} else if (rw) { // Shall we use the Writer Thread too ?
+		if (scePthreadCreate(&writer, NULL, Writer, NULL, "KConsoleWriter") != SCE_OK) {
+			Console::WriteError("Couldn't start KConsole Writer Thread.\n");
+			return false;
+		}
 	}
+	return true;
 }
 
-// Instance Deinitializer.
-void LibHomebrew::Console::KConsoleOff(void) { 
-	Console::WriteLine("Stopping Reader Thread.\n");
-	if (isRunning) stopThread = true;
-	while (isRunning) { /* Nothing to do here, just wait for the Thread to be exited cracefully.  }
-	for (int i = 0; i < 50; i++) { /* Give the Thread function some milli secs to return.  }
-}*/
+// Stop Kernel Console Reader Thread.
+void LibHomebrew::Console::StopKConsole(void) { stopThread = true; }

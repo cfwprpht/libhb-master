@@ -20,12 +20,15 @@
 #pragma comment( lib , "libSceMsgDialog_stub_weak.a" )
 #pragma comment( lib , "libSceAvPlayer_stub_weak.a" )
 #pragma comment( lib , "libSceNet_stub_weak.a" )
+#pragma comment( lib , "libSceNetCtl_stub_weak.a" )
 
 #include "fw.h"
 #include <stdio.h>
 #include <vectormath.h>
 #include <vector>
 #include <string>
+#include <net.h>
+#include <libnetctl.h>
 #include <sampleutil.h>
 #include <user_service.h>
 #include <system_service.h>
@@ -33,6 +36,7 @@
 #include <common_dialog.h>
 #include <message_dialog.h>
 #include <video_out.h>
+#include <sys/dirent.h>
 #include "syscall.h"
 #include "syscalls.h"
 #include "defines.h"
@@ -41,7 +45,10 @@
 #include "file_info.h"
 #include "ps4_directory.h"
 #include "ps4_process.h"
+#include "ps4_file.h"
+#include "ps4_network.h"
 #include "swiss_knife.h"
+#include "logger.h"
 #include "libUtil/av_util.h"
 #include "libUtil/resource_manager.h"
 #include "libUtil/config.h"
@@ -112,6 +119,8 @@ namespace LibHomebrew {
 		void         Banner(const char *banner);
 		void         BannerPos(Position pos);
 		void         BannerPos(float x, float y);
+		void         ShaderPos(Position pos);
+		void         ShaderPos(float x, float y);
 		void         BannerSize(float size);
 		void         BannerColor(Color color);
 		void         UseTitle(bool state);
@@ -157,6 +166,7 @@ namespace LibHomebrew {
 		static Position                titlePos;
 		static Position                timePos;
 		static Position                bannerPos;
+		static Position                shaderPos;
 		static Color                   titleColor;
 		static Color                   timeColor;
 		static Color                   bannerColor;

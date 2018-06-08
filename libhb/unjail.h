@@ -22,11 +22,17 @@ struct kpayload_args { uint64_t user_arg; };
 
 struct kdump_args { uint64_t argArrayPtr; };
 
-// Unjail patches for FW 4.05.
-void *unjail405(struct thread *td);
+// Unjail patches for all FWs.
+void *unjail(struct thread *td);
 
-// Unjail patches for FW 4.55.
-void *unjail455(struct thread *td);
+// Enable SUDO mode.
+void *enableSUDO(struct thread *td);
 
-// Unjail patches for FW 5.XX.
-void *unjail500(struct thread *td);
+// Disable SUDO mode.
+void *disableSUDO(struct thread *td);
+
+// Disable Process ASLR.
+void *disableProcessASLR(struct thread *td);
+
+// Enable Browser.
+void *enableBrowser(struct thread *td);

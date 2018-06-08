@@ -29,7 +29,7 @@ LibHomebrew::Logger::Logger(const char *path) {
 /* Initialize. */
 int LibHomebrew::Logger::Init(const char *path) {
 	if (!init) {
-		FILE *fd = fopen(path, "r");
+		FILE *fd = fopen(path, "ab+");
 		if (!fd) return 1;                               // Do file exists ?
 		fclose(fd);                                      // Close the file.
 		pathToLog = strdup(path);                        // Store path so we can write into the file later.

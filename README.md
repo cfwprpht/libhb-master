@@ -1,3 +1,4 @@
+=================
 PS4 LibHomebrew
 =================
 
@@ -16,9 +17,17 @@ PS4 LibHomebrew
  Then i crapped various sources which where already available like the one from f0f and ps4-kexec. The unjail patches for both 4.05 and 4.55
  where also crapped from the Net. The File System Dumper i ported to use LibHomebrew is the one from wildcard.
  For sure also Credits goes out to flatz, querty and xerpi. For fpkg, fself, webkit exploit, kernel exploit,.....
- Oh and not to forget The DarkProgrammer for testing and pointing me onto bugs.
+ Oh and not to forget The DarkProgrammer for the 4.55 pkg base, testing and pointing me onto bugs.
  SpecterDev for his syscall 11 implementation. Various devs i don't know the name now and which where included into the unjail and system whide patches.
+ IDC and Vortex for various code blocks here and there as example "Vortexs GetLocalIP()" for the PS4. IDC as example for patches and the FTP source from xerpi.
+ DarkElement for pointing me onto stuff while i am into work, like to pointing me onto the hdd key offset so i could add them for other fws too.
+ zecoxao for the eap_part_key offset for 4.55. (?)
+
+## Library Contributors:
+ Vultra, Erickson, DarkElement, XDPX, SimplePerson,
  
+## Downloads:
+ LibHB-Sample-PKGs: http://www.mediafire.com/file/kyb27dfubtidqbu/libhb-sample-pkgs.rar
 
 
 ## Updates:
@@ -90,3 +99,39 @@ Added definations:
  Added a sample "SaveDataMasterKeyDumper" on how to use libHB with your own kernel function.
  Moved the pkgs and the samples into the libhb-master.rar archive. Can be downloaded on the releases button.
  Will look into the FileSystem Dumper and fix it as next.
+ 
+## Update 13:
+ Added nmount, fstatat, and readlink System calls to the Sys Class. (credits @IDC)
+ Fixed lseek Systemcall. (Wrong number, credits @IDC)
+ Added GetLocalIP() Function to SwissKnife class. (credits @Vortex)
+ Added Shader Position for the Banner to the application class.
+ Added GetTimeString() to SwissKnife.
+ Added sceNetCtl Library to LibHomebrew.
+ Changed Logger Initialisation to create the file if not existend.
+ Included Headers: ps4_network.h, ps4_file.h, logger.h and libnetCtl.h into the Application Class header.
+ Kernel Console is now working.
+ Added a sample on how to use kernel console.
+ Added critical_enter() and critical_exit() to liblv2.
+ Added a Input Writer for the Kernel Console. You can either wait for a specific input 'kconsole.waitForUsrInput("TRIANGLE")'
+  or you can overload a buffer pointer and compare the input your self. ['kconsole.waitForUserInput(*buffer)']
+  Or just wait for any input without comparing.
+ Added a function to liblv2 'lv2.csleep()' to wait a few milli/micro seconds before we write some new string to the buffer. Giving the App loop some time to do his job.
+ Added 'lv2.toHexString(unsigned char *data, int len)' and 'lv2.hexify(char *string)'.
+ Added over 400 lv2 calls to the library.
+ Added 5.0X unjail patches. (credits @Vortex)
+ Added Support for 5.0X exploited FW.
+ Ported FTP App (Simple for now, no SELF Decryption) and made it match for libHB. It's running but have some problems with getting 'LIST'.
+  I'll put it into the release so others also can have a look while i am bussy.
+  It use the usb drive for logging. Create a Folder called 'PS4FTP' into the root of your usb drive. If you want to enable debug logging,
+  create a empty text file within 'PS4FTP' directory and rename it to 'usedebug.txt'.
+  Attemption: The drive need to be connected before you run the app. Since the check for logging is within the preparation process.
+ Updated MasterKeyDumper to use Kernel Console.
+ Added pkg helpers 'finalize_pkg.exe' and 'make_pkg.bat'. For your project, open the .bat in a editor and change the pkg and project name to yours.
+  Else when your done with preparing your pkg, sfo, gp4, and have builded your elf, just right click the finalize_pkg.exe and run as administrator, wait a bit, press space then enter. Done.
+ Added the custom sleep of lv2 to our WriteLine for the kernel. Giving the Application loop time to write out our message.
+ Added SAMU lv2 calls.
+ Added SceSblSrtcSetTime lv2 call to the library.
+ Added HDD Key Offset for all 3 FWs. Dump your HDD Key !
+ Added Patches for Disable Prcoess ASLR, Enable Browser Permanent and SUDO (DevKit ID patch and Allow mapping of SELF).
+ Added SaveDataMasterKey Dumper v2. Since FW 5.05, getSealedKeySecret() changed and hase now flags to use (1-4).
+ Splitted Sample PKGs into a own upload.
