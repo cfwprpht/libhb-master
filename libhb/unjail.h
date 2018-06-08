@@ -28,7 +28,6 @@ void *unjail(struct thread *td);
 // Enable SUDO mode.
 void *enableSUDO(struct thread *td);
 
-<<<<<<< HEAD
 // Disable SUDO mode.
 void *disableSUDO(struct thread *td);
 
@@ -37,10 +36,3 @@ void *disableProcessASLR(struct thread *td);
 
 // Enable Browser.
 void *enableBrowser(struct thread *td);
-=======
-// Unjail patches for FW 5.XX.
-void *unjail500(struct thread *td);
-
-//unjail patches for FW 5.05.
-void *unjail505(struct thread *td);
->>>>>>> origin/master

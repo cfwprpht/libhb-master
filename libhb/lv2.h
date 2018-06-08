@@ -375,19 +375,11 @@ typedef struct ksym_t {
 	int64_t      (*sysctl_register_oid)(char *a1, byte *a2);
 	int64_t      (*sysctl_add_oid)(int64_t a1, int64_t *a2, int a3, char *a4, int a5, int64_t a6, int64_t a7, int64_t a8, int64_t a9, char *a10, int a11);
 #elif defined FW_455
-<<<<<<< HEAD
 	int64_t      (*sysctl_register_oid)(byte *a1, byte *a2);
 	int64_t      (*sysctl_add_oid)(int64_t a1, int64_t *a2, int a3, byte *a4, int a5, int64_t a6, int64_t a7, int64_t a8, int64_t a9, char *a10, int a11);
 #else
 	int64_t      **(*sysctl_register_oid)(int64_t **a1, int64_t *a2, int64_t a3);
 	uint64_t     *(*sysctl_add_oid)(uint64_t **a1, uint64_t **a2, int a3, int64_t a4, int a5, uint64_t a6, int64_t a7, uint64_t a8, uint64_t a9, char *a10, int a11);
-=======
-	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey);
-#elif defined FW_500 || FW_501
-	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey, unsigned char *v3);
-#elif defined FW_505
-	int (*getSealedKeySecret)(unsigned char *saveDataMasterKey, unsigned char *saveDataMasterHashKey, unsigned char *v3);
->>>>>>> origin/master
 #endif
 	int64_t      *(*sysctl_unregister_oid)(int64_t **a1);
 	sint64_t     (*sysctl_ctx_init)(int64_t a1);
@@ -950,9 +942,6 @@ void lv2_syscall_install(int num, void *call, int narg);
 
 /* Initialize lv2, map functions. */
 int lv2_init(void);
-<<<<<<< HEAD
 
 /* Initialize lib kernel console, map functions. */
 void kconsole_init(void);
-=======
->>>>>>> origin/master

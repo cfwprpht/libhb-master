@@ -103,18 +103,6 @@ int LibHomebrew::Loot::Proc::EnableBrowser(void) {
 	return Sys::kexec((void *)&enableBrowser, &td);
 }
 
-// Unjail, root, full access and more for this process.
-int LibHomebrew::Loot::Proc::Freedom500(void) {
-	struct thread td;
-	return Sys::kexec((void *)&unjail500, &td);
-}
-
-// Unjail, root, full access and more for this process.
-int LibHomebrew::Loot::Proc::Freedom505(void) {
-	struct thread td;
-	return Sys::kexec((void *)&unjail505, &td);
-}
-
 // Reboot the Console.
 void LibHomebrew::Loot::Proc::Reboot(void) {
 	int evf = syscall(540, "SceSysCoreReboot");
