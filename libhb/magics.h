@@ -2163,7 +2163,7 @@
 #define __sceKernelIsAssistMode                         0x654280
 #define __sceSblRcMgrIsAllowDataExecutionInFselfProcess 0x1D09A0
 #define __sceSblSsDecryptSealedKey                      0x61F2A0
-#define __getSealedKeySecret                            0x61F420
+#define __getSealedKeySecret                            0x61F800
 #define __sceSblACMgrIsSystemUcred                      0x10F90
 #define __sceSblServiceMailbox                          0x6308C0
 #define ___sceSblKeyMgrSmStart                          0x62E7F0
