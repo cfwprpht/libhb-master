@@ -587,7 +587,7 @@ typedef struct ksym_t {
 #elif defined FW_455
 	int          (*getSealedKeySecret)(byte *saveDataMasterKey, byte *saveDataMasterHashKey);
 #else 
-	int          (*getSealedKeySecret)(byte *saveDataMasterKey, byte *saveDataMasterHashKey, byte *v3);
+	int          (*getSealedKeySecret)(byte *saveDataMasterKey, byte *saveDataMasterHashKey, int16_t v3);
 #endif
 	int          (*sceSblSsGenerateSealedKey)(void *decryptedSealedKey);
 	int          (*sceSblKeymgrClearKey)(uint32_t a1);

@@ -135,3 +135,7 @@ Added definations:
  Added Patches for Disable Prcoess ASLR, Enable Browser Permanent and SUDO (DevKit ID patch and Allow mapping of SELF).
  Added SaveDataMasterKey Dumper v2. Since FW 5.05, getSealedKeySecret() changed and hase now flags to use (1-4).
  Splitted Sample PKGs into a own upload.
+ 
+## Update 14:
+ Fixed lv2 offsets for FW 5.05.
+ All Samples are back working now.

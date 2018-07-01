@@ -29,7 +29,6 @@ static volatile int _global_test = 0;
 extern uint8_t _start[], _end[];
 KernSymTable lv2;
 KConSymTable kconsole;
-static int kconInitialized = 0;
 
 unsigned int long long __readmsr(unsigned long __register) {
 	// Loads the contents of a 64-bit model specific register (MSR) specified in
@@ -194,16 +193,10 @@ void waitForUsrInput(char *inputToWait) {
 	if (!inputToWait) {
 		// Just wait for any input.
 		// Wait for a valid input, matching the overlaoded trigger.
-		while (lv2.strlen(input) == 0) {
-			lv2.memset(input, 0, sizeof(input));
-			lv2.copyin(&kcon_input_buffer, &input, sizeof(kcon_input_buffer));
-		}
+		while (lv2.strlen(input) == 0) { lv2.copyin(&kcon_input_buffer, &input, sizeof(kcon_input_buffer)); }
 	} else if (inputToWait[0] != 'C' && inputToWait[0] != 'T' && inputToWait[0] != 'L' && inputToWait[0] != 'R' && inputToWait[0] != 'S' && inputToWait[0] != 'O' && inputToWait[0] != 'c' && inputToWait[0] != 't' && inputToWait[0] != 'l' && inputToWait[0] != 'r' && inputToWait[0] != 's' && inputToWait[0] != 'o') {
 		// Wait for any input and copy to buffer.
-		while (lv2.strlen(input) == 0) {
-			lv2.memset(input, 0, sizeof(input));
-			lv2.copyin(&kcon_input_buffer, &input, sizeof(kcon_input_buffer));
-		}
+		while (lv2.strlen(input) == 0) { lv2.copyin(&kcon_input_buffer, &input, sizeof(kcon_input_buffer)); }
 
 		// Copy input to buffer so the caller can compare against.
 		lv2.memcpy(inputToWait, input, lv2.strlen(input));
@@ -917,16 +910,13 @@ int lv2_init(void) {
 /* Initialize Kernel Console Functions. */
 void kconsole_init(void) {
 	// Resolve internal functions.
-	if (!kconInitialized) {
-		kconsole.WriteLine       = WriteLine;
-		kconsole.WriteError      = WriteError;
-		kconsole.WriteWarning    = WriteWarning;
-		kconsole.LineBreak       = LineBreak;
-		kconsole.getMsg          = getMsg;
-		kconsole.getErrorMsg     = getErrorMsg;
-		kconsole.getWarningMsg   = getWarningMsg;
-		kconsole.waitForUsrInput = waitForUsrInput;
-		kconsole.setMsg          = setMsg;
-		kconInitialized          = 1;
-	}
+	kconsole.WriteLine = WriteLine;
+	kconsole.WriteError = WriteError;
+	kconsole.WriteWarning = WriteWarning;
+	kconsole.LineBreak = LineBreak;
+	kconsole.getMsg = getMsg;
+	kconsole.getErrorMsg = getErrorMsg;
+	kconsole.getWarningMsg = getWarningMsg;
+	kconsole.waitForUsrInput = waitForUsrInput;
+	kconsole.setMsg = setMsg;
 }
