@@ -23,6 +23,7 @@
 #include <net.h>
 #include <libnetctl.h>
 #include <sampleutil.h>
+#include <system_service.h>
 
 using namespace LibHomebrew::PS4IO;
 
@@ -343,6 +344,59 @@ char *LibHomebrew::Loot::SwissKnife::GetLocalIP(void) {
 	sceNetCtlTerm();
 
 	return ret;
+}
+
+/* Get SSID Name. */
+char *LibHomebrew::Loot::SwissKnife::GetSsid(void) {
+	char *ret = nullptr;
+	int res;
+	SceNetCtlInfo info;
+
+	res = sceNetCtlInit();
+	if (res < 0) return ret;
+
+	res = sceNetCtlGetInfo(SCE_NET_CTL_INFO_SSID, &info);
+	if (res < 0) return ret;
+	ret = strdup(info.ssid);
+
+	sceNetCtlTerm();
+
+	return ret;
+}
+
+/* Get Language. */
+char *LibHomebrew::Loot::SwissKnife::GetLanguage(void) {
+	char *res = nullptr;
+	int32_t systemParamValue = 0;
+
+	int ret = sceSystemServiceParamGetInt(SCE_SYSTEM_SERVICE_PARAM_ID_LANG, &systemParamValue);
+	if (ret != SCE_OK) return res;
+
+	if (systemParamValue == SCE_SYSTEM_PARAM_LANG_JAPANESE) res = strdup("jp");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_GERMAN) res = strdup("de");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_ENGLISH_US) res = strdup("en-us");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_ENGLISH_GB) res = strdup("en-gb");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_DANISH) res = strdup("da");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_SPANISH) res = strdup("es");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_FRENCH) res = strdup("fr");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_ITALIAN) res = strdup("it");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_DUTCH) res = strdup("nl");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_NORWEGIAN) res = strdup("no");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_POLISH) res = strdup("pl");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_PORTUGUESE_PT) res = strdup("pt");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_RUSSIAN) res = strdup("ru");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_FINNISH) res = strdup("fi");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_SWEDISH) res = strdup("sv");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_KOREAN) res = strdup("ko");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_CHINESE_S) res = strdup("zh-cn");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_CHINESE_T) res = strdup("zh-tw");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_PORTUGUESE_BR) res = strdup("pt-br");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_TURKISH) res = strdup("tr");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_SPANISH_LA) res = strdup("es-mx");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_ARABIC) res = strdup("ar");
+	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_FRENCH_CA) res = strdup("fr-ca");
+
+	return res;
 }
 
 /*------------------------------------

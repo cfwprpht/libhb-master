@@ -139,3 +139,6 @@ Added definations:
 ## Update 14:
  Fixed lv2 offsets for FW 5.05.
  All Samples are back working now.
+ 
+## Update 15:
+ Added Functions GetSsid() & GetLanguage() to the SwissKnife class.

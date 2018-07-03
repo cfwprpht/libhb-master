@@ -51,6 +51,8 @@ namespace LibHomebrew {
 			static char *intostr(int num);
 			static String GetUsb(void);
 			static char *GetLocalIP(void);
+			static char *GetSsid(void);
+			static char *GetLanguage(void);
 			static long FileSize(FILE *stream);
 			static off_t FileSize(const char *path);			
 			static bool PathExists(const char *path);
