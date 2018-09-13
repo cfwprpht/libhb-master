@@ -148,7 +148,7 @@ Added definations:
  Added Line highlighting abbility to the Console.
  Added functions GetSelectedLine() & SetSelectedLine() as well as Clear() to the Console Class.
  
-    ## Update 17:
+## Update 17:
      Apllication Lopp will now run in Core 3 which is less interrupted by the system then others. UserEntry Loop will run in Core 1.
      Added c language wrappers for the c++ Console Class. If you have some c source and you want to write to the screen, inlcude "c_console.h" and just do it.
      Added a BitConverter to SwissKnife to bit swapp bytes.
