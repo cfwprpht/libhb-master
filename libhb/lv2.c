@@ -13,6 +13,8 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
+
 #include "lv2.h"
 #include "magics.h"
 #include <string.h>
@@ -25,7 +27,7 @@ static char kcon_usrld_error_buffer[1024];
 static char kcon_usrld_warning_buffer[1024];
 static char kcon_input_buffer[10];
 
-static volatile int _global_test = 0;
+//static volatile int _global_test = 0;
 extern uint8_t _start[], _end[];
 KernSymTable lv2;
 KConSymTable kconsole;
@@ -68,7 +70,7 @@ void hookprintf(const char *format, ...) {
 }
 
 // Kernel Console WriteLine.
-void WriteLine(const char *format, ...) {
+void _WriteLine(const char *format, ...) {
 	// Setup a Kernel Buffer.
 	char buff[1024];
 
@@ -92,7 +94,7 @@ void WriteLine(const char *format, ...) {
 }
 
 // Kernel Console WriteError.
-void WriteError(const char *format, ...) {
+void _WriteError(const char *format, ...) {
 	// Setup a Kernel Buffer.
 	char buff[1024];
 
@@ -116,7 +118,7 @@ void WriteError(const char *format, ...) {
 }
 
 // Kernel Console WriteWarning.
-void WriteWarning(const char *format, ...) {
+void _WriteWarning(const char *format, ...) {
 	// Setup a Kernel Buffer.
 	char buff[1024];
 
@@ -140,7 +142,7 @@ void WriteWarning(const char *format, ...) {
 }
 
 // Kernel Console do Line Break.
-void LineBreak(void) {
+void _LineBreak(void) {
 	// Setup a Kernel Buffer.
 	char buff[3] = "\n";
 
@@ -910,10 +912,10 @@ int lv2_init(void) {
 /* Initialize Kernel Console Functions. */
 void kconsole_init(void) {
 	// Resolve internal functions.
-	kconsole.WriteLine = WriteLine;
-	kconsole.WriteError = WriteError;
-	kconsole.WriteWarning = WriteWarning;
-	kconsole.LineBreak = LineBreak;
+	kconsole.WriteLine = _WriteLine;
+	kconsole.WriteError = _WriteError;
+	kconsole.WriteWarning = _WriteWarning;
+	kconsole.LineBreak = _LineBreak;
 	kconsole.getMsg = getMsg;
 	kconsole.getErrorMsg = getErrorMsg;
 	kconsole.getWarningMsg = getWarningMsg;

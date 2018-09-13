@@ -18,14 +18,18 @@
 #include <sampleutil.h>
 #include <sstream>
 #include <sys/dirent.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 /* Display defination */
 #define DISPLAY_WIDTH	1920
 #define DISPLAY_HEIGHT	1080
 
 /* Application infos */
-#define TITLE_STR           "PS4 Shell"
-#define VERSION_STR         "0.20"
+#define TITLE_STR           ""
+#define VERSION_STR         ""
+#define APP_STR             "EMPTY_FILL_ME_UP"
 
 /*E Definitions about charactor displayed */
 #define CHAR_COL			84
@@ -48,6 +52,9 @@
 #define BTN_CODE_ENTER		'x'
 #define BTN_CODE_BACK		'o'
 
+//The maximum number of character string
+#define TEXT_MAX_LENGTH 20
+
 /*E Definitions of the colors */
 namespace ssg     = sce::SampleUtil::Graphics;
 namespace ssi     = sce::SampleUtil::Input;
@@ -65,6 +72,10 @@ typedef unsigned char            byte;
 typedef struct tm                Time;
 typedef struct dirent            DirEntry;
 typedef int FILEC;
+
+/* Importend paths */
+static String pathToLibc;
+static String pathToLibSceFios2;
 
 /* Color definations */
 static const vecmath::Vector4_arg BLACK               = vecmath::Vector4(0.0, 0.0, 0.0, 1.0);
@@ -86,3 +97,8 @@ static const vecmath::Vector4_arg GRAY                = vecmath::Vector4(0.5, 0.
 static const vecmath::Vector4_arg DARK_GRAY           = vecmath::Vector4(0.3, 0.3, 0.3, 1.0);
 static const vecmath::Vector4_arg DARK_GRAY_SHATTERED = vecmath::Vector4(0.3, 0.3, 0.3, 0.7);
 static const vecmath::Vector4_arg PINK                = vecmath::Vector4(0, 0, 0, 0);
+
+static const uint32_t _YELLOW = 0xFFFF11FF;
+static const uint32_t _RED    = 0xFF0000FF;
+static const uint32_t _BLACK  = 0x00000000;
+static const uint32_t _WHITE  = 0xFFFFFFFF;

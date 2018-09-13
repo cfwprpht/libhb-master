@@ -13,9 +13,15 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
+
 #include <sampleutil.h>
 #include "logger.h"
 #include "syscalls.h"
+
+bool LibHomebrew::Logger::debug = false;
+bool LibHomebrew::Logger::dbgInit = false;
+const char *LibHomebrew::Logger::_pathToLog = nullptr;
 
 /* Instance Initializer */
 LibHomebrew::Logger::Logger(const char *path) {
@@ -38,6 +44,18 @@ int LibHomebrew::Logger::Init(const char *path) {
 	return SCE_OK;                                       // Return success.
 }
 
+/* Initialize. */
+int LibHomebrew::Logger::InitDbg(const char *path) {
+	if (!dbgInit) {
+		FILE *fd = fopen(path, "ab+");
+		if (!fd) return 1;                               // Do file exists ?
+		fclose(fd);                                      // Close the file.
+		_pathToLog = strdup(path);                       // Store path so we can write into the file later.
+		dbgInit = true;                                  // Set to initialized.		
+	}
+	return SCE_OK;                                       // Return success.
+}
+
 /* Write a message to the log. */
 int LibHomebrew::Logger::Log(const char *msg, ...) {
 	if (!init) return 1;                            // Check if logger would be initialized else we return.
@@ -51,6 +69,29 @@ int LibHomebrew::Logger::Log(const char *msg, ...) {
 		return SCE_OK;
 	}
 	return 1;
+}
+
+/* Write a message to the log. */
+int LibHomebrew::Logger::Debug(const char *msg, ...) {
+	if (!dbgInit) return 1;                            // Check if logger would be initialized else we return.
+	if (debug) {
+		FILE *fd = fopen(_pathToLog, "a");
+		if (fd) {
+			va_list args;
+			va_start(args, msg);
+			vfprintf(fd, msg, args);
+			va_end(args);
+			fclose(fd);
+			return SCE_OK;
+		}
+	}
+	return 1;
+}
+
+// Enabling Debug Logging.
+void LibHomebrew::Logger::UseDebug(void) {
+	if (debug) debug = false;
+	else debug = true;
 }
 
 /* Return the initialisation state. */

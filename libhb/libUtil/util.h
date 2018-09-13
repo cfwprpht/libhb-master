@@ -5,6 +5,7 @@
 namespace common {
 	namespace Util {
 		std::wstring convertUtf8toUcs2(const std::string& str);
+		std::string formatString(const char* format, ...);
 	}
 }
 

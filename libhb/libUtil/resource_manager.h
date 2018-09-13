@@ -25,22 +25,8 @@ namespace common {
 	namespace Util {
 		class ResourceManager {
 		public:
-			ResourceManager(void);
-			virtual ~ResourceManager(void);
-
-			int initialize(sce::SampleUtil::Graphics::GraphicsLoader *loader,
-				sce::SampleUtil::Graphics::SpriteRenderer *spriteRenderer,
-				common::Configuration::Config *config,
-				const int displayWidth, const int displayHeight);
-
-			int finalize(void);
-
-			sce::SampleUtil::Graphics::Texture *getTexture(const std::string &resourceName);
-			sce::SampleUtil::Graphics::Collada::ColladaData *getCollada(const std::string &resourceName);
 			common::Configuration::Config *config;
 			bool verbose;
-
-		public:
 			int		_displayWidth;
 			int		_displayHeight;
 
@@ -64,7 +50,20 @@ namespace common {
 			bool                                                isAddcont;
 			Util::DirectMemoryHeap                              directMemoryHeap;
 
-		private:
+			ResourceManager(void);
+			virtual ~ResourceManager(void);
+
+			int initialize(sce::SampleUtil::Graphics::GraphicsLoader *loader,
+				sce::SampleUtil::Graphics::SpriteRenderer *spriteRenderer,
+				common::Configuration::Config *config,
+				const int displayWidth, const int displayHeight);
+
+			int finalize(void);
+			int load(void);
+			sce::SampleUtil::Graphics::Texture *getTexture(const std::string &resourceName);
+			sce::SampleUtil::Graphics::Collada::ColladaData *getCollada(const std::string &resourceName);			
+
+		private:			
 			int loadTexture(const std::string &resourceName);
 			int unloadTexture(const std::string &resourceName);
 			int loadCollada(const std::string &resourceName);

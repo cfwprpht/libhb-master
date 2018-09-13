@@ -15,5 +15,11 @@
 
 #pragma once
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 /* PS4 FreeBSD Linux-Style Syscall implementation [64 bit]. */
 long syscall(long n, ...);

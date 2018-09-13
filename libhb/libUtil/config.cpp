@@ -13,16 +13,16 @@
 *
 */
 
-
 #include "config.h"
 #include "lua_util.h"
 #include "util.h"
+#include "../logger.h"
 
+using namespace LibHomebrew;
 namespace cc = common::Configuration;
 namespace cu = common::Util;
 
-static void convertFloatTable(cc::FloatValueMap &pathMap, const cu::LuaValue::Table *table)
-{
+static void convertFloatTable(cc::FloatValueMap &pathMap, const cu::LuaValue::Table *table) {
 	common::Util::LuaValue::Table::const_iterator it;
 	for (it = table->begin(); it != table->end(); it++) {
 		std::string name = it->first;
@@ -32,71 +32,46 @@ static void convertFloatTable(cc::FloatValueMap &pathMap, const cu::LuaValue::Ta
 	}
 }
 
-static int readModelPath2(const common::Util::LuaValue *lv, cc::PathMap  &modelPathMap)
-{
-	if (!isTable(lv)) {
-		return -1;
-	}
+static int readModelPath2(const common::Util::LuaValue *lv, cc::PathMap  &modelPathMap) {
+	if (!isTable(lv)) { return -1; }
 
 	const common::Util::LuaValue *v = lv->getField("model_path");
-	if (!isTable(v)) {
-		return -1;
-	}
+	if (!isTable(v)) { return -1; }
 
 	convertStringTable(modelPathMap, v->asTable());
 	return SCE_OK;
 
 }
 
-static int readTexturePath2(const common::Util::LuaValue *lv, cc::PathMap  &texturePathMap)
-{
-	if (!isTable(lv)) {
-		return -1;
-	}
+static int readTexturePath2(const common::Util::LuaValue *lv, cc::PathMap  &texturePathMap) {
+	if (!isTable(lv)) { return -1; }
 
 	const common::Util::LuaValue *v = lv->getField("texture_path");
-	if (!isTable(v)) {
-		return -1;
-	}
+	if (!isTable(v)) { return -1; }
 
 	convertStringTable(texturePathMap, v->asTable());
 	return SCE_OK;
 }
 
-
-static int readSoundPath(const common::Util::LuaValue *lv, cc::SoundPath &soundPath)
-{
-	if (!isTable(lv)) {
-		return -1;
-	}
+static int readSoundPath(const common::Util::LuaValue *lv, cc::SoundPath &soundPath) {
+	if (!isTable(lv)) { return -1; }
 
 	const common::Util::LuaValue *v = lv->getField("sound_path");
-	if (!isTable(v)) {
-		return -1;
-	}
+	if (!isTable(v)) { return -1; }
 
 	cc::PathMap  soundPathMap;
 	convertStringTable(soundPathMap, v->asTable());
 
-	soundPath.shot = soundPathMap["shot"];
-	soundPath.explosion = soundPathMap["explosion"];
-	soundPath.reload = soundPathMap["reload"];
-	soundPath.applause = soundPathMap["applause"];
-	soundPath.gameBgm = soundPathMap["game_bgm"];
+	soundPath.gameBgm  = soundPathMap["game_bgm"];
 
 	return SCE_OK;
 }
 
-static int readPlayStylesSensitivity(const common::Util::LuaValue *lv, cc::PlayStyleSensitivity &playStyleSensitivity)
-{
-	if (!isTable(lv)) {
-		return -1;
-	}
+static int readPlayStylesSensitivity(const common::Util::LuaValue *lv, cc::PlayStyleSensitivity &playStyleSensitivity) {
+	if (!isTable(lv)) { return -1; }
 
 	const common::Util::LuaValue *v = lv->getField("play_style_sensitivity");
-	if (!isTable(v)) {
-		return -1;
-	}
+	if (!isTable(v)) { return -1; }
 
 	cc::FloatValueMap  playStyleSensitivityValueMap;
 	convertFloatTable(playStyleSensitivityValueMap, v->asTable());
@@ -112,8 +87,7 @@ static int readPlayStylesSensitivity(const common::Util::LuaValue *lv, cc::PlayS
 	return SCE_OK;
 }
 
-static int readConfig(lua_State *L, cc::Config &config, std::string language)
-{
+static int readConfig(lua_State *L, cc::Config &config, std::string language) {
 	int ret;
 	lua_getglobal(L, "config");
 	int top = lua_gettop(L);
@@ -125,8 +99,7 @@ static int readConfig(lua_State *L, cc::Config &config, std::string language)
 		delete lv;
 		return -1;
 	}
-
-
+	
 	const common::Util::LuaValue *archive_file = lvConfig->getField("archive_file");
 	const common::Util::LuaValue *mount_point = lvConfig->getField("mount_point");
 	const common::Util::LuaValue *livearea_data_dir = lvConfig->getField("livearea_data_dir");
@@ -194,7 +167,6 @@ static int readConfig(lua_State *L, cc::Config &config, std::string language)
 	ret = readSoundPath(lv, config.soundPath);
 	if (ret != SCE_OK) { delete lv; return ret; }
 
-
 	ret = readPlayStylesSensitivity(lv, config.playStyleSensitivity);
 
 	{
@@ -231,49 +203,54 @@ static int readConfig(lua_State *L, cc::Config &config, std::string language)
 	return SCE_OK;
 }
 
-int cc::Config::initialize(const char* configPath, const std::string& _language)
-{
+int cc::Config::initialize(const char* configPath, const std::string& _language) {
 	int ret = 0;
-	language = _language;
 
+	Logger::Debug("Giving Power to LUA.\n");
 	lua_State *L = luaL_newstate();
 	luaL_openlibs(L);
 
 	lua_pushstring(L, _language.c_str());
 	lua_setglobal(L, "language");
+	Logger::Debug("Language set.\n");
 
 #ifdef ENABLE_PATCH
+	Logger::Debug("Enable Patch.\n");
 	lua_pushboolean(L, 1);
 #else
 	lua_pushboolean(L, 0);
 #endif
 	lua_setglobal(L, "ispatched");
+	Logger::Debug("Global set 'ispatched'.\n");
 
+	Logger::Debug("Calling LUA DoFile.\n");
 	ret = luaL_dofile(L, configPath);
 
 	if (ret != 0) {
 		const char *msg = NULL;
 		if (!lua_isnil(L, -1)) {
 			msg = lua_tostring(L, -1);
-			printf("ERROR when executing %s\n", configPath);
-			printf("   Reason: %s.\n", msg);
+			Logger::Debug("ERROR when executing %s\n", configPath);
+			Logger::Debug("   Reason: %s.\n", msg);
 			lua_pop(L, 1);
 		}
 		return ret;
 	}
+	Logger::Debug("Executing %s ok !\n", configPath);
 
+	Logger::Debug("Reading configuration now...");
 	ret = readConfig(L, *this, _language);
+	if (ret != SCE_OK) Logger::Debug("error !\n");
+	else Logger::Debug("ok !\n");
+
 	lua_close(L);
-
+	Logger::Debug("Taked Power from LUA away.\n");
 	lastLoadedFilePath = configPath;
-
 	language = _language;
-
 	return ret;
 }
 
-
-int cc::Config::reload() { return initialize(lastLoadedFilePath.c_str(), language); }
+int cc::Config::down() { return initialize(lastLoadedFilePath.c_str(), language); }
 
 std::wstring cc::Config::getTextUcs2(const std::string &id) {
 	cc::TextTableUcs2::iterator it = textTableUcs2.find(id);

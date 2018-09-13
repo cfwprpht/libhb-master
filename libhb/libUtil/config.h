@@ -24,23 +24,13 @@ namespace common {
 	namespace Configuration {
 		class SoundPath {
 		public:
+			std::string		gameBgm;
+
 			void dump() {}
 			void clear() {}
-
-		public:
-			std::string		shot;
-			std::string		explosion;
-			std::string		reload;
-			std::string		gameBgm;
-			std::string		applause;
-
 		};
 
 		class PlayStyleSensitivity {
-		public:
-			void dump() {}
-			void clear() {}
-
 		public:
 			float	leftStickMovableViewpoint;
 			float	motionSensorMovableViewpoint;
@@ -48,6 +38,9 @@ namespace common {
 			float	touchPadMovableViewpoint;
 			float	touchPadFixedViewpoint;
 			float	padTrackerFixedViewpoint;
+
+			void dump() {}
+			void clear() {}
 		};
 
 
@@ -59,14 +52,6 @@ namespace common {
 
 
 		class Config {
-		public:
-			int initialize(const char* configPath, const std::string& language);
-			int reload();
-			void clear();
-			void dump();
-			std::wstring getTextUcs2(const std::string &id);
-			std::string getTextUtf8(const std::string &id);
-
 		public:
 			bool		useArchive;
 			std::string language;
@@ -81,31 +66,29 @@ namespace common {
 			std::string	multiPlaySaveDataFileName;
 			std::string	loadExecArgumentHeaderForInvitation;
 			std::string	loadExecArgumentHeaderForPlayTogether;
-
-			int playStyleSelectTime;
-			int gameReadyTime;
-			int gamePlayTime;
-			int timeupDisplayTime;
-			int videoRecordingNotificationDisplayTime;
-			int npServiceLabel;
-			int npScoreBoardId;
-
-			bool enableLongestNameTest;
+			int         playStyleSelectTime;
+			int         gameReadyTime;
+			int         gamePlayTime;
+			int         timeupDisplayTime;
+			int         videoRecordingNotificationDisplayTime;
+			int         npServiceLabel;
+			int         npScoreBoardId;
+			bool        enableLongestNameTest;
 			std::string longestUserName;
 			std::string longestNpOnlineId;
-
-			PathMap modelPathMap;
-			PathMap texturePathMap;
-			SoundPath soundPath;
-
+			PathMap     modelPathMap;
+			PathMap     texturePathMap;
+			SoundPath   soundPath;
 			TextTableUcs2 textTableUcs2;
 			TextTableUtf8 textTableUtf8;
 			TemplateTable sceneTemplateTable;
+			PlayStyleSensitivity playStyleSensitivity;
+			std::string	         lastLoadedFilePath;
 
-
-			PlayStyleSensitivity		playStyleSensitivity;
-
-			std::string	lastLoadedFilePath;
+			int initialize(const char* configPath, const std::string& language);
+			int down();
+			std::wstring getTextUcs2(const std::string &id);
+			std::string getTextUtf8(const std::string &id);
 		};
 
 	}

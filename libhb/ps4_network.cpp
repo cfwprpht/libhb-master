@@ -13,6 +13,8 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
+
 #include "ps4_network.h"
 #include "console.h"
 #include <sampleutil.h>
@@ -47,7 +49,7 @@ LibHomebrew::PS4Network::Network::Network(char *_ip, char *_port, char *_name, b
 }
 
 // Instanze Deinitializer.
-LibHomebrew::PS4Network::Network::~Network() {	
+LibHomebrew::PS4Network::Network::~Network() {
 	if (isInit) sceNetSocketClose(sock);
 	delete ip;
 	delete port;
@@ -111,11 +113,4 @@ int LibHomebrew::PS4Network::Network::Send(const char *msg, ...) {
 		sceNetSend(sock, mesBuf, size, 0);
 	}
 	return 0;
-}
-
-// Get the PS4s local ip.
-char *LibHomebrew::PS4Network::Network::GetLocalIP(void) {
-	//SceNetSockInfo sinfo;
-	//int socks = sceNetGetSockInfo(-1, NULL, 10, 0);
-	return strdup("Need to fix...");
 }

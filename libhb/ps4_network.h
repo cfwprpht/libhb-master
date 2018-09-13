@@ -17,6 +17,12 @@
 
 #include <_types.h>
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 #define UNDEFINED -99
 
 namespace LibHomebrew {
@@ -48,7 +54,6 @@ namespace LibHomebrew {
 			int Open(void);
 			void Close(void);
 			int Send(const char *msg, ...);
-			static char *GetLocalIP(void);
 		};
 	}
 }

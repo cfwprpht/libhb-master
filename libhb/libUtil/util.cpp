@@ -1,16 +1,31 @@
 
 #include "util.h"
 
-std::wstring common::Util::convertUtf8toUcs2(const std::string& str)
-{
+std::string common::Util::formatString(const char* format, ...) {
+	unsigned int bufSize = 1024;
+	char *buf = (char*)malloc(bufSize);
+	va_list ap;
+	va_start(ap, format);
+	do {
+		int n = vsnprintf(buf, bufSize, format, ap);
+		va_end(ap);
+		if ((n >= 0) && ((n + 1)<bufSize)) {
+			std::string ret = buf;
+			free(buf);
+			return ret;
+		}
+		bufSize *= 2;
+		buf = (char*)realloc(buf, bufSize);
+	} while (1);
+}
+
+std::wstring common::Util::convertUtf8toUcs2(const std::string& str) {
 	std::wstring ret;
 	const char *src = str.c_str();
-	if (src == NULL) {
-		return ret;
-	}
+	if (src == NULL) { return ret; }
 	wchar_t	dstCode = 0;
-	char		strByte = 0;
-	char		convertNum = 0;
+	char	strByte = 0;
+	char	convertNum = 0;
 
 	int	i = 0;
 	while (1) {

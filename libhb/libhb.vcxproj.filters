@@ -47,9 +47,6 @@
     <ClCompile Include="file_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tty.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ps4_process.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -57,6 +54,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="lv2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ps4_elf_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="c_console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -103,9 +106,6 @@
     <ClInclude Include="file_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tty.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ps4_process.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -122,6 +122,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="elf_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ime_keyboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ps4_elf_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ime_dialog_outer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="msg_dialog_outer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="c_console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

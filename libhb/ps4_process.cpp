@@ -13,11 +13,15 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
+
 #include "ps4_process.h"
 #include "console.h"
 #include "syscalls.h"
 #include "ps4_file.h"
 #include "file_info.h"
+#include "logger.h"
+#include "ps4_elf_loader.h"
 #include <system_service.h>
 
 extern "C" {
@@ -30,7 +34,7 @@ bool LibHomebrew::Loot::Proc::verbose = false;
 
 // Load and Execute a other elf located within this application path.
 // Swapps Application with the current running one. 
-bool LibHomebrew::Loot::Proc::LoadExec(const char *path, char *const *argv) {
+bool LibHomebrew::Loot::Proc::SysLoadExec(const char *path, char *const *argv) {
 	if (path == nullptr) return false;
 	if (path[0] == '\0') return false;
 	
@@ -38,6 +42,56 @@ bool LibHomebrew::Loot::Proc::LoadExec(const char *path, char *const *argv) {
 	ret = sceSystemServiceLoadExec(path, argv);
 	if (ret == SCE_OK) return true;
 	return false;
+}
+
+// Load and Execute a other elf from any path.
+int LibHomebrew::Loot::Proc::UserLoadExec(const char *path, void *arg1, void *arg2) {
+	if (path == nullptr) return false;
+	if (path[0] == '\0') return false;
+
+	int (*ptr)(void *args1, void *args2);
+	static char buf[1048576];
+
+	FILE* elf = fopen(path, "rb");
+	if (!elf) { Logger::Debug("[PS4-Process] Couldn't load elf from path : %s\n", path); return -1; }
+	fread(buf, 1, sizeof(buf), elf);
+	ptr = reinterpret_cast<int (*)(void *, void *)>(ElfLoader::LoadImage(buf, sizeof(buf)));
+	if (!ptr) return -1;
+
+	Logger::Debug("[PS4-Process] Executing Mapped ELF now.\n");
+	return ptr(arg1, arg2);
+}
+
+// Load and Execute a binary from any path.
+int LibHomebrew::Loot::Proc::LoadExecBin(const char *path, void *arg1, void *arg2) {
+	if (path == nullptr) return false;
+	if (path[0] == '\0') return false;
+
+	// Try to open the file.
+	FILE *fd = fopen(path, "r");
+	if (!fd) { Logger::Debug("[PS4-Process] Couldn't load bin from path : %s\n", path); return -1; }
+
+	// Load it.
+	byte *buffer;
+	fseek(fd, 0, SEEK_END);
+	long len = ftell(fd);
+	rewind(fd);
+	buffer = (byte *)malloc(len);
+	fread(buffer, 1, len, fd);
+	fclose(fd);
+
+	// Setup memory.
+	char *execute = (char *)Sys::mmap(NULL, len, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
+	if (!execute) { Logger::Debug("[PS4-Process] Can't allocate memory\n"); return -1; }
+
+	memset(execute, 0x0, len);
+	memcpy(execute, buffer, len);
+
+	// Run.
+	int (*func)(void *, void *) = reinterpret_cast<int (*)(void *, void *)>(execute);
+
+	Logger::Debug("[PS4-Process] Executing Mapped Binary now.\n");
+	return func(arg1, arg2);
 }
 
 // Kernel Execute aka Syscall 11 with path argument.
@@ -49,13 +103,13 @@ int LibHomebrew::Loot::Proc::Kexec(const char *path) {
 	FileInfo info(path);
 	PS4File file(path);
 	if (file.Exists()) {
-		if (file.Open2(IO::Read, IO::Byte)) {
+		if (file.Open(IO::Read, IO::BYTE)) {
 			buffer = malloc(info.Length());
-			if (!file.Read2(buffer, info.Length())) {
+			if (!file.Read(buffer, info.Length())) {
 				if (verbose) Console::WriteError("Kexec file load error.\n");
 				return 1;
 			}
-			file.Close2();
+			file.Close();
 		} else return 1;
 	} else return 1;
 
@@ -80,15 +134,15 @@ int LibHomebrew::Loot::Proc::Freedom(void) {
 }
 
 // Enable SUDO. DevKit ID and Allow Map of SELF patch.
-int LibHomebrew::Loot::Proc::EnableSUDO(void) {
+int LibHomebrew::Loot::Proc::EnableMMAPSelf(void) {
 	struct thread td;
-	return Sys::kexec((void *)&enableSUDO, &td);
+	return Sys::kexec((void *)&enableMMAPSelf, &td);
 }
 
 // Disable SUDO.
-int LibHomebrew::Loot::Proc::DisableSUDO(void) {
+int LibHomebrew::Loot::Proc::DisableMMAPSelf(void) {
 	struct thread td;
-	return Sys::kexec((void *)&disableSUDO, &td);
+	return Sys::kexec((void *)&disableMMAPSelf, &td);
 }
 
 // Disable Process ASLR.

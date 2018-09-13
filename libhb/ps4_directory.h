@@ -18,6 +18,12 @@
 #include "defines.h"
 #include "file_info.h"
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 namespace LibHomebrew {
 	namespace PS4IO {
 		class PS4Dir {
@@ -35,8 +41,6 @@ namespace LibHomebrew {
 			~PS4Dir();
 			static bool Exists(const char *source);
 			bool Exists(void);
-			static bool isDir(const char *source);
-			bool isDir(void);
 			static bool Copy(const char *source, const char *destination);
 			bool Copy(const char *destination);
 			static bool Mkdir(const char *dir);
@@ -44,13 +48,14 @@ namespace LibHomebrew {
 			static bool Mkpath(const char *path);
 			bool Mkpath(char *path);
 			static bool Remove(const char *source);
+			static void Remove(char **source);
 			bool Remove(void);
 			static bool RemoveRecursive(const char *path);
 			bool RemoveRecursive(void);
 			static bool CopyRecursive(const char *source, const char *destination);
 			bool CopyRecursive(const char *destination);
 			static bool Move(const char *source, const char *_new);
-			bool Move(const char *_new);			
+			bool Move(const char *_new);
 			static int Open(const char *directory);
 			bool Open(void);
 			static bool Close(int directory);
@@ -60,7 +65,7 @@ namespace LibHomebrew {
 			char *Path(void);
 			char *DirName(void);
 			char *PathTo(void);
-			std::vector<FileInfo> EntryInfoList(void);
+			std::vector<FileInfo> *EntryInfoList(void);
 		};
 	}
 }

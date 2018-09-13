@@ -13,19 +13,22 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
 #include "application.h"
 #include <algorithm>
 
 // AV Player.
 common::Util::AvPlayer player;
-ssi::Button LibHomebrew::Application::input = ssi::kButtonNone;
+ssi::Button            LibHomebrew::Application::input = ssi::kButtonNone;
 
 // Resources
-ResourceManager resManager;
-Config LibHomebrew::Application::conf;
+ResourceManager        LibHomebrew::Application::resManager;
+SoundManager           LibHomebrew::Application::soundManager;
+EventDispatcher        LibHomebrew::Application::eventDispatcher;
+UserEntryManager       usrEntryManager;
+Config                 LibHomebrew::Application::conf;
 
 // Console informations.
-static char *sandBoxDirectory;
 static char messageBuffer[1045];
 static char titleBuffer[64];
 static char timeBuffer[16];
@@ -44,8 +47,15 @@ bool LibHomebrew::Application::useCursor     = false;
 bool LibHomebrew::Application::useVid        = false;
 bool LibHomebrew::Application::useTitle      = false;
 bool LibHomebrew::Application::useBanner     = false;
+bool LibHomebrew::Application::useResources  = false;
+bool LibHomebrew::Application::useSound      = false;
+bool LibHomebrew::Application::debug         = false;
+bool LibHomebrew::Application::useIme        = false;
+bool LibHomebrew::Application::useDialog     = false;
+EventDataUserInfo LibHomebrew::Application::data;
+PictureBox LibHomebrew::Application::bgi;
 Position LibHomebrew::Application::titlePos  = Position(0.0, 0.0);
-Position LibHomebrew::Application::timePos   = Position(0.0, 0.0);
+Position LibHomebrew::Application::timePos   = Position(0.01, 0.0);
 Position LibHomebrew::Application::bannerPos = Position(0.0, 0.0);
 Position LibHomebrew::Application::shaderPos = Position(0.0, 0.0);
 Color LibHomebrew::Application::titleColor   = LIGHT_BLUE;;
@@ -55,17 +65,20 @@ float LibHomebrew::Application::titleSize    = CHAR_N;
 float LibHomebrew::Application::timeSize     = CHAR_S;
 float LibHomebrew::Application::bannerSize   = 0.08;
 
+//The domain that stores the character string of the result
+wchar_t LibHomebrew::Application::resultTextBuf[TEXT_MAX_LENGTH + 1];
+
 // Effect fun.
 float posX;
 float posY;
 float _posX;
 float _posY;
-static int count;
+//static int count;
 int bannerCount;
 int pauseCount;
 int blinked;
 static int interval       = 80;
-static int intervalShowen = 3;
+//static int intervalShowen = 3;
 static bool bannerEffect  = true;
 
 size_t sceLibcHeapSize = 256 * 1024 * 1024;
@@ -76,6 +89,10 @@ void *(*UsrEntry)(void*) = 0;
 // The Thread for the User main Entry.
 ScePthread usrMainEntry;
 void RunUserEntry(void) {
+	// Set to run the User Entry Loop in Core 1.
+	scePthreadSetaffinity(usrMainEntry, 1);
+	
+	// Run UserEntry.
 	if (scePthreadCreate(&usrMainEntry, NULL, UsrEntry, NULL, "User Entry") != SCE_OK) {
 		if (verbose) Console::WriteError("Couldn't run User Application Code !\n");
 	}
@@ -96,28 +113,28 @@ int LibHomebrew::Application::UserInfo::finalize() {
 	return SCE_OK;
 }
 
-int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsContext) {
+int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsContext, Application *app) {
 	if (padContext->update() >= SCE_OK) {
 		// Update Left Stick.
-		sce::Vectormath::Simd::Aos::Vector2 leftStick = padContext->getLeftStick();
+		/*sce::Vectormath::Simd::Aos::Vector2 leftStick = padContext->getLeftStick();
 		posY += leftStick.getY() * 0.01;
-		posX += leftStick.getX() * 0.005;
+		posX += leftStick.getX() * 0.005;*/
 
 		// Compare new position against the old one and count up if they are same, aka stick didn't move.
 		// Cursor and button navi effect.
-		if (posY == _posY) {
+		/*if (posY == _posY) {
 			if (posX == _posX) {
 				if (count != 300) count++;
 			} else count = 0;
 		} else count = 0;
 		_posY = posY;
-		_posX = posX;
+		_posX = posX;*/
 
 		// Are we out of range ?
-		if (posX < 0.0) posX = 0.0;
+		/*if (posX < 0.0) posX = 0.0;
 		if (posX > 1.0) posX = 1.0;
 		if (posY < 0.0) posY = 0.0;
-		if (posY > 1.0) posY = 1.0;
+		if (posY > 1.0) posY = 1.0;*/
 
 		// Let TTY update his buttons.
 		if (multiLine) TTY::update(padContext);
@@ -134,14 +151,11 @@ int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsCon
 			strftime(timeBuffer2, sizeof(timeBuffer2), "%H_%M_%S", tm);
 		}
 
-		// Update All Forms and objects.
-		/* Not implemented yet */
-
 		// Do Buttons.
 		if (padContext->isButtonDown(ssi::kButtonUp, ssi::kButtonEventPatternAny)) {
-
+			// Moved into TTY Class so we can determine if there are any more lines on top and on end when using Line Highlighting.
 		} else if (padContext->isButtonDown(ssi::kButtonDown, ssi::kButtonEventPatternAny)) {
-
+			// Moved into TTY Class so we can determine if there are any more lines on top and on end when using Line Highlighting.
 		} else if (padContext->isButtonDown(ssi::kButtonLeft, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonLeft;
 			Console::SetUserInput(ssi::kButtonLeft);
@@ -171,12 +185,6 @@ int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsCon
 		} else if (padContext->isButtonPressed(ssi::kButtonCross, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonCross;
 			Console::SetUserInput(ssi::kButtonCross);
-			if (useVid & isPlaying) {
-				if (player.isPlaying()) {
-					player.stop();
-					isPlaying = false;
-				}
-			}
 		} else if (padContext->isButtonPressed(ssi::kButtonR1, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonR1;
 			Console::SetUserInput(ssi::kButtonR1);
@@ -185,8 +193,7 @@ int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsCon
 			Console::SetUserInput(ssi::kButtonR2);
 		} else if (padContext->isButtonPressed(ssi::kButtonR3, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonR3;
-			Console::SetUserInput(ssi::kButtonR3);
-			TTY::clear();
+			Console::SetUserInput(ssi::kButtonR3);			
 		} else if (padContext->isButtonPressed(ssi::kButtonL1, ssi::kButtonEventPatternAny)) {
 			input = ssi::kButtonL1;
 			Console::SetUserInput(ssi::kButtonL1);
@@ -205,7 +212,18 @@ int LibHomebrew::Application::UserInfo::update(ssg::GraphicsContext *graphicsCon
 		} else {
 			input = ssi::kButtonNone;
 			Console::SetUserInput(ssi::kButtonNone);
-		}		
+		}
+
+		if (app->textViewer.size() > 0) {
+			for (std::vector<TextViewer *>::iterator it = app->textViewer.begin(); it != app->textViewer.end(); it++) {
+				(*it)->Update(padContext);
+			}
+		}
+		if (app->hexViewer.size() > 0) {
+			for (std::vector<HexViewer *>::iterator it = app->hexViewer.begin(); it != app->hexViewer.end(); it++) {
+				(*it)->Update(padContext);
+			}
+		}
 	}
 	return SCE_OK;
 }
@@ -240,6 +258,7 @@ void LibHomebrew::Application::UserInfo::render(ssg::GraphicsContext *graphicsCo
 	}
 }
 
+// Initialize the Application Instance.
 int LibHomebrew::Application::initialize(void) {
 	int ret = 0;
 	(void)ret;
@@ -262,42 +281,121 @@ int LibHomebrew::Application::initialize(void) {
 	uint32_t height = graphicsContext->getNextRenderTarget()->getHeight();
 	sprite->setRenderTargetSize(Size(width, height));
 
-	// Initialize Resource Manager.
-	conf.useArchive = false;
-	resManager.verbose = true;
-	resManager.initialize(Graphics(), sprite, &conf, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-
-	// Initialize AV Player.
-	ret = player.initialize(Graphics(), sprite, getAudioContext(), &resManager.directMemoryHeap);
-	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
-
-	// Clear Buffer before using.
-	memset(messageBuffer, 0, sizeof(messageBuffer));
-	sandBoxDirectory = new char[64];
-	memset(sandBoxDirectory, 0, 64);
-	memset(titleBuffer, 0, sizeof(titleBuffer));
-	memset(timeBuffer, 0, sizeof(timeBuffer));
-	memset(timeBuffer2, 0, sizeof(timeBuffer2));
-
-	// Generate Titel string with version.
-	if (useTitle) {
-		snprintf(titleBuffer, sizeof(titleBuffer), "********* %s *********", title);
-		titlePos = Position(getCenteredPosX(strlen(titleBuffer)), MARGIN_Y);
-	}
-
-	// Set start and close flags.
-	start = true;
-	close = false;
-
 	// Get Freedom for this Process.
 	int uid = Sys::getuid();
 	if (uid != 0) Proc::Freedom();
 
-	// Resolve Current Directory.
+	// Shall we use Debugging ?
+	if (debug) {
+		// Get Connected usb drive.
+		String path = SwissKnife::GetUsb();
+		path += "debug_";
+		path += SwissKnife::GetTimeString();
+		path += ".log";
 
+		// Initialize debug log.
+		Logger::UseDebug();
+		Logger::InitDbg(path.c_str());
 
-	// Clear SplashScreen.
+		// Debug Logg Header.
+		Logger::Debug("Debugging startet...\n");
+	}
+
+	// Shall we use Ime Dialog ?
+	if (useIme) {
+		Logger::Debug("### ime_dialog : Initialize --> ");
+		wcsncpy(resultTextBuf, L"Edit", sizeof(resultTextBuf) / sizeof(wchar_t));
+
+		imeDialog = new ImeDialogWrapper();
+		SCE_SAMPLE_UTIL_ASSERT(imeDialog != NULL);
+		ret = imeDialog->initialize();
+		if (ret != 0) Logger::Debug("error ###\n");
+		else Logger::Debug("ok ###\n");
+	}
+
+	// Shall we use Message Dialog ?
+	if (useDialog) {
+		Logger::Debug("### msg_dialog : Initialize --> ");
+		msgDialog = new MsgDialogWrapper();
+		ret = msgDialog->initialize();
+		if (ret < 0) Logger::Debug("error ###\n");
+		else {
+			Logger::Debug("ok ###\n");
+			msgDialog->doNotTerminate(true);    // Needed so we can re-use the dialog without the need to initialize it over and over again.
+		}
+	}
+
+	// Initialize config.
+	Logger::Debug("Initializing config...\n");
+	if (useResources | useSound) conf.initialize("/mnt/sandbox/pfsmnt/ADD_YOUR_TITLE_ID_HERE-app0/game_data/config.lua", "english_us");
+	Logger::Debug("Initializing config...done.\n");
+	
+	// Initialize Resource Manager.
+	Logger::Debug("Initializing resource manager...\n");
+	resManager.initialize(Graphics(), sprite, &conf, width, height);
+	Logger::Debug("Initializing resource manager done.\n");
+
+	// Shall we load resources from the app folder ?
+	if (useResources) {
+		Logger::Debug("Loading resources...\n");
+		resManager.load();
+		Logger::Debug("Loading resources done.\n");
+	}
+
+	// Initialize Sound Manager.
+	if (useSound) {
+		Logger::Debug("Initializing sound manager...\n");
+		soundManager.initialize(Audio(), &conf, &usrEntryManager, &eventDispatcher);
+		Logger::Debug("Initializing sound manager done.\n");		
+	}
+
+	// Initialize AV Player.
+	Logger::Debug("Initializing av player...\n");
+	player.initialize(Graphics(), sprite, Audio(), &resManager.directMemoryHeap);
+	Logger::Debug("Initializing av player done.\n");
+
+	// Clear Buffer before using.
+	memset(messageBuffer, 0, sizeof(messageBuffer));
+	memset(titleBuffer, 0, sizeof(titleBuffer));
+	memset(timeBuffer, 0, sizeof(timeBuffer));
+	memset(timeBuffer2, 0, sizeof(timeBuffer2));
+	Logger::Debug("Buffers cleared.\n");
+
+	// Generate Titel string with version.
+	if (useTitle) {
+		snprintf(titleBuffer, sizeof(titleBuffer), "%s", title);
+		titlePos = Position(getCenteredPosX(strlen(titleBuffer)), MARGIN_Y);
+		Logger::Debug("Title set.\n");
+	}
+
+	// Set start and close flags.
+	start = true;
+	Logger::Debug("Flags set.\n");
+
+	// Setting Importend paths.
+	Logger::Debug("Setting Importend paths...");
+	pathToLibc = String("/mnt/sandbox/pfsmnt/");
+	pathToLibc += APP_STR;
+	pathToLibc += "-app0/sce_module/libc.sprx";
+	pathToLibSceFios2 = String("/mnt/sandbox/pfsmnt/");
+	pathToLibSceFios2 += APP_STR;
+	pathToLibSceFios2 += "-app0/sce_module/libSceFios2.sprx";
+	Logger::Debug("done.\n");
+
+	// Set Background Image properties.
+	bgi.setFillMode(bgi.kFillModeDotByDot);
+	bgi.setVAlign(bgi.kVAlignCenter);
+	bgi.setHAlign(bgi.kHAlignCenter);	
+	bgi.setPosition(Position(0.0f, 0.0f));
+	bgi.setSize(Size(1.0f, 1.0f));
+	bgi.Visible(true);
+	bgi.Hide();
+	Logger::Debug("Background image properties set.\n");
+	
+	// Clear SplashScreen
+	Logger::Debug("Hidding splash screen...");
 	sceSystemServiceHideSplashScreen();
+	Logger::Debug("done.\n");
 
 	return SCE_OK;
 }
@@ -354,36 +452,40 @@ int LibHomebrew::Application::update(void) {
 		}
 	}
 
+	// Update User Info aka pad to userId.
 	if (!isPlaying) {
 		for (std::vector<UserInfo*>::iterator it = usersInfo.begin(); it != usersInfo.end(); it++) {
-			ret = (*it)->update(getGraphicsContext());
+			ret = (*it)->update(getGraphicsContext(), this);
 			if (ret != SCE_OK) {
 				return 1;
 			}
-		}
+		}		
 	}
 
 	// Update/Run player.
 	if (isPlaying) {
-		int ret;
-		(void)ret;
 		int32_t vhandle = Graphics()->getVideoOutHandle();
 		sceVideoOutWaitVblank(vhandle);
 		if (player.isPlaying()) {
 			ret = player.update();
 			SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 		}
-	} else if (input == ssi::kButtonR1) {
-		if (useVid) {
-			Play();
-			input = ssi::kButtonNone;
-		}		
 	}
 
 	// Run User Main Entry.
 	if (start) {		
 		RunUserEntry();
 		start = false;
+	}
+
+	// Update Dialogs.
+	if (!isPlaying) {
+		if (useIme) {
+			if (imeDialog->everyFrame() == ImeDialogWrapper::STATUS_DIALOG_FINISH) {
+				Logger::Debug("IME set resultTextBuf to \"%ls\"\n", resultTextBuf);
+			}
+		}
+		if (useDialog) msgDialog->everyFrame();
 	}
 	return SCE_OK;
 }
@@ -392,12 +494,22 @@ int LibHomebrew::Application::update(void) {
 void LibHomebrew::Application::render(void) {
 	Graphics()->beginScene(getGraphicsContext()->getNextRenderTarget(), Graphics()->getDepthStencilSurface());
 	Graphics()->clearRenderTarget(0x00000000);
-	Graphics()->setDepthFunc(sce::SampleUtil::Graphics::kDepthFuncAlways);	// for drawDebugStringf
+	Graphics()->setDepthFunc(G::kDepthFuncAlways);	// for drawDebugStringf
 
 	if (isPlaying) player.render(Graphics(), sprite);
 	else {
+		// Draw Background Image, if set.
+		bgi.Draw(Graphics(), sprite);
+
+		// Draw external forms.	
+		if (drawFuncs.size() > 0) {
+			for (std::vector<void(*)()>::iterator it = drawFuncs.begin(); it != drawFuncs.end(); it++) {
+				(*it)();
+			}
+		}
+
 		// Draw on screen TTY.
-		if (multiLine) TTY::render(getSpriteRenderer(), getGraphicsContext());
+		if (multiLine) TTY::render(sprite, Graphics());
 
 		// Draw Title.		
 		if (useTitle) drawStringf(titlePos, titleSize, titleColor, titleBuffer);
@@ -420,17 +532,47 @@ void LibHomebrew::Application::render(void) {
 			if (strlen(Console::singleCenterBuff) > 0) drawStringf(Position(getCenteredPosX(strlen(Console::singleCenterBuff)), 0.50), Console::singleCenterBuff);
 		}
 
-		// Draw external forms.
-		if (drawFuncs.size() > 0) {
-			for (std::vector<void (*)()>::iterator it = drawFuncs.begin(); it != drawFuncs.end(); it++) {
-				(*it)();
+		// Draw external forms.		
+		if (forms.size() > 0) {
+			for (std::vector<Form *>::iterator it = forms.begin(); it != forms.end(); it++) {
+				(*it)->Draw(Graphics(), sprite);
+			}
+		}
+		if (widgets.size() > 0) {
+			for (std::vector<WidgetBase *>::iterator it = widgets.begin(); it != widgets.end(); it++) {
+				(*it)->Draw(Graphics(), sprite);
+			}
+		}
+		if (pictures.size() > 0) {
+			for (std::vector<PictureBox *>::iterator it = pictures.begin(); it != pictures.end(); it++) {
+				// Change the finger position.
+				if (!strcmp((*it)->getId(), "finger")) {
+					Position pos = Position(0.0f, 0.05f + (TTY::getSelectedLineIndex() * 0.03f));
+					(*it)->setPosition(pos);
+				}				
+				(*it)->Draw(Graphics(), sprite);
+			}
+		}
+		if (rtbs.size() > 0) {
+			for (std::vector<RichTextBox *>::iterator it = rtbs.begin(); it != rtbs.end(); it++) {
+				(*it)->Draw(Graphics(), sprite);
+			}
+		}
+		if (textViewer.size() > 0) {
+			for (std::vector<TextViewer *>::iterator it = textViewer.begin(); it != textViewer.end(); it++) {
+				(*it)->Draw(Graphics(), sprite);
+			}
+		}
+		if (hexViewer.size() > 0) {
+			for (std::vector<HexViewer *>::iterator it = hexViewer.begin(); it != hexViewer.end(); it++) {
+				(*it)->Draw(Graphics(), sprite);
 			}
 		}
 
 		// Draw cursor.
-		for (std::vector<UserInfo*>::iterator it = usersInfo.begin(); it != usersInfo.end(); it++) {
+		/*for (std::vector<UserInfo*>::iterator it = usersInfo.begin(); it != usersInfo.end(); it++) {
 			(*it)->render(Graphics(), sprite);
-		}
+		}*/
 	}
 	Graphics()->endScene();
 	Graphics()->flip(1);
@@ -440,6 +582,21 @@ void LibHomebrew::Application::render(void) {
 int LibHomebrew::Application::finalize(void) {
 	int ret = 0;
 	(void)ret;
+
+	// Finalize Dialogs.
+	if (useIme && imeDialog) {
+		imeDialog->finalize();
+		delete imeDialog;
+		imeDialog = NULL;
+	}
+	if (useDialog && msgDialog) {
+		msgDialog->finalize();
+		delete msgDialog;
+		msgDialog = NULL;
+	}
+
+	// Clear used Resources of the Sound Manager.
+	if (useSound) soundManager.finalize();
 
 	// Clear AV Player.
 	if (isPlaying) player.stop();
@@ -454,11 +611,14 @@ int LibHomebrew::Application::finalize(void) {
 	sprite = NULL;
 	pLoader = NULL;
 
+	// Free Event data.
+	delete data.userInfo;
+	data.userInfo = NULL;
+
 	// Finalize all missing stuff.
-	delete[] sandBoxDirectory;
-	delete title;
-	delete banner;
-	delete videoPath;
+	free(title);
+	free(banner);
+	free(videoPath);
 
 	// Finalize all logged in users.
 	std::vector<UserInfo*>::iterator it;
@@ -479,6 +639,9 @@ int LibHomebrew::Application::finalize(void) {
 
 // Just a shorter symbol.
 G::GraphicsContext *LibHomebrew::Application::Graphics(void) { return getGraphicsContext(); }
+
+// Just a shorter symbol.
+A::AudioContext *LibHomebrew::Application::Audio(void) { return getAudioContext(); }
 
 // Internal shorter Symbol for drawing a Rectagnel.
 void LibHomebrew::Application::drawRect(float x, float y, float width, float height, Color color) {
@@ -510,6 +673,40 @@ int LibHomebrew::Application::drawStringf(float x, float y, float size, Color co
 	n = vsnprintf(buf, sizeof(buf), format, args);
 	Position pos = Position(x, y);
 	if (sprite != NULL) sprite->drawDebugString(Application::Graphics(), pos, size, color, buf);
+	va_end(args);
+
+	return n;
+}
+
+// Internal Draw String.
+int LibHomebrew::Application::drawStringArrayf(float x, float y, float size, Color color, const char *format, ...) {
+	char buf[1000];
+	char tmp[1000];
+	int n, startIndex, lines;
+
+	va_list args;
+	va_start(args, format);
+	n = vsnprintf(buf, sizeof(buf), format, args);
+	Position pos = Position(x, y);
+	int len = strlen(buf);
+	if (sprite != NULL) {
+		startIndex = 0;
+		lines = 0;
+		for (int i = 0; i < len; i++) {
+			if (buf[i] == '\n') {
+				strncat(tmp + startIndex + (startIndex ? 1 : 0), buf + startIndex + (startIndex ? 1 : 0), i - startIndex);
+				startIndex = i;
+				sprite->drawDebugString(Application::Graphics(), Position(pos.getX(), pos.getY() + (lines * size)), size, color, tmp);
+				lines++;
+				memset(tmp, 0, i - startIndex);
+			}
+		}
+		if (startIndex == 0) sprite->drawDebugString(Application::Graphics(), pos, size, color, buf);
+		else if (startIndex != len) {
+			strncat(tmp + startIndex + (startIndex ? 1 : 0), buf + startIndex + (startIndex ? 1 : 0), len - startIndex);
+			sprite->drawDebugString(Application::Graphics(), Position(pos.getX(), pos.getY() + (lines * size)), size, color, tmp);
+		}
+	}
 	va_end(args);
 
 	return n;
@@ -602,61 +799,143 @@ int LibHomebrew::Application::drawStringf(Position pos, const char *format, ...)
 	return n;
 }
 
+// Internal Draw String. (Writes in white)
+int LibHomebrew::Application::drawStringArrayf(Position pos, const char *format, ...) {
+	char buf[1000];
+	char tmp[1000];
+	int n, startIndex, lines;
+
+	va_list args;
+	va_start(args, format);
+	n = vsnprintf(buf, sizeof(buf), format, args);
+	int len = strlen(buf);
+	if (sprite != NULL) {
+		startIndex = 0;
+		lines = 0;
+		for (int i = 0; i < len; i++) {
+			if (buf[i] == '\n') {
+				strncat(tmp + startIndex + (startIndex ? 1 : 0), buf + startIndex + (startIndex ? 1 : 0), i - startIndex);
+				startIndex = i;
+				sprite->drawDebugString(Application::Graphics(), Position(pos.getX(), pos.getY() + (lines * 0.03f)), 0.03f, WHITE, tmp);
+				lines++;
+				memset(tmp, 0, i - startIndex);
+			}
+		}
+		if (startIndex == 0) sprite->drawDebugString(Application::Graphics(), pos, 0.03f, WHITE, buf);
+		else if (startIndex != len) {
+			strncat(tmp + startIndex + (startIndex ? 1 : 0), buf + startIndex + (startIndex ? 1 : 0), len - startIndex);
+			sprite->drawDebugString(Application::Graphics(), Position(pos.getX(), pos.getY() + (lines * 0.03f)), 0.03f, WHITE, tmp);
+		}
+	}
+	va_end(args);
+
+	return n;
+}
+
 // Get centered position for x by a string, based on his length.
 float LibHomebrew::Application::getCenteredPosX(int len) { return 0.5 - (len / (float)CHAR_COL / 2.0) + MARGIN_X; }
 
-// Center Position for a Form.
-Position LibHomebrew::Application::CenterForm(float x, float y) { return Position((0.5 - (x / 2.0)), (0.5 - (y / 2.0))); }
-
 // Run Video.
 void LibHomebrew::Application::Play(void) {
-	int ret;
-	(void)ret;
-	if (strlen(videoPath) > 0) {
-		Console::WriteLine("Trying to run Video...");
-		int32_t vhandle = Graphics()->getVideoOutHandle();
-		for (int i = 0; i < 3; i++) sceVideoOutWaitVblank(vhandle);
-		ret = player.start(videoPath);
-		if (ret == SCE_OK) {
-			isPlaying = true;
-			Console::WriteLine("Ok !\n");
-		} else Console::WriteLine("Error !\n");
-	} else Console::WriteError("No video, no path defined !\nNeed some coffee ?\n");
+	if (!isPlaying) {
+		int ret;
+		(void)ret;
+		if (strlen(videoPath) > 0) {
+			Logger::Debug("Trying to run Video...");
+			int32_t vhandle = Graphics()->getVideoOutHandle();
+			for (int i = 0; i < 3; i++) sceVideoOutWaitVblank(vhandle);
+			ret = player.start(videoPath);
+			if (ret == SCE_OK) {
+				isPlaying = true;
+				Logger::Debug("Ok !\n");
+			} else Logger::Debug("Error !\n");
+		} else Logger::Debug("No video, no path defined !\nNeed some coffee ?\n");
+	}
 }
 
-// Run the application loop.
-int LibHomebrew::Application::exec(void) {
+// Run Video.
+int LibHomebrew::Application::Play(const char *path) {
+	int ret = 0;
+	
+	if (!isPlaying) {
+		(void)ret;
+		if (strlen(path) > 0) {
+			Logger::Debug("Trying to run Video...");
+			int32_t vhandle = Graphics()->getVideoOutHandle();
+			for (int i = 0; i < 3; i++) sceVideoOutWaitVblank(vhandle);
+			ret = player.start(path);
+			if (ret == SCE_OK) {
+				isPlaying = true;
+				Logger::Debug("Ok !\n");
+			} else Logger::Debug("Error !\n");
+		} else Logger::Debug("No video, no path defined !\nNeed some coffee ?\n");
+	}
+
+	return ret;
+}
+
+// Trigger Play if a video file was already loaded and startet. (Does not load a file and play it.)
+void LibHomebrew::Application::AVP_TriggerPlay(void) {
+	if (isPlaying) {
+		
+	}
+}
+
+// Trigger Resume if a video file was already loaded and startet.
+void LibHomebrew::Application::AVP_TriggerResume(void) {
+	if (isPlaying) {
+
+	}
+}
+
+// Trigger Pause if a video file was already loaded and startet.
+void LibHomebrew::Application::AVP_TriggerPause(void) {
+	if (isPlaying) {
+
+	}
+}
+
+// Trigger Stop if a video file was already loaded and startet.
+void LibHomebrew::Application::AVP_TriggerStop(void) {
+	if (isPlaying) {
+		player.stop();
+		isPlaying = false;
+	}
+}
+
+// The App Loop.
+void *AppLoop(void *) {
 	int ret = 0;
 	(void)ret;
 
-	ret = initialize();
+	ret = app.initialize();
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
 
 	while (1) {
-		if (close) break;
-		ret = update();
+		if (app.IsClosed()) break;
+		ret = app.update();
 		if (ret != SCE_OK) break;
-		render();
+		app.render();
 	}
 
-	ret = finalize();
+	ret = app.finalize();
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
-
-	// Dirty but since we can't exit to gui, we simple try to open a non existing path via syscall symbol.
-	Sys::open("/let/me/out/here/", O_RDONLY, 0);
 
 	return 0;
 }
 
-// Add User Main Entry to the Application to run after initializing.
-void LibHomebrew::Application::Add(void *usrLoop) { UsrEntry = reinterpret_cast<void *(*)(void*)>(usrLoop); }
+// Run the application loop in a own quite core.
+ScePthread appLoop;
+int LibHomebrew::Application::exec(void) {
+	// Set App Loop to run in Core 3.
+	scePthreadSetaffinity(appLoop, 3);
 
-// Add a external Draw function to the Applications drawing loop.
-void LibHomebrew::Application::AddDraw(void (*drawEvent)()) { drawFuncs.push_back(drawEvent); }
-
-// Remove a external Draw function from the Applications drawing loop.
-void LibHomebrew::Application::RemoveDraw(void (*drawEvent)()) {
-	drawFuncs.erase(std::remove(drawFuncs.begin(), drawFuncs.end(), drawEvent), drawFuncs.end());
+	// Run the App Loop.
+	if (scePthreadCreate(&appLoop, NULL, AppLoop, NULL, "App Loop") == SCE_OK) {
+		// Wait for exit.
+		scePthreadJoin(appLoop, NULL);
+	}
+	return 0;
 }
 
 // Set Application Title Text.
@@ -725,28 +1004,297 @@ void LibHomebrew::Application::UseScreenShot(bool state) { useScreenShot = state
 // Enable to play a mp4.
 void LibHomebrew::Application::UseVideo(bool state) { useVid = state; }
 
+// Enable to use Sound Effects.
+void LibHomebrew::Application::UseSound(bool state) { useSound = state; }
+
+// Enable early debugging.
+void LibHomebrew::Application::UseDebug(void) {
+	if (debug) debug = false;
+	else debug = true;
+}
+
+// Enable to use and load Application Resources.
+void LibHomebrew::Application::UseResources(bool state) { useResources = state; }
+
+// Enable Ime Dialog.
+void LibHomebrew::Application::UseIme(void) { useIme = true; }
+
+// Enable Msg Dialog.
+void LibHomebrew::Application::UseDialog(void) { useDialog = true; }
+
+// Show Ime Dialog.
+wchar_t *LibHomebrew::Application::ShowIme(wchar_t *title, wchar_t *placeholder) {
+	if (imeDialog->getStatus() == ImeDialogWrapper::STATUS_BEGIN) {
+		memset(resultTextBuf, 0, sizeof(resultTextBuf) / sizeof(wchar_t));
+		wcsncpy(resultTextBuf, L"Edit", sizeof(resultTextBuf) / sizeof(wchar_t));
+		
+		const int32_t showDialogResult = imeDialog->show_ime_dialog(title, placeholder, resultTextBuf, TEXT_MAX_LENGTH);
+		if (showDialogResult != SCE_OK) {
+			Logger::Debug("Error in show_ime_dialog(): 0x%8X\n", showDialogResult);
+			return resultTextBuf;
+		}
+
+		ImeDialogWrapper::Status status;
+		while (true) {
+			status = imeDialog->getStatus();
+			if (status == ImeDialogWrapper::STATUS_DIALOG_FINISH) break;
+			else if (status == ImeDialogWrapper::STATUS_DIALOG_ERROR) break;
+		}
+	}
+	return resultTextBuf;
+}
+
+// Show Msg Dialog.
+DialogResult LibHomebrew::Application::ShowMsg(const char *message) {
+	// Set a result.
+	DialogResult _result = DialogResult::Error;
+
+	// Is Dialog Ready ?
+	if (msgDialog->getStatus() == MsgDialogWrapper::STATUS_BEGIN) {		
+		// Show the dialog.
+		const int32_t showDialogResult = msgDialog->show_msg_dialog(message);
+		if (showDialogResult != SCE_OK) {
+			Logger::Debug("Error in show_msg_dialog(): 0x%8X\n", showDialogResult);
+			goto done;
+		}
+
+		// Wait for Dialog to be done.
+		MsgDialogWrapper::Status status;
+		while (true) {
+			status = msgDialog->getStatus();
+			if (status == MsgDialogWrapper::STATUS_DIALOG_FINISH) break;
+			else if (status == MsgDialogWrapper::STATUS_DIALOG_ERROR) break;
+		}
+
+		// Resolve the result.	
+		if (status == MsgDialogWrapper::STATUS_DIALOG_FINISH) {
+			uint32_t result = msgDialog->getResult();
+			if (result == SCE_MSG_DIALOG_BUTTON_ID_OK) {
+				_result = PS4Forms::DialogResult::Ok;
+			} else if (result == SCE_MSG_DIALOG_BUTTON_ID_NO) {
+				_result = DialogResult::No;
+			} else if (result == SCE_MSG_DIALOG_BUTTON_ID_YES) {
+				_result = DialogResult::Yes;
+			} else if (result == SCE_MSG_DIALOG_BUTTON_ID_INVALID) {
+				_result = DialogResult::Cancel;
+			}
+		}			
+	}
+done:
+	// Return result.
+	return _result;
+}
+
+// Show Msg Dialog, defining specific buttons to use.
+DialogResult LibHomebrew::Application::ShowMsg(const char *message, Buttons button, const char *button1, const char *button2) {
+	// Set a result.
+	DialogResult _result = DialogResult::Error;
+
+	// Is Dialog Ready ?
+	if (msgDialog->getStatus() == MsgDialogWrapper::STATUS_BEGIN) {
+		// Show the dialog.
+		const int32_t showDialogResult = msgDialog->show_msg_dialog(message, button, button1, button2);
+		if (showDialogResult != SCE_OK) {
+			Logger::Debug("Error in show_msg_dialog(): 0x%8X\n", showDialogResult);
+			goto done;
+		}
+
+		// Wait for Dialog to be done.
+		MsgDialogWrapper::Status status;
+		while (true) {
+			status = msgDialog->getStatus();
+			if (status == MsgDialogWrapper::STATUS_DIALOG_FINISH) break;
+			else if (status == MsgDialogWrapper::STATUS_DIALOG_ERROR) break;
+		}
+
+		// Resolve the result.	
+		if (status == MsgDialogWrapper::STATUS_DIALOG_FINISH) {
+			uint32_t result = msgDialog->getResult();
+			if (result == SCE_MSG_DIALOG_BUTTON_ID_OK) {
+				_result = PS4Forms::DialogResult::Ok;
+			} else if (result == SCE_MSG_DIALOG_BUTTON_ID_NO) {
+				_result = DialogResult::No;
+			} else if (result == SCE_MSG_DIALOG_BUTTON_ID_YES) {
+				_result = DialogResult::Yes;
+			} else if (result == SCE_MSG_DIALOG_BUTTON_ID_INVALID) {
+				_result = DialogResult::Cancel;
+			} else if (result == SCE_MSG_DIALOG_BUTTON_ID_BUTTON1) {
+				_result = DialogResult::Button1;
+			} else if (result == SCE_MSG_DIALOG_BUTTON_ID_BUTTON2) {
+				_result = DialogResult::Button2;
+			}
+		}			
+	}
+done:
+	// Return result.
+	return _result;
+}
+
 // Set the Vide path.
 void LibHomebrew::Application::Video(const char *path) { videoPath = strdup(path); }
 
 // Closing the Application.
 void LibHomebrew::Application::Close(void) { close = true; }
 
+// Determine if the application loop shall be stopped and this instance be closed.
+bool LibHomebrew::Application::IsClosed(void) { return close; }
+
 // Returns the user input.
 ssi::Button LibHomebrew::Application::Input(void) { return input; }
+
+// Add a background image to the picture box.
+void LibHomebrew::Application::setBackgroundImage(ssg::Texture *texture) {
+	bgi.addImage(texture);
+	bgi.Show();
+}
+
+// Show the Background Image.
+void LibHomebrew::Application::ShowBgi(void) { bgi.Show(); }
+
+// Hide the Background Image.
+void LibHomebrew::Application::HideBgi(void) { bgi.Hide(); }
 
 // Clear the input if needed.
 void LibHomebrew::Application::ClearInput(void) { input = ssi::kButtonNone; }
 
+// Add User Main Entry to the Application to run after initializing.
+void LibHomebrew::Application::AddCode(void *usrLoop) { UsrEntry = reinterpret_cast<void *(*)(void*)>(usrLoop); }
+
+// Add a external Draw function to the Applications drawing loop.
+void LibHomebrew::Application::Add(void (*drawEvent)()) { drawFuncs.push_back(drawEvent); }
+
+// Add a Form to the Application loop.
+void LibHomebrew::Application::Add(PS4Forms::Form *toAdd) { if (toAdd != nullptr) forms.push_back(toAdd); }
+
+// Add a Widget to the Application loop.
+void LibHomebrew::Application::Add(PS4Forms::WidgetBase *toAdd) { if (toAdd != nullptr) widgets.push_back(toAdd); }
+
+// Add a PictureBox to the Application loop.
+void LibHomebrew::Application::Add(PS4Forms::PictureBox *toAdd) { if (toAdd != nullptr) pictures.push_back(toAdd); }
+
+// Add a RichTextBox to the Application loop.
+void LibHomebrew::Application::Add(PS4Forms::RichTextBox *toAdd) { if (toAdd != nullptr) rtbs.push_back(toAdd); }
+
+// Add a TextViewer to the Application loop.
+void LibHomebrew::Application::Add(PS4Forms::TextViewer *toAdd) { if (toAdd != nullptr) textViewer.push_back(toAdd); }
+
+// Add a HexViewer to the Application loop.
+void LibHomebrew::Application::Add(PS4Forms::HexViewer *toAdd) { if (toAdd != nullptr) hexViewer.push_back(toAdd); }
+
+// Remove a external Draw function from the Applications drawing loop.
+void LibHomebrew::Application::Remove(void (*drawEvent)()) {
+	drawFuncs.erase(std::remove(drawFuncs.begin(), drawFuncs.end(), drawEvent), drawFuncs.end());
+}
+
+// Remove Form from the Application loop.
+void LibHomebrew::Application::Remove(PS4Forms::Form *toRemove) {
+	if (toRemove != nullptr) {
+		forms.erase(std::remove(forms.begin(), forms.end(), toRemove), forms.end());
+	}
+}
+
+// Remove Widget from the Application loop.
+void LibHomebrew::Application::Remove(PS4Forms::WidgetBase *toRemove) {
+	if (toRemove != nullptr) {
+		widgets.erase(std::remove(widgets.begin(), widgets.end(), toRemove), widgets.end());
+	}
+}
+
+// Add a PictureBox to the Application loop.
+void LibHomebrew::Application::Remove(PS4Forms::PictureBox *toRemove) {
+	if (toRemove != nullptr) {
+		pictures.erase(std::remove(pictures.begin(), pictures.end(), toRemove), pictures.end());
+	}
+}
+
+// Remove Form from the Application loop.
+void LibHomebrew::Application::Remove(PS4Forms::RichTextBox *toRemove) {
+	if (toRemove != nullptr) {
+		rtbs.erase(std::remove(rtbs.begin(), rtbs.end(), toRemove), rtbs.end());
+	}
+}
+
+// Remove Widget from the Application loop.
+void LibHomebrew::Application::Remove(PS4Forms::TextViewer *toRemove) {
+	if (toRemove != nullptr) {
+		textViewer.erase(std::remove(textViewer.begin(), textViewer.end(), toRemove), textViewer.end());
+	}
+}
+
+// Add a PictureBox to the Application loop.
+void LibHomebrew::Application::Remove(PS4Forms::HexViewer *toRemove) {
+	if (toRemove != nullptr) {
+		hexViewer.erase(std::remove(hexViewer.begin(), hexViewer.end(), toRemove), hexViewer.end());
+	}
+}
+
+// Get a Form based on his ID.
+Form *LibHomebrew::Application::GetFormById(String id) {
+	if (forms.size() > 0) {
+		for (std::vector<Form *>::iterator it = forms.begin(); it != forms.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
+// Get a Widget based on his ID.
+WidgetBase *LibHomebrew::Application::GetWidgetById(String id) {
+	if (widgets.size() > 0) {
+		for (std::vector<WidgetBase *>::iterator it = widgets.begin(); it != widgets.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
+// Get a PictureBox based on his ID.
+PictureBox *LibHomebrew::Application::GetPictureById(String id) {
+	if (pictures.size() > 0) {
+		for (std::vector<PictureBox *>::iterator it = pictures.begin(); it != pictures.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
+// Get a Form based on his ID.
+RichTextBox *LibHomebrew::Application::GetRtbById(String id) {
+	if (rtbs.size() > 0) {
+		for (std::vector<RichTextBox *>::iterator it = rtbs.begin(); it != rtbs.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
+// Get a Widget based on his ID.
+TextViewer *LibHomebrew::Application::GetTextViewerById(String id) {
+	if (textViewer.size() > 0) {
+		for (std::vector<TextViewer *>::iterator it = textViewer.begin(); it != textViewer.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
+// Get a PictureBox based on his ID.
+HexViewer *LibHomebrew::Application::GetHexViewerById(String id) {
+	if (hexViewer.size() > 0) {
+		for (std::vector<HexViewer *>::iterator it = hexViewer.begin(); it != hexViewer.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
 //E Handle UserService events.
 //J UserService のイベントをハンドルします。
 int LibHomebrew::Application::userEventHandler(SceUserServiceEvent *event) {
-	if (event == NULL) {
-		return 0;
-	}
+	if (event == NULL) return 0;
 	if (event->eventType == SCE_USER_SERVICE_EVENT_TYPE_LOGIN) {
 		onLogin(event->userId);
-	}
-	else if (event->eventType == SCE_USER_SERVICE_EVENT_TYPE_LOGOUT) {
+	} else if (event->eventType == SCE_USER_SERVICE_EVENT_TYPE_LOGOUT) {
 		onLogout(event->userId);
 	}
 
@@ -758,6 +1306,7 @@ int LibHomebrew::Application::userEventHandler(SceUserServiceEvent *event) {
 int LibHomebrew::Application::onLogin(SceUserServiceUserId userId) {
 	int ret;
 	(void)ret;
+
 	//E Get local user name of the user.
 	//E After user have linked to Sony Entertainment Network account, it is the same as Online ID .
 	//J ユーザーのローカルユーザー名を取得する。
@@ -778,7 +1327,7 @@ int LibHomebrew::Application::onLogin(SceUserServiceUserId userId) {
 
 	usersInfo.push_back(userInfo);
 
-	printf("user \"%s\" (0x%x) logged in\n", userName, userId);
+	Logger::Debug("user \"%s\" (0x%x) logged in\n", userName, userId);
 
 	return SCE_OK;
 }
@@ -799,7 +1348,7 @@ int LibHomebrew::Application::onLogout(SceUserServiceUserId userId) {
 		}
 	}
 
-	printf("user \"%s\" (0x%x) logged out\n", userInfo->userName.c_str(), userInfo->userId);
+	Logger::Debug("user \"%s\" (0x%x) logged out\n", userInfo->userName.c_str(), userInfo->userId);
 
 	ret = userInfo->finalize();
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);

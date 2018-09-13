@@ -13,6 +13,8 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
+
 #include "swiss_knife.h"
 #include "defines.h"
 #include "syscalls.h"
@@ -20,6 +22,7 @@
 #include "file_info.h"
 #include "ps4_directory.h"
 #include "ps4_file.h"
+#include "logger.h"
 #include <net.h>
 #include <libnetctl.h>
 #include <sampleutil.h>
@@ -38,8 +41,51 @@ void LibHomebrew::Loot::SwissKnife::Verbose(void) {
 	else verbose = true;
 }
 
+// Compare Arrays against each other.
+bool LibHomebrew::Loot::SwissKnife::Contains(char *source, char  *range) {
+	if (!source) return false;
+	int len = sizeof(source) / sizeof(*source);
+	int lenr = sizeof(range) / sizeof(*range);
+	for (int i = 0; i < len; i++) {
+		if (source[i] == range[0]) {
+			if ((len - i) >= lenr) {
+				int match = 1;
+				for (int j = 1; j < lenr; j++) {
+					if (source[i + j] == range[j]) match++;
+					else { i += j; break; }
+				}
+				if (match == lenr) return true;
+			}
+			else break;
+		}
+	}
+	return false;
+}
+
+// Compare Arrays against each other.
+bool LibHomebrew::Loot::SwissKnife::Contains(byte *source, byte *range) {
+	if (!source) return false;
+	for (int i = 0; i < Length(source); i++) {
+		if (source[i] == range[0]) {
+			if ((Length(source) - i) >= Length(range)) {
+				int match = 1;
+				for (int j = 1; j < Length(range); j++) {
+					if (source[i + j] == range[j]) match++;
+					else { i += j; break; }
+				}
+				if (match == Length(range)) return true;
+			}
+			else break;
+		}
+	}
+	return false;
+}
+
 /* Get Array size. */
 size_t LibHomebrew::Loot::SwissKnife::ArraySize(char *array) { return sizeof(array) / sizeof(*array); }
+
+// Get Item count of a Array.
+int LibHomebrew::Loot::SwissKnife::Length(byte *array) { return (sizeof(array) / sizeof(*array)); }
 
 /* Convert a void ptr byte array to a hex string. */
 String LibHomebrew::Loot::SwissKnife::ToHexString(void *bytes, int len) {
@@ -197,19 +243,22 @@ void LibHomebrew::Loot::SwissKnife::Split(StringList *_list, char *str, const ch
 
 /* Trims the file name out of a path string and returns the name. */
 char *LibHomebrew::Loot::SwissKnife::GetName(char *str) {
-	StringList *splitted;
+	StringList splitted;
+	char *_str = strdup(str);                                                      // Make a copy of the string to split, to not destroy the data.
 
-	if (strstr(str, "/") != nullptr) {
+	if (strstr(_str, "/") == nullptr) {
 		if (verbose) Console::WriteLine("Couldn't find a single path slash within this string.\n");
+		Logger::Debug("Couldn't find a single path slash within this string.\n");
 		return nullptr;
-	} else if (!strlen(str)) {
+	} else if (!strlen(_str)) {
 		if (verbose) Console::WriteLine("Dude how i shall split a empty string ? o_O\n");
+		Logger::Debug("Dude how i shall split a empty string ? o_O\n");
 		return nullptr;
 	}
 
-	splitted = new StringList();                                                     // Allocate memory for our list to begin with.
-	Split(splitted, str, "/");                                                       // Split the string now.
-	return strdup(splitted->at(splitted->size()).c_str());                           // And return the last entry of the splitted array.
+	Split(&splitted, _str, "/");                                                   // Split the string now.
+	free(_str);                                                                    // Free memory.
+	return strdup(splitted.at(splitted.size() - 1).c_str());                       // And return the last entry of the splitted array.
 }
 
 /*
@@ -218,7 +267,8 @@ char *LibHomebrew::Loot::SwissKnife::GetName(char *str) {
 */
 char *LibHomebrew::Loot::SwissKnife::GetPath(char *str) {
 	String path(str);
-	String name(SwissKnife::GetName(str));
+	String split(str);
+	String name(SwissKnife::GetName((char *)split.c_str()));
 	String done;
 	int pos = path.find(name + "/");
 	if (pos != -1) done = path.replace(pos, (name + "/").length(), "");
@@ -229,9 +279,43 @@ char *LibHomebrew::Loot::SwissKnife::GetPath(char *str) {
 	return strdup(done.c_str());
 }
 
+// Get Main user name.
+char *LibHomebrew::Loot::SwissKnife::GetUserName(void) {
+	char *buffer = nullptr;
+	long lSize;
+	FILE *usrName = fopen("/user/home/10000000/np/token.dat", "r");	
+	
+	if (usrName) {
+		// Obtain file size.
+		fseek(usrName, 0, SEEK_END);
+		lSize = ftell(usrName);
+		rewind(usrName);
+
+		// Allocate memory for he buffer.
+		buffer = (char *)malloc(lSize);
+		if (buffer == nullptr) {
+			if (verbose) Console::WriteLine("Memory error %s.\n", stderr);
+			Logger::Debug("Memory error %s.\n", stderr);
+			return buffer;
+		}		
+
+		// Copy name into buffer.
+		int result = fread(buffer, 1, lSize, usrName);
+		if (result != lSize) {
+			if (verbose) Console::WriteLine("Reading error %s.\n", stderr);
+			Logger::Debug("Reading error %s.\n", stderr);
+			return buffer;
+		}
+
+		// Free mem.
+		fclose(usrName);		
+	}
+	return buffer;
+}
+
 /* Finds the last matching string within a char array and returns the indexer.
 * If no matching result was found or the string to find is 0, it will return
-* the arrays start offset. */
+* a null pointer. */
 char *LibHomebrew::Loot::SwissKnife::strstrLast(const char *array, const char *find) {
 	if (*find == '\0') return (char *)array;
 	char *start, *found;
@@ -239,9 +323,18 @@ char *LibHomebrew::Loot::SwissKnife::strstrLast(const char *array, const char *f
 	for (;;) {
 		found = strstr(start, (char *)find);
 		if (found == nullptr) start = start - 1;
-		else break;
+		else return start;
 	}
-	return start;
+	return nullptr;
+}
+
+// Replace a string with a other one.
+bool LibHomebrew::Loot::SwissKnife::Replace(String &str, const String &from, const String &to) {
+	size_t start_pos = str.find(from);
+	if (start_pos == String::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
 }
 
 /* Reverse a Array. */
@@ -299,30 +392,28 @@ char *LibHomebrew::Loot::SwissKnife::intostr(int num) {
 	return converted;
 }
 
+/* Converts integer(s) to a string. */
+char *LibHomebrew::Loot::SwissKnife::intostr(long num) {
+	char *converted = (char *)malloc(16);
+	sprintf(converted, "%ld", num);
+	return converted;
+}
+
 /* Get First connected Usb Device. Attemption: Will loop till a device would be connected. */
 String LibHomebrew::Loot::SwissKnife::GetUsb(void) {
 	if (verbose) Console::WriteLine("Waiting for USB Device...");
 	String usb_path;
 	while (true) {
-		FILE *check = fopen("/mnt/usb0/ghse7ihbredguwezs.txt", "wb");
-		if (check) {
-			fclose(check);
-			if (verbose) {
-				Console::WriteLine("got usb0.\n");
-				Console::LineBreak();
-			}
-			Sys::unlink("/mnt/usb0/ghse7ihbredguwezs.txt");
+		if (PS4Dir::Exists("/mnt/usb0")) {
+			if (verbose) Console::WriteLine("got usb0.\n");
+			Logger::Debug("got usb0.\n");
 			usb_path = String("/mnt/usb0/");
 			break;
-		} else {
-			check = fopen("/mnt/usb1/ghse7ihbredguwezs.txt", "wb");
-			if (check) {
-				fclose(check);
-				if (verbose) Console::WriteLine("got usb1.\n");
-				Sys::unlink("/mnt/usb1/ghse7ihbredguwezs.txt");
-				usb_path = String("/mnt/usb1/");
-				break;
-			}
+		} else if (PS4Dir::Exists("/mnt/usb0")) {
+			if (verbose) Console::WriteLine("got usb1.\n");
+			Logger::Debug("got usb1.\n");
+			usb_path = String("/mnt/usb1/");
+			break;
 		}
 	}
 	return usb_path;
@@ -397,6 +488,36 @@ char *LibHomebrew::Loot::SwissKnife::GetLanguage(void) {
 	else if (systemParamValue == SCE_SYSTEM_PARAM_LANG_FRENCH_CA) res = strdup("fr-ca");
 
 	return res;
+}
+
+/* Dump some data buffer to a file. */
+void LibHomebrew::Loot::SwissKnife::DumpFile(char *name, unsigned char *raw, size_t size) {
+	FILE *fd = fopen(name, "wb");
+	if (fd) {
+		fwrite(raw, 1, size, fd);
+		fclose(fd);
+		Console::WriteLine("File Dumped to: %s\n", name);
+		Console::LineBreak();
+		Logger::Debug("File Dumped to: %s\n", name);
+	} else {
+		Console::WriteError("Couldn't open file for writting: %s\n", strerror(errno));
+		Logger::Debug("Couldn't open file for writting: %s\n", strerror(errno));
+	}
+}
+
+/* Dump some data buffer to a file. */
+void LibHomebrew::Loot::SwissKnife::DumpFile(char *name, int64_t *raw, size_t size) {
+	FILE *fd = fopen(name, "wb");
+	if (fd) {
+		fwrite(raw, 1, size, fd);
+		fclose(fd);
+		Console::WriteLine("File Dumped to: %s\n", name);
+		Console::LineBreak();
+		Logger::Debug("File Dumped to: %s\n", name);
+	} else {
+		Console::WriteError("Couldn't open file for writting: %s\n", strerror(errno));
+		Logger::Debug("Couldn't open file for writting: %s\n", strerror(errno));
+	}
 }
 
 /*------------------------------------
@@ -479,4 +600,76 @@ char *LibHomebrew::Loot::SwissKnife::genPs4Path(const char *path) {
 	char *ret = strdup(newPath);
 	delete[] newPath;
 	return ret;
+}
+
+// BitConvert Bytes to a unsigned short aka 16 bit vlaue.
+void LibHomebrew::Loot::BitConverter::ToUShort(unsigned char *bytes, uint16_t *result) {
+	int N = sizeof(bytes) / sizeof(*bytes);
+	result = (uint16_t *)malloc(N / 2);
+	for (int i = 0; i < N; i += 2) result[i / 2] = bytes[i] | (uint16_t)bytes[i + 1] << 8;
+}
+
+// BitConvert Bytes to a unsigned integer aka 32 bit vlaue.
+void LibHomebrew::Loot::BitConverter::ToUInt(unsigned char *bytes, uint32_t *result) {
+	int N = sizeof(bytes) / sizeof(*bytes);
+	result = (uint32_t *)malloc(N / 4);
+	for (int i = 0; i < N; i += 4)
+		result[i / 4] = bytes[i] | (uint32_t)bytes[i + 1] << 8
+		| (uint32_t)bytes[i + 2] << 16 | (uint32_t)bytes[i + 3] << 24;
+}
+
+// BitConvert Bytes to a unsigned long aka 64 bit vlaue.
+void LibHomebrew::Loot::BitConverter::ToULong(unsigned char *bytes, uint64_t *result) {
+	int N = sizeof(bytes) / sizeof(*bytes);
+	result = (uint64_t *)malloc(N / 8);
+	for (int i = 0; i < N; i += 4)
+		result[i / 4] = bytes[i] | (uint64_t)bytes[i + 1] << 8
+		| (uint64_t)bytes[i + 2] << 16 | (uint64_t)bytes[i + 3] << 24;
+}
+
+// BitConvert Bytes to a unsigned long long aka 64 bit vlaue.
+void LibHomebrew::Loot::BitConverter::ToULongLong(unsigned char *bytes, unsigned long long *result) {
+	int N = sizeof(bytes) / sizeof(*bytes);
+	result = (unsigned long long *)malloc(N / 8);
+	for (int i = 0; i < N; i += 4)
+		result[i / 4] = bytes[i] | (unsigned long long)bytes[i + 1] << 8
+		| (unsigned long long)bytes[i + 2] << 16 | (unsigned long long)bytes[i + 3] << 24
+		| (unsigned long long)bytes[i + 4] << 32 | (unsigned long long)bytes[i + 5] << 40
+		| (unsigned long long)bytes[i + 6] << 48 | (unsigned long long)bytes[i + 7] << 56;
+}
+
+// BitConvert Bytes to a short aka 16 bit vlaue.
+void LibHomebrew::Loot::BitConverter::ToShort(unsigned char *bytes, int16_t *result) {
+	int N = sizeof(bytes) / sizeof(*bytes);
+	result = (int16_t *)malloc(N / 2);
+	for (int i = 0; i < N; i += 2) result[i / 2] = bytes[i] | (int16_t)bytes[i + 1] << 8;
+}
+
+// BitConvert Bytes to a integer aka 32 bit vlaue.
+void LibHomebrew::Loot::BitConverter::ToInt(unsigned char *bytes, int32_t *result) {
+	int N = sizeof(bytes) / sizeof(*bytes);
+	result = (int32_t *)malloc(N / 4);
+	for (int i = 0; i < N; i += 4)
+		result[i / 4] = bytes[i] | (int32_t)bytes[i + 1] << 8
+		| (int32_t)bytes[i + 2] << 16 | (int32_t)bytes[i + 3] << 24;
+}
+
+// BitConvert Bytes to a unsigned long aka 64 bit vlaue.
+void LibHomebrew::Loot::BitConverter::ToLong(unsigned char *bytes, int64_t *result) {
+	int N = sizeof(bytes) / sizeof(*bytes);
+	result = (int64_t *)malloc(N / 8);
+	for (int i = 0; i < N; i += 4)
+		result[i / 4] = bytes[i] | (int64_t)bytes[i + 1] << 8
+		| (int64_t)bytes[i + 2] << 16 | (int64_t)bytes[i + 3] << 24;
+}
+
+// BitConvert Bytes to a long long aka 64 bit vlaue.
+void LibHomebrew::Loot::BitConverter::ToLongLong(unsigned char *bytes, long long *result) {
+	int N = sizeof(bytes) / sizeof(*bytes);
+	result = (long long *)malloc(N / 8);
+	for (int i = 0; i < N; i += 4)
+		result[i / 4] = bytes[i] | (long long)bytes[i + 1] << 8
+		| (long long)bytes[i + 2] << 16 | (long long)bytes[i + 3] << 24
+		| (long long)bytes[i + 4] << 32 | (long long)bytes[i + 5] << 40
+		| (long long)bytes[i + 6] << 48 | (long long)bytes[i + 7] << 56;
 }

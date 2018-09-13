@@ -13,6 +13,8 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
+
 #include "_types.h"
 #include "syscall.h"
 #include "syscalls.h"

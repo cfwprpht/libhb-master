@@ -16,6 +16,7 @@
 #include "stdafx.h"
 #include "resource_manager.h"
 #include "../console.h"
+#include "../logger.h"
 
 using namespace LibHomebrew;
 namespace ssg = sce::SampleUtil::Graphics;
@@ -30,88 +31,94 @@ int cu::ResourceManager::initialize(ssg::GraphicsLoader *loader, ssg::SpriteRend
 	int ret;
 	(void)ret;
 
-	graphicsLoader = loader;
+	graphicsLoader  = loader;
 	_spriteRenderer = spriteRenderer;
-	_displayWidth = displayWidth;
-	_displayHeight = displayHeight;
-	config = _config;
+	_displayWidth   = displayWidth;
+	_displayHeight  = displayHeight;
+	config          = _config;
+	isAddcont       = false;
+	Logger::Debug("Variables overloaded.\n");
 
-	isAddcont = false;
+	/*ret = ssg::Collada::createColladaLoader( &colladaLoader, graphicsLoader );
+	SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
+	*/
 
+	Logger::Debug("Checking for archive...");
 	if (_config->useArchive) {
+		Logger::Debug("use !\nWill try to mount the archive...");
 		ret = psarcMount.mount(_config->archiveFile, _config->mountPoint);
-		SCE_SAMPLE_UTIL_ASSERT_MSG(SCE_OK == ret, "ret=%#x", ret);
-		if (ret == SCE_OK) if (verbose) Console::WriteLine("[Archive file was mounted.]\n");
-	}
+		if (ret == SCE_OK) Logger::Debug("success !\n");
+		else Logger::Debug("error !\n");
+	} else Logger::Debug("don't use !\n");
 
-#if 0 //TODO: Bug 57527
-	ret = loadTextTable(config->useArchive ? ("/app0/game_data/lua_script/text.lua") : "/app0/game_data/lua_script/text.lua",
-		config->language, "texttable", textTable);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-
-	ret = loadTextTable(config->useArchive ? (config->mountPoint + "lua_script/ui.lua") : "/app0/game_data/lua_script/ui.lua",
-		config->language, "uitemplatetable", uiTemplateTable);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-#endif
-
+	/*Logger::Debug("Creating Font Loader.\n");
 	ret = ssg::createFontLoader(&fontLoader, graphicsLoader);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 
+	Logger::Debug("Creating Font SB.\n");
 	ssg::FontParam fontParam;
 	fontParam.setDefaults();
 	fontParam.weight = ssg::kFontWeightBold;
 	fontParam.fontSizePixelH = displayHeight * 0.03;
 	fontParam.fontSizePixelV = displayHeight * 0.03;
 	ret = fontLoader->createFont(&fontSB, &fontParam, 64);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 
+	Logger::Debug("Creating Font S.\n");
 	fontParam.setDefaults();
 	fontParam.weight = ssg::kFontWeightBlack;
 	fontParam.fontSizePixelH = displayHeight * 0.04;
 	fontParam.fontSizePixelV = displayHeight * 0.04;
 	ret = fontLoader->createFont(&fontS, &fontParam, 64);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 
+	Logger::Debug("Creating Font M.\n");
 	fontParam.setDefaults();
 	fontParam.weight = ssg::kFontWeightBlack;
 	fontParam.fontSizePixelH = displayHeight * 0.08;
 	fontParam.fontSizePixelV = displayHeight * 0.08;
 	ret = fontLoader->createFont(&fontM, &fontParam, 64);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 
+	Logger::Debug("Creating Font MB.\n");
 	fontParam.setDefaults();
 	fontParam.weight = ssg::kFontWeightBold;
 	fontParam.fontSizePixelH = displayHeight * 0.15;
 	fontParam.fontSizePixelV = displayHeight * 0.15;
 	ret = fontLoader->createFont(&fontMB, &fontParam, 64);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 
+	Logger::Debug("Creating Font L.\n");
 	fontParam.setDefaults();
 	fontParam.weight = ssg::kFontWeightBlack;
 	fontParam.fontSizePixelH = displayHeight * 0.20;
 	fontParam.fontSizePixelV = displayHeight * 0.20;
-	ret = fontLoader->createFont(&fontL, &fontParam, 64);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+	ret = fontLoader->createFont(&fontL, &fontParam, 64);*/
 
+	Logger::Debug("Initializing DMEM....");
 	ret = directMemoryHeap.initialize(256 * 1024 * 1024, 256 * 1024 * 1024);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+	if (ret != SCE_OK) Logger::Debug("error !\n");
+	else Logger::Debug("ok !\n");
 
+	return SCE_OK;
+}
+
+// You can add texture and collade here to load for your app.
+int cu::ResourceManager::load(void) {
+	//loadTexture("bg");
 	return SCE_OK;
 }
 
 int cu::ResourceManager::loadTexture(const std::string &resourceName) {
 	if (textureMap.find(resourceName) != textureMap.end()) {
 		// alraedy loaded
+		Logger::Debug("Texture already loaded.\n");
 		return SCE_OK;
 	}
 
 	sce::SampleUtil::Graphics::Texture *texture = NULL;
 	const char *texPath = config->texturePathMap[resourceName].c_str();
-	if (verbose) Console::WriteLine("Loading : %s\n", texPath);
+	Logger::Debug("Loading : %s ...", texPath);
 	int ret = graphicsLoader->createTextureFromFile(&texture, texPath);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+	if (ret != SCE_OK) { Logger::Debug("error !\n"); return ret; }
+	else Logger::Debug("ok !\n");
 
-	if (verbose) Console::WriteLine("Load completed : %s\n", texPath);
+	Logger::Debug("Load completed : %s\n", texPath);
 	textureMap[resourceName] = texture;
 	return ret;
 }
@@ -164,42 +171,17 @@ int cu::ResourceManager::finalize(void) {
 	int ret;
 	ret = directMemoryHeap.finalize();
 	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+		
+	//unloadTexture("sephiroth");
 
-	ret = unloadTexture("busy48");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-	ret = unloadTexture("eff_explode");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-	ret = unloadTexture("eff_shot");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-	ret = unloadTexture("target_g");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-	ret = unloadTexture("bullet");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-	ret = unloadTexture("verified_account_icon_large");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-	ret = unloadTexture("verified_account_icon_small");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-
-	ret = unloadCollada("shooting_range");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-
-	ret = unloadCollada("target_a");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-
-	ret = unloadCollada("gun");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-
-	ret = unloadCollada("bullet");
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-
-	sce::SampleUtil::destroy(colladaLoader);
+	/*sce::SampleUtil::destroy(colladaLoader);
 
 	sce::SampleUtil::destroy(fontMB);
 	sce::SampleUtil::destroy(fontSB);
 	sce::SampleUtil::destroy(fontL);
 	sce::SampleUtil::destroy(fontM);
 	sce::SampleUtil::destroy(fontS);
-	sce::SampleUtil::destroy(fontLoader);
+	sce::SampleUtil::destroy(fontLoader);*/
 
 	if (config->useArchive) psarcMount.unmount();
 

@@ -142,3 +142,58 @@ Added definations:
  
 ## Update 15:
  Added Functions GetSsid() & GetLanguage() to the SwissKnife class.
+
+## Update 16:
+ Fixed icc_nvs_read() and icc_nvs_write() offsets for 5.05.
+ Added Line highlighting abbility to the Console.
+ Added functions GetSelectedLine() & SetSelectedLine() as well as Clear() to the Console Class.
+ 
+## Update 17:
+ Apllication Lopp will now run in Core 3 which is less interrupted by the system then others. UserEntry Loop will run in Core 1.
+ Added c language wrappers for the c++ Console Class. If you have some c source and you want to write to the screen, inlcude "c_console.h" and just do it.
+ Added a BitConverter to SwissKnife to bit swapp bytes.
+ PS4 Forms Class would be extendet. There is now a Dynamicall instance of the TTYD Class for on screen printing Text.
+   Still the Static TTY Class will always directly write to the screen.
+ Added RichTextBox Class to PS4Forms.
+ Added TextViewer and HexViewer Classes to PS4Forms.
+ The PictureBox of the Forms class got changed.
+ Draw Functions of the Application class can now write out text blocks too.
+ LibLua is now embeded as a static library into libhb.
+ Added Event and Sound Manager to LibUtil.
+ Resources can now handled with libhb.
+   Modify resources.lua and config.lua to add your pictures, sounds, translations or what ever.
+   Add images to the Resource Manager class of the libUtil and sound files to the Sound Manager.
+   A Detailed information video can be found on my youtube channel.
+   To enable them use "app.UseResources()" and "app.UseSounds()".
+ Event class would be added to the libUtil.
+ The Applications initalisation process where we, till now, couldn't debug it proper without to use UART,
+   can now be debugged to a log file on a usb drive. Put a USB Stick into your console before running the app.
+   Use "app.UseDebug()" to enable it.
+ Logger class would be extendet and have a static "Logger::Debug()" function call which will write into the debug log but only
+   when the "app.Debug()" flag would be set. Use it to write some additional private debug messages into the log.
+ A background image can be set. After adding the resource and AFTER "app.Exec()" would be called, you can define a image within the UserEntry loop with,
+   "app.setBackgroundImage();". With "app.ShowBgi()" and "app.HideBgi()" you can show or hide the Background Image.
+ The Consoles typically Message and IME (aka input) Dialog would be added to the Application loop.
+   Use "app.UseIme()" & "app.UseDialog()" to tell the app initialistaion routine that they shall be initialized.
+   To use them just call "app.ShowMsg()" or "app.ShowIme()" to use them.
+ Console Class, to draw text to screen, would be extendet. Following Functions are now available:
+   Pause();
+	 EnableHighlighting();
+	 DisableHighlighting();
+	 LineBreak();
+	 DeleteLastLine();
+	 SetXCoordinate();
+	 SetYCoordinate();
+	 GetXCoordinate();
+	 GetYCoordinate();
+	 GetSelectedLineIndex();
+	 SetSelectedLineIndex();
+	 *ReadLine();
+ TTY Class can now colorize a specific amount of characters per line. Just use the normal Color draw functions. The routine will do everyting on it self.
+   A Line can now be rewindet with "\r".
+   Line Highlighting would be extendet. It will draw a bar over the selected line now.
+ SwissKniffe have two new functions. "GetLanguage()" & "GetUserName()".
+ The PS4File and PS4Dir Classes got the Copy and CopyRecursive Function rewritten.
+   Additional the "PS4File::Exists()" and "PS4Dir::Exists()" functions do use now sceFios2 library to check whether they exists or not.
+ A ELF Loader was added to the libhb. (Still WIP)
+ 

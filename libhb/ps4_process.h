@@ -17,6 +17,12 @@
 
 #include <_types.h>
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 namespace LibHomebrew {
 	namespace Loot {
 		class Proc {
@@ -24,12 +30,14 @@ namespace LibHomebrew {
 			static bool verbose;
 
 		public:
-			static bool LoadExec(const char *path, char *const *argv);
+			static bool SysLoadExec(const char *path, char *const *argv);
+			static int UserLoadExec(const char *path, void * arg1, void *arg2);
+			static int LoadExecBin(const char *path, void * arg1, void *arg2);
 			static int Kexec(const char *path);
 			static int Kexec(void *buffer);
 			static int Freedom(void);
-			static int EnableSUDO(void);
-			static int DisableSUDO(void);
+			static int EnableMMAPSelf(void);
+			static int DisableMMAPSelf(void);
 			static int DisableProcASLR(void);
 			static int EnableBrowser(void);
 			static void Reboot(void);

@@ -16,7 +16,6 @@
 #include "stdafx.h"
 #include "lua_util.h"
 
-
 namespace cu = common::Util;
 
 #pragma region LuaValue
@@ -31,11 +30,13 @@ double cu::LuaValue::asNumber(void) const
 	SCE_SAMPLE_UTIL_ASSERT(m_type == kTypeNumber);
 	return val.numberValue;
 }
+
 bool cu::LuaValue::asBool(void) const
 {
 	SCE_SAMPLE_UTIL_ASSERT(m_type == kTypeBool);
 	return val.boolValue;
 }
+
 const std::string cu::LuaValue::asString(void) const
 {
 	SCE_SAMPLE_UTIL_ASSERT(m_type == kTypeString);
@@ -53,14 +54,14 @@ void cu::LuaValue::setBool(bool b)
 	m_type = kTypeBool;
 	val.boolValue = b;
 }
+
 void cu::LuaValue::setString(std::string str)
 {
 	m_type = kTypeString;
 	val.stringValue = new std::string(str);
 }
 
-const cu::LuaValue *cu::LuaValue::getField(const std::string fieldName) const
-{
+const cu::LuaValue *cu::LuaValue::getField(const std::string fieldName) const {
 	SCE_SAMPLE_UTIL_ASSERT(m_type == kTypeTable);
 	Table::iterator it = val.tableValue->find(fieldName);
 	if (it == val.tableValue->end()) {

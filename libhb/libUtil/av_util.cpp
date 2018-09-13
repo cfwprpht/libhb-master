@@ -1,10 +1,4 @@
-﻿/* SCE CONFIDENTIAL
- * PlayStation(R)4 Programmer Tool Runtime Library Release 03.508.031
- * Copyright (C) 2013 Sony Computer Entertainment Inc. 
- * All Rights Reserved.
- */
-
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <stdio.h>
 #include <kernel.h>
 #include <scebase_common.h>
@@ -12,8 +6,10 @@
 #include "av_util.h"
 #include "sceavplayer_ex.h"
 #include <ngs2.h>
+#include "../logger.h"
 
 using namespace common::Util;
+using namespace LibHomebrew;
 namespace vecmath = sce::Vectormath::Simd::Aos;
 namespace ssg = sce::SampleUtil::Graphics;
 
@@ -60,7 +56,7 @@ int AvPlayer::TextureBuffer::finalize(void) {
 }
 
 static void fast_memcpy(void *dst, const void* src, size_t size) {
-	//printf("memcpy(%p, %p, %lx\n", dst, src, size);
+	Logger::Debug("[AV-Player] memcpy(%p, %p, %lx\n", dst, src, size);
 
 	uint64_t *dst64 =(uint64_t *)dst;
 	const uint64_t *src64 =(const uint64_t *)src;
@@ -138,7 +134,6 @@ AvPlayer::TexPair AvPlayer::TextureBuffer::getCurrentTexture(void) {
 	return m_pairs[m_index];
 }
 
-
 /* --------------------------------------------------------------------- */
 AvPlayer::AvPlayer(void) {
 	m_hSamplePlayer		= NULL;	
@@ -159,7 +154,7 @@ int AvPlayer::initialize(ssg::GraphicsLoader *loader, ssg::SpriteRenderer *sprit
 	m_heap           = heap;
 	m_loader         = loader;
 	m_spriteRenderer = spriteRenderer;
-	m_audioContext   = audioContext;
+	_audioContext    = audioContext;
 	m_heap           = heap;
 	m_isStarted      = false;
 	m_videoTimeStamp = 0;
@@ -180,7 +175,7 @@ void AvPlayer::eventCallback(void* p, int32_t argEventId, int32_t argSourceId, v
 	(void)ret;
 	AvPlayer *self = (AvPlayer*)p;
 	if(argEventId == SCE_AVPLAYER_STATE_READY) {
-		printf("TIMESTAMP0: %ld----------------------------------------\n",  sceAvPlayerCurrentTime(self->m_hSamplePlayer));
+		Logger::Debug("[AV-Player] TIMESTAMP0: %ld----------------------------------------\n",  sceAvPlayerCurrentTime(self->m_hSamplePlayer));
 
 		int numStream = sceAvPlayerStreamCount(self->m_hSamplePlayer);
 		for(uint32_t i=0;i<numStream; i++){
@@ -191,13 +186,13 @@ void AvPlayer::eventCallback(void* p, int32_t argEventId, int32_t argSourceId, v
 			SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 
 			if(streamInfo.type == SCE_AVPLAYER_AUDIO) {
-				ret = self->m_audioContext->createRawVoice(&self->m_rawVoice, 1024*128, SCE_NGS2_WAVEFORM_TYPE_PCM_I16L, 
+				ret = self->_audioContext->createRawVoice(&self->m_rawVoice, 1024*128, SCE_NGS2_WAVEFORM_TYPE_PCM_I16L, 
 					streamInfo.details.audio.channelCount, streamInfo.details.audio.sampleRate);
 				SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 				ret = self->m_rawVoice->play();
 				SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 
-				printf("enbale audio\n");
+				Logger::Debug("[AV-Player] enbale audio\n");
 				ret = sceAvPlayerEnableStream(self->m_hSamplePlayer, i);
 				SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 			}
@@ -208,13 +203,13 @@ void AvPlayer::eventCallback(void* p, int32_t argEventId, int32_t argSourceId, v
 				self->m_width  = streamInfo.details.video.width;
 				self->m_height = streamInfo.details.video.height;
 
-				printf("enbale video\n");
+				Logger::Debug("[AV-Player] enbale video\n");
 				ret = sceAvPlayerEnableStream(self->m_hSamplePlayer, i);
 				SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 			}
 		}
-		printf("TIMESTAMP0: %ld\n", sceAvPlayerCurrentTime(self->m_hSamplePlayer));
-		printf("start\n");
+		Logger::Debug("[AV-Player] TIMESTAMP0: %ld\n", sceAvPlayerCurrentTime(self->m_hSamplePlayer));
+		Logger::Debug("[AV-Player] start\n");
 
 		self->m_startTime = sceKernelGetProcessTime();	
 		ret = sceAvPlayerStart(self->m_hSamplePlayer);
@@ -264,7 +259,7 @@ void* AvPlayer::audioThreadEntry(void *arg) {
 			memset( &audioFrame, 0, sizeof(SceAvPlayerFrameInfo) );
 			bool audioAvailable = sceAvPlayerGetAudioData( self->m_hSamplePlayer, &audioFrame );
 			if(!audioAvailable){
-				//printf("audio not available\n");
+				//Logger::Debug("audio not available\n");
 				sceKernelUsleep(100);
 				continue;
 			}
@@ -287,7 +282,7 @@ void* AvPlayer::audioThreadEntry(void *arg) {
 				}
 				continue;
 			}
-			printf("audio time stamp=%ld\n", audioFrame.timeStamp);
+			Logger::Debug("audio time stamp=%ld\n", audioFrame.timeStamp);
 			break;
 		}
 
@@ -319,10 +314,10 @@ void* AvPlayer::audioThreadEntry(void *arg) {
 		if(self->m_pendingAudioData.data != NULL){
 			ret = self->m_rawVoice->addData(self->m_pendingAudioData.data, self->m_pendingAudioData.size);
 			if(ret != SCE_OK){
-				//printf("audio buffer is full\n");
+				Logger::Debug("[AV-Player : AudioThreadEntry] audio buffer is full\n");
 				break;
 			}
-			//printf("audio buffer pushed\n");
+			Logger::Debug("[AV-Player : AudioThreadEntry] audio buffer pushed\n");
 
 			self->m_pendingAudioData.data = NULL;
 			self->m_pendingAudioData.size = 0;
@@ -336,7 +331,7 @@ void* AvPlayer::audioThreadEntry(void *arg) {
 		memset( &audioFrame, 0, sizeof(SceAvPlayerFrameInfo) );
 		bool audioAvailable = sceAvPlayerGetAudioData( self->m_hSamplePlayer, &audioFrame );
 		if(!audioAvailable){
-			//printf("audio data is not available\n");
+			Logger::Debug("[AV-Player : AudioThreadEntry] audio data is not available\n");
 			break;
 		}
 
@@ -466,7 +461,6 @@ int AvPlayer::stop(void) {
 	return SCE_OK;
 }
 
-
 int AvPlayer::update(void) {
 	if (!m_isPlaying) return SCE_OK;
 
@@ -478,10 +472,10 @@ int AvPlayer::update(void) {
 		if(m_pendingAudioData.data != NULL){
 			ret = m_rawVoice->addData(m_pendingAudioData.data, m_pendingAudioData.size);
 			if(ret != SCE_OK){
-				//printf("audio buffer is full\n");
+				//Logger::Debug("[AV-Player] audio buffer is full\n");
 				break;
 			}
-			//printf("audio buffer pushed\n");
+			//Logger::Debug("audio buffer pushed\n");
 			m_pendingAudioData.data = NULL;
 			m_pendingAudioData.size = 0;
 			break;
@@ -490,7 +484,7 @@ int AvPlayer::update(void) {
 		memset( &audioFrame, 0, sizeof(SceAvPlayerFrameInfo) );
 		bool audioAvailable = sceAvPlayerGetAudioData( m_hSamplePlayer, &audioFrame );
 		if(!audioAvailable){
-			//printf("audio data is not available\n");
+			//Logger::Debug("[AV-Player] audio data is not available\n");
 			break;
 		}
 
@@ -505,10 +499,10 @@ int AvPlayer::update(void) {
 		memset(&videoFrame, 0, sizeof(SceAvPlayerFrameInfo));
 		
 		bool frameAvailable = sceAvPlayerGetVideoData(m_hSamplePlayer, &videoFrame);
-		//printf("TIMESTAMP: a=%d, %ld, %ld\n",  frameAvailable, sceAvPlayerCurrentTime(m_hSamplePlayer), videoFrame.timeStamp);
+		Logger::Debug("[AV-Player] TIMESTAMP: a=%d, %ld, %ld\n",  frameAvailable, sceAvPlayerCurrentTime(m_hSamplePlayer), videoFrame.timeStamp);
 		if (frameAvailable) {
 			m_videoTimeStamp = videoFrame.timeStamp;
-			//printf("video time stamp=%ld\n", videoFrame.timeStamp);
+			Logger::Debug("[AV-Player] video time stamp=%ld\n", videoFrame.timeStamp);
 	
 			void *y = videoFrame.pData;
 			void *cbcr = (((uint8_t*)videoFrame.pData) + (videoFrame.details.video.width * videoFrame.details.video.height));
@@ -566,10 +560,10 @@ int AvPlayer::update(void) {
 			}
 			ret = m_rawVoice->addData(m_pendingAudioData.data, m_pendingAudioData.size);
 			if(ret != SCE_OK){
-				//printf("audio buffer is full\n");
+				//Logger::Debug("[AV-Player] audio buffer is full\n");
 				break;
 			}
-			//printf("audio buffer pushed\n");
+			//Logger::Debug("[AV-Player] audio buffer pushed\n");
 			m_pendingAudioData.data = NULL;
 			m_pendingAudioData.size = 0;
 		}
@@ -577,7 +571,7 @@ int AvPlayer::update(void) {
 		memset( &audioFrame, 0, sizeof(SceAvPlayerFrameInfo) );
 		bool audioAvailable = sceAvPlayerGetAudioData( m_hSamplePlayer, &audioFrame );
 		if(!audioAvailable){
-			//printf("audio data is not available\n");
+			//Logger::Debug("[AV-Player] audio data is not available\n");
 			break;
 		}
 		m_pendingAudioData.data = audioFrame.pData;
@@ -605,4 +599,3 @@ void AvPlayer::render(sce::SampleUtil::Graphics::GraphicsContext *context, sce::
 
 bool AvPlayer::isPlaying(void) { return m_isPlaying; }
 /* --------------------------------------------------------------------- */
-

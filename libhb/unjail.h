@@ -18,6 +18,12 @@
 #include <_types.h>
 #include "lv2.h"
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 struct kpayload_args { uint64_t user_arg; };
 
 struct kdump_args { uint64_t argArrayPtr; };
@@ -25,11 +31,11 @@ struct kdump_args { uint64_t argArrayPtr; };
 // Unjail patches for all FWs.
 void *unjail(struct thread *td);
 
-// Enable SUDO mode.
-void *enableSUDO(struct thread *td);
+// Enable Mapping of SELF files.
+void *enableMMAPSelf(struct thread *td);
 
-// Disable SUDO mode.
-void *disableSUDO(struct thread *td);
+// Disable Mapping of SELF files.
+void *disableMMAPSelf(struct thread *td);
 
 // Disable Process ASLR.
 void *disableProcessASLR(struct thread *td);

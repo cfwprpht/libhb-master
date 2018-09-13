@@ -17,6 +17,12 @@
 
 #include "defines.h"
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 namespace LibHomebrew {
 	namespace Loot {
 		/* Hexmap */
@@ -31,6 +37,9 @@ namespace LibHomebrew {
 			~SwissKnife() {}
 			static void Verbose(void);
 			static size_t ArraySize(char *array);
+			static int Length(byte *array);
+			static bool Contains(byte *source, byte *range);
+			static bool Contains(char *source, char  *range);
 			static String ToHexString(void *bytes, int len);
 			static String ToHexString(byte *bytes, int len);
 			static String GetTimeString(void);
@@ -45,20 +54,37 @@ namespace LibHomebrew {
 			static void Split(StringList *_list, char *str, const char *delim);
 			static char *GetName(char *str);
 			static char *GetPath(char *str);
+			static char *GetUserName(void);
 			static char *strstrLast(const char *array, const char *find);
+			static bool Replace(String &str, const String &from, const String &to);
 			static void Reverse(char *array);
 			static int strNumLast(const char *str);
 			static char *intostr(int num);
+			static char *intostr(long num);
 			static String GetUsb(void);
 			static char *GetLocalIP(void);
 			static char *GetSsid(void);
 			static char *GetLanguage(void);
+			static void DumpFile(char *name, unsigned char *raw, size_t size);
+			static void DumpFile(char *name, int64_t *raw, size_t size);
 			static long FileSize(FILE *stream);
-			static off_t FileSize(const char *path);			
+			static off_t FileSize(const char *path);
 			static bool PathExists(const char *path);
 			static char *GetAbsolutePs4Path(const char *path);
 			static bool isPs4Path(const char *path);
 			static char *genPs4Path(const char *path);
+		};
+
+		class BitConverter {
+		public:
+			void ToUShort(unsigned char *bytes, uint16_t *result);
+			void ToUInt(unsigned char *bytes, uint32_t *result);
+			void ToULong(unsigned char *bytes, uint64_t *result);
+			void ToULongLong(unsigned char *bytes, unsigned long long *result);
+			void ToShort(unsigned char *bytes, int16_t *result);
+			void ToInt(unsigned char *bytes, int32_t *result);
+			void ToLong(unsigned char *bytes, int64_t *result);
+			void ToLongLong(unsigned char *bytes, long long *result);
 		};
 	}
 }

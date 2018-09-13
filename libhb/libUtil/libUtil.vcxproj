@@ -48,11 +48,17 @@
   <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;SCE_SAMPLE_UTIL_ASSERTS_ENABLED=1;ENABLE_PATCH=0;ENABLE_ADDCONT=1;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SCE_ORBIS_SDK_DIR)\target\include;$(ProjectDir)\..\..\..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <DisableSpecificWarnings>-Wno-unknown-pragmas;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
     <ClCompile>
@@ -64,22 +70,33 @@
   <ItemGroup>
     <ClInclude Include="av_util.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="event.h" />
     <ClInclude Include="lua_util.h" />
     <ClInclude Include="psarc_util.h" />
     <ClInclude Include="resource_manager.h" />
+    <ClInclude Include="sound_manager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="thread_util.h" />
+    <ClInclude Include="user_entry_manager.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="av_util.cpp" />
     <ClCompile Include="config.cpp" />
+    <ClCompile Include="event.cpp" />
     <ClCompile Include="lua_util.cpp" />
     <ClCompile Include="psarc_util.cpp" />
     <ClCompile Include="resource_manager.cpp" />
+    <ClCompile Include="sound_manager.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="thread_util.cpp" />
+    <ClCompile Include="user_entry_manager.cpp" />
     <ClCompile Include="util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libLua\libLua.vcxproj">
+      <Project>{967ed826-d059-413f-9936-9bd876ed3794}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

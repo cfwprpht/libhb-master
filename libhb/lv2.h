@@ -18,6 +18,12 @@
 #include "fw.h"
 #include <_types.h>
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 #define KERNSIZE   0x2000000
 #define PML4SHIFT  39
 #define PDPSHIFT   30
@@ -697,6 +703,10 @@ typedef struct ksym_t {
 	int64_t      (*icc_snvs_write_sector)(const void *a1, void *a2);
 	int64_t      (*icc_snvs_get_write_count)(const void *a1, void *a2);
 #endif	
+	//@ bank   = 1-4.
+	//@ block  = max 8192.
+	//@ size   = max 0x400.
+	//@ buffer = data storage.
 #ifdef FW_405
 	int64_t      (*icc_nvs_write)(char a1, uint32_t a2, short a3, uint16_t a4, int64_t a5);
 	int64_t      (*icc_nvs_read)(char a1, uint32_t a2, short a3, short a4, int64_t a5);
@@ -704,9 +714,13 @@ typedef struct ksym_t {
 	int64_t      (*icc_nvs_write)(char a1, char a2, short a3, uint16_t a4, int64_t a5);
 	int64_t      (*icc_nvs_read)(char a1, char a2, short a3, short a4, int64_t a5);
 	char         (*icc_sc_fw_update_handler)(int64_t a1, int64_t a2);
-#else
+#elif defined FW_500
 	int64_t      (*icc_nvs_write)(char a1, short a2, uint16_t a3, int64_t a4);
 	int64_t      (*icc_nvs_read)(char a1, short a2, short a3, int64_t a4);
+	int64_t      (*icc_sc_fw_update_handler)(char a1, int64_t a2, int64_t a3);
+#else
+	int64_t      (*icc_nvs_write)(char bank, short block, uint16_t size, int64_t *buffer);
+	int64_t      (*icc_nvs_read)(char bank, short block, uint16_t size, int64_t *buffer);
 	int64_t      (*icc_sc_fw_update_handler)(char a1, int64_t a2, int64_t a3);
 #endif	
 	int          (*icc_nvs_flush)(long a1);

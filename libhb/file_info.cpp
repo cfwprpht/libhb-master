@@ -13,6 +13,8 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
+
 #include "file_info.h"
 #include "swiss_knife.h"
 #include "ps4_file.h"
@@ -30,8 +32,8 @@ LibHomebrew::PS4IO::FileInfo::FileInfo(const char *_path) {
 	name     = SwissKnife::GetName((char *)_path);
 	absolute = SwissKnife::GetAbsolutePs4Path(_path);
 	exists   = SwissKnife::PathExists(path);
-	isfile   = PS4File::isFile(path);
-	isdir    = PS4Dir::isDir(path);
+	isfile   = PS4File::Exists(path);
+	isdir    = PS4Dir::Exists(path);
 	if (!isdir) len = SwissKnife::FileSize(_path);
 	else len = 0;
 }

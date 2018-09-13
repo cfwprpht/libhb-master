@@ -13,9 +13,10 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
+
 #include "console.h"
 #include "defines.h"
-#include "tty.h"
 #include <sstream>
 #include <_types.h>
 
@@ -29,6 +30,9 @@ char LibHomebrew::Console::singleCenterBuff[128];
 // Internal flag. Used to stop the reader thread gracefully.
 bool LibHomebrew::Console::stopThread = false;
 
+// Determine if the TTY is paused or not.
+bool LibHomebrew::Console::isPaused = false;
+
 // The Reader Thread.
 ScePthread LibHomebrew::Console::reader;
 
@@ -38,52 +42,97 @@ ScePthread LibHomebrew::Console::writer;
 // The User Button Input.
 ssi::Button LibHomebrew::Console::input;
 
+// Read a Line from the screen.
+char *LibHomebrew::Console::ReadLine(void) {
+	char *none = nullptr;
+	if (!isPaused) {
+		input = ssi::kButtonNone;
+		isPaused = true;
+		while (input != ssi::kButtonCross) {/**/}
+		isPaused = false;
+		return GetSelectedLine();
+	} else return none;
+}
+
 // Write a Line to the screen.
 void LibHomebrew::Console::WriteLine(const char *msg, ...) {
-	char buf[512];                                            // Initialize a buffer.
-	va_list args;                                             // Initialize a variable list.
-	va_start(args, msg);                                      // Get the args into a type specific list.
-	vsnprintf(buf, sizeof(buf), msg, args);                   // Format the string.
-	TTY::onScreenPrintf(buf);                                 // Push buffer to tty.
-	va_end(args);                                             // Close the variable argument list.
+	if (!isPaused) {
+		char buf[1000];                                           // Initialize a buffer.
+		va_list args;                                             // Initialize a variable list.
+		va_start(args, msg);                                      // Get the args into a type specific list.
+		vsnprintf(buf, sizeof(buf), msg, args);                   // Format the string.
+		TTY::onScreenPrintf(buf);                                 // Push buffer to tty.
+		va_end(args);                                             // Close the variable argument list.
+	}
 }
 
 // Write a red colored Line to the screen.
 void LibHomebrew::Console::WriteError(const char *msg, ...) {
-	char buf[512];                                            // Initialize a buffer.
-	va_list args;                                             // Initialize a variable list.
-	va_start(args, msg);                                      // Get the args into a type specific list.
-	vsnprintf(buf, sizeof(buf), msg, args);                   // Format the string.
-	TTY::onScreenPrintf(MENU_TTY_TEXT_COLOUR_ERROR, buf);     // Push buffer to tty.
-	va_end(args);                                             // Close the variable argument list.
+	if (!isPaused) {
+		char buf[1000];                                           // Initialize a buffer.
+		va_list args;                                             // Initialize a variable list.
+		va_start(args, msg);                                      // Get the args into a type specific list.
+		vsnprintf(buf, sizeof(buf), msg, args);                   // Format the string.
+		TTY::onScreenPrintf(TTY::tty_text_color_error, buf);      // Push buffer to tty.
+		va_end(args);                                             // Close the variable argument list.
+	}
 }
 
 // Write a yellow colored Line to the screen.
 void LibHomebrew::Console::WriteWarning(const char *msg, ...) {
-	char buf[512];                                            // Initialize a buffer.
-	va_list args;                                             // Initialize a variable list.
-	va_start(args, msg);                                      // Get the args into a type specific list.
-	vsnprintf(buf, sizeof(buf), msg, args);                   // Format the string.
-	TTY::onScreenPrintf(MENU_TTY_TEXT_COLOUR_WARNING, buf);   // Push buffer to tty.
-	va_end(args);                                             // Close the variable argument list.
+	if (!isPaused) {
+		char buf[1000];                                           // Initialize a buffer.
+		va_list args;                                             // Initialize a variable list.
+		va_start(args, msg);                                      // Get the args into a type specific list.
+		vsnprintf(buf, sizeof(buf), msg, args);                   // Format the string.
+		TTY::onScreenPrintf(TTY::tty_text_color_warning, buf);    // Push buffer to tty.
+		va_end(args);                                             // Close the variable argument list.
+	}
 }
 
 // Add a Line Break.
 void LibHomebrew::Console::LineBreak(void) {
-	char buf[3];                                              // Initialize a buffer.
-	sprintf(buf, "%s", "\n");                                 // Add the Linebreak.
-	TTY::onScreenPrintf(buf);                                 // Push buffer to tty.
+	if (!isPaused) {
+		char buf[3];                                              // Initialize a buffer.
+		sprintf(buf, "%s", "\n");                                 // Add the Linebreak.
+		TTY::onScreenPrintf(buf);                                 // Push buffer to tty.
+	}
 }
+
+// Deletes the last line from the buffer.
+void LibHomebrew::Console::DeleteLastLine(void) { TTY::deleteLastLine(); }
 
 // Write a Line with your own color.
 void LibHomebrew::Console::WriteColor(uint32_t color, const char *msg, ...) {
-	char buf[512];                                            // Initialize a buffer.
-	va_list args;                                             // Initialize a variable list.
-	va_start(args, msg);                                      // Get the args into a type specific list.
-	vsnprintf(buf, sizeof(buf), msg, args);                   // Format the string.
-	TTY::onScreenPrintf(color, buf);                          // Push buffer to tty.
-	va_end(args);                                             // Close the variable argument list.
+	if (!isPaused) {
+		char buf[1000];                                           // Initialize a buffer.
+		va_list args;                                             // Initialize a variable list.
+		va_start(args, msg);                                      // Get the args into a type specific list.
+		vsnprintf(buf, sizeof(buf), msg, args);                   // Format the string.
+		TTY::onScreenPrintf(color, buf);                          // Push buffer to tty.
+		va_end(args);                                             // Close the variable argument list.
+	}
 }
+
+// Get the selected line.
+char *LibHomebrew::Console::GetSelectedLine(void) {
+	char *none = nullptr;
+	if (!isPaused) return TTY::getSelectedLine();
+	else return none;
+}
+
+// Get the selected line indexer.
+int LibHomebrew::Console::GetSelectedLineIndex(void) {
+	int  none = -1;
+	if (!isPaused) return TTY::getSelectedLineIndex();
+	else return none;
+}
+
+// Set the selected line.
+void LibHomebrew::Console::SetSelectedLine(char *line) { if (!isPaused) TTY::setSelectedLine(line); }
+
+// Set the selected line indexer.
+void LibHomebrew::Console::SetSelectedLineIndex(unsigned int line) { if (!isPaused) TTY::setSelectedLineIndex(line); }
 
 // Write a single, centered message to the screen.
 void LibHomebrew::Console::SingleLine(const char *msg, ...) {
@@ -94,8 +143,41 @@ void LibHomebrew::Console::SingleLine(const char *msg, ...) {
 	va_end(args);                                                     // Close the variable argument list.
 }
 
+// Clear TTY screen.
+void LibHomebrew::Console::Clear(void) { if (!isPaused) TTY::clear(); }
+
+// Pause TTY screen, wait for button x press.
+void LibHomebrew::Console::Pause(void) {
+	if (!isPaused) {
+		input = ssi::kButtonNone;
+		LineBreak();
+		WriteWarning("Press X...\n");
+		isPaused = true;
+		while (input != ssi::kButtonCross) {/**/}
+		isPaused = false;
+	}
+}
+
+// Enable Line highlighting.
+void LibHomebrew::Console::EnableHighlighting(void) { TTY::useLineHighlighting(true); }
+
+// Disable Line highlighting.
+void LibHomebrew::Console::DisableHighlighting(void) { TTY::useLineHighlighting(false); }
+
 // Clear a single, centered message.
-void LibHomebrew::Console::SingleLineClear(void) { memset(singleCenterBuff, 0, sizeof(singleCenterBuff)); }
+void LibHomebrew::Console::SingleLineClear(void) { if (!isPaused) memset(singleCenterBuff, 0, sizeof(singleCenterBuff)); }
+
+// Set the x coordinate position.
+void LibHomebrew::Console::SetXCoordinate(float value) { TTY::setX(value); }
+
+// Set the y coordinate position.
+void LibHomebrew::Console::SetYCoordinate(float value) { TTY::setY(value); }
+
+// Get the x coordinate position.
+float LibHomebrew::Console::GetXCoordinate(void) { return TTY::getX(); }
+
+// Get the y coordinate position.
+float LibHomebrew::Console::GetYCoordinate(void) { return TTY::getY(); }
 
 // Sets the user input into the console class.
 void LibHomebrew::Console::SetUserInput(ssi::Button usrIn) { input = usrIn; }

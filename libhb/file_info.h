@@ -18,6 +18,12 @@
 #include <vector>
 #include "defines.h"
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 namespace LibHomebrew {
 	namespace PS4IO {
 		class FileInfo {

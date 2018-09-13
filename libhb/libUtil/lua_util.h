@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <sampleutil.h>
 #include <hash_map>
-#include <external/lua.hpp>
+#include "../libLua/lua.hpp"
 
 struct LuaValue;
 struct lua_State;

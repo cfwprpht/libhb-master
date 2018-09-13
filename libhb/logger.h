@@ -15,18 +15,30 @@
 
 #pragma once
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 namespace LibHomebrew {
 	class Logger {
 	private:
 		const char *pathToLog;
-		bool init = false;
+		static const char *_pathToLog;
+		bool init    = false;
+		static bool debug;
+		static bool dbgInit;
 
 	public:
 		Logger(const char *path);
 		Logger() {}
 		~Logger() {}
 		int Init(const char *path);
+		static int InitDbg(const char *path);
 		int Log(const char *msg, ...);
+		static int Debug(const char *msg, ...);
+		static void UseDebug(void);
 		bool GetInitState(void);
 		void Deinit();
 	};

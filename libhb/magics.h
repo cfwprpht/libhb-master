@@ -2358,8 +2358,8 @@
 #define __icc_query                                     0x43540 // fixed.
 #define __icc_query_nowait                              0x44020 // fixed.
 #define __icc_send                                      0x44160 // fixed.
-#define __icc_nvs_write                                 0x395380
-#define __icc_nvs_read                                  0x395460
+#define __icc_nvs_write                                 0x395750 // fixed.
+#define __icc_nvs_read                                  0x395830 // fixed.
 #define __icc_nvs_drvinit                               0x395550
 #define __icc_nvs_init                                  0x395590
 #define __icc_snvs_read_sector                          0x26CA40 // fixed.

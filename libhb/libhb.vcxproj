@@ -39,9 +39,10 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\common\include</AdditionalIncludeDirectories>
       <CppExceptions>false</CppExceptions>
+      <DisableSpecificWarnings>-Wno-unknown-pragmas;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>-lSceUserService_stub_weak;-lSceSystemService_stub_weak</AdditionalDependencies>
+      <AdditionalDependencies>-lSceUserService_stub_weak;-lSceSystemService_stub_weak;-lSceCommonDialog_stub_weak</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -50,6 +51,10 @@
 xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectDir)\sce_module\"
 </Command>
     </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
     <ClCompile>
@@ -72,11 +77,13 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
   <ItemGroup>
     <ClCompile Include="application.cpp" />
     <ClCompile Include="console.cpp" />
+    <ClCompile Include="c_console.cpp" />
     <ClCompile Include="file_info.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="lv2.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClCompile Include="ps4_elf_loader.cpp" />
     <ClCompile Include="ps4_process.cpp" />
     <ClCompile Include="ps4_directory.cpp" />
     <ClCompile Include="ps4_file.cpp" />
@@ -86,7 +93,6 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
     <ClCompile Include="swiss_knife.cpp" />
     <ClCompile Include="syscall.cpp" />
     <ClCompile Include="syscalls.cpp" />
-    <ClCompile Include="tty.cpp" />
     <ClCompile Include="unjail.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
     </ClCompile>
@@ -102,15 +108,20 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="console.h" />
+    <ClInclude Include="c_console.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="elf.h" />
     <ClInclude Include="elf_common.h" />
     <ClInclude Include="file_info.h" />
     <ClInclude Include="fw.h" />
+    <ClInclude Include="ime_dialog_outer.h" />
+    <ClInclude Include="ime_keyboard.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="lv2.h" />
     <ClInclude Include="magics.h" />
+    <ClInclude Include="msg_dialog_outer.h" />
     <ClInclude Include="ps4_directory.h" />
+    <ClInclude Include="ps4_elf_loader.h" />
     <ClInclude Include="ps4_file.h" />
     <ClInclude Include="ps4_forms.h" />
     <ClInclude Include="ps4_message_box.h" />
@@ -119,7 +130,6 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
     <ClInclude Include="swiss_knife.h" />
     <ClInclude Include="syscall.h" />
     <ClInclude Include="syscalls.h" />
-    <ClInclude Include="tty.h" />
     <ClInclude Include="unjail.h" />
   </ItemGroup>
   <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />

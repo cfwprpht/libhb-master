@@ -18,6 +18,12 @@
 #include "_types.h"
 #include "syscall.h"
 
+#ifdef LIBRARY_IMPL
+#define __declspec(dllexport)
+#else
+#define __declspec(dllimport)
+#endif
+
 class Sys {
 public:
 	/* Module Information structure. */
@@ -40,7 +46,7 @@ public:
 	static int create(const char *pathname, int mode);
 	static int link(const char *oldname, const char *newname);
 	static int unlink(const char *pathname);
-	static int kexec(void* func, void *user_arg);	
+	static int kexec(void* func, void *user_arg);
 	static int getpid(void);
 	static int mount(const char *type, const char *dir, int flags, void *data);
 	static int unmount(const char *dir, int flags);

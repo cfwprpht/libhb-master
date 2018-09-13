@@ -13,10 +13,13 @@
 *
 */
 
+
 #include "stdafx.h"
 #include "psarc_util.h"
 #include <assert.h>
 #include <ctype.h>
+
+#pragma comment( lib , "libSceFios2_stub_weak.a" )
 
 using namespace common::Util;
 namespace vm = sce::Vectormath::Simd::Aos;

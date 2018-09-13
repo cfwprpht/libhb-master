@@ -32,12 +32,13 @@ namespace common {
 			int start(const char* fileName);
 			int stop(void);
 			bool isPlaying(void);
+
 		private:
 			static void eventCallback(void* p, int32_t argEventId, int32_t argSourceId, void* argEventData);
 
 			sce::SampleUtil::Graphics::GraphicsLoader *m_loader;
 			sce::SampleUtil::Graphics::SpriteRenderer *m_spriteRenderer;
-			sce::SampleUtil::Audio::AudioContext *m_audioContext;
+			sce::SampleUtil::Audio::AudioContext *_audioContext;
 			DirectMemoryHeap *m_heap;
 
 			SceAvPlayerHandle						m_hSamplePlayer;
@@ -69,6 +70,7 @@ namespace common {
 				int32_t m_index;
 				uint32_t m_width;
 				uint32_t m_height;
+
 			public:
 				TextureBuffer(void) { m_pairs = NULL; }
 				~TextureBuffer(void) { finalize(); }
