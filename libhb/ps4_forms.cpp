@@ -1894,6 +1894,26 @@ PS4Forms::Form::~Form() {
 			(*it)->Close();
 		}
 	}
+	if (button.size() > 0) {
+		for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+			(*it)->Close();
+		}
+	}
+	if (sbar.size() > 0) {
+		for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+			(*it)->Close();
+		}
+	}
+	if (checkB.size() > 0) {
+		for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+			(*it)->Close();
+		}
+	}
+	if (textb.size() > 0) {
+		for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
+			(*it)->Close();
+		}
+	}
 	if (pictures.size() > 0) {
 		for (std::vector<PictureBox *>::iterator it = pictures.begin(); it != pictures.end(); it++) {
 			(*it)->Close();
@@ -1950,6 +1970,26 @@ void PS4Forms::Form::setPosition(Position position) {
 			(*it)->setParentPos(position);
 		}
 	}
+	if (button.size() > 0) {
+		for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+			(*it)->setParentPos(position);
+		}
+	}
+	if (sbar.size() > 0) {
+		for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+			(*it)->setParentPos(position);
+		}
+	}
+	if (checkB.size() > 0) {
+		for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+			(*it)->setParentPos(position);
+		}
+	}
+	if (textb.size() > 0) {
+		for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
+			(*it)->setParentPos(position);
+		}
+	}
 	if (pictures.size() > 0) {
 		for (std::vector<PictureBox *>::iterator it = pictures.begin(); it != pictures.end(); it++) {
 			(*it)->setParentPos(position);
@@ -1978,6 +2018,26 @@ void PS4Forms::Form::setParentPos(Position position) {
 	}
 	if (labels.size() > 0) {
 		for (std::vector<Label *>::iterator it = labels.begin(); it != labels.end(); it++) {
+			(*it)->setParentPos(position);
+		}
+	}
+	if (button.size() > 0) {
+		for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+			(*it)->setParentPos(position);
+		}
+	}
+	if (sbar.size() > 0) {
+		for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+			(*it)->setParentPos(position);
+		}
+	}
+	if (checkB.size() > 0) {
+		for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+			(*it)->setParentPos(position);
+		}
+	}
+	if (textb.size() > 0) {
+		for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
 			(*it)->setParentPos(position);
 		}
 	}
@@ -2025,6 +2085,26 @@ void PS4Forms::Form::Show(void) {
 			(*it)->Show();
 		}
 	}
+	if (button.size() > 0) {
+		for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+			(*it)->Show();
+		}
+	}
+	if (sbar.size() > 0) {
+		for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+			(*it)->Show();
+		}
+	}
+	if (checkB.size() > 0) {
+		for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+			(*it)->Show();
+		}
+	}
+	if (textb.size() > 0) {
+		for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
+			(*it)->Show();
+		}
+	}
 	if (pictures.size() > 0) {
 		for (std::vector<PictureBox *>::iterator it = pictures.begin(); it != pictures.end(); it++) {
 			(*it)->Show();
@@ -2054,6 +2134,26 @@ void PS4Forms::Form::ShowForm(void) {
 	}
 	if (labels.size() > 0) {
 		for (std::vector<Label *>::iterator it = labels.begin(); it != labels.end(); it++) {
+			(*it)->Show();
+		}
+	}
+	if (button.size() > 0) {
+		for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+			(*it)->Show();
+		}
+	}
+	if (sbar.size() > 0) {
+		for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+			(*it)->Show();
+		}
+	}
+	if (checkB.size() > 0) {
+		for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+			(*it)->Show();
+		}
+	}
+	if (textb.size() > 0) {
+		for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
 			(*it)->Show();
 		}
 	}
@@ -2092,6 +2192,26 @@ void PS4Forms::Form::Hide(void) {
 			(*it)->Hide();
 		}
 	}
+	if (button.size() > 0) {
+		for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+			(*it)->Hide();
+		}
+	}
+	if (sbar.size() > 0) {
+		for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+			(*it)->Hide();
+		}
+	}
+	if (checkB.size() > 0) {
+		for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+			(*it)->Hide();
+		}
+	}
+	if (textb.size() > 0) {
+		for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
+			(*it)->Hide();
+		}
+	}
 	if (pictures.size() > 0) {
 		for (std::vector<PictureBox *>::iterator it = pictures.begin(); it != pictures.end(); it++) {
 			(*it)->Hide();
@@ -2127,6 +2247,26 @@ void PS4Forms::Form::SetSprite(ssg::SpriteRenderer *sprite) {
 			(*it)->SetSprite(sprite);
 		}
 	}
+	if (button.size() > 0) {
+		for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+			(*it)->SetSprite(sprite);
+		}
+	}
+	if (sbar.size() > 0) {
+		for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+			(*it)->SetSprite(sprite);
+		}
+	}
+	if (checkB.size() > 0) {
+		for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+			(*it)->SetSprite(sprite);
+		}
+	}
+	if (textb.size() > 0) {
+		for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
+			(*it)->SetSprite(sprite);
+		}
+	}
 	if (pictures.size() > 0) {
 		for (std::vector<PictureBox *>::iterator it = pictures.begin(); it != pictures.end(); it++) {
 			(*it)->SetSprite(sprite);
@@ -2157,6 +2297,26 @@ bool PS4Forms::Form::UpdateCursor(float x, float y) {
 	}
 	if (labels.size() > 0) {
 		for (std::vector<Label *>::iterator it = labels.begin(); it != labels.end(); it++) {
+			(*it)->UpdateCursor(x, y);
+		}
+	}
+	if (button.size() > 0) {
+		for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+			(*it)->UpdateCursor(x, y);
+		}
+	}
+	if (sbar.size() > 0) {
+		for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+			(*it)->UpdateCursor(x, y);
+		}
+	}
+	if (checkB.size() > 0) {
+		for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+			(*it)->UpdateCursor(x, y);
+		}
+	}
+	if (textb.size() > 0) {
+		for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
 			(*it)->UpdateCursor(x, y);
 		}
 	}
@@ -2195,6 +2355,26 @@ void PS4Forms::Form::Visible(bool Visible) {
 				(*it)->Show();
 			}
 		}
+		if (button.size() > 0) {
+			for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+				(*it)->Show();
+			}
+		}
+		if (sbar.size() > 0) {
+			for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+				(*it)->Show();
+			}
+		}
+		if (checkB.size() > 0) {
+			for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+				(*it)->Show();
+			}
+		}
+		if (textb.size() > 0) {
+			for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
+				(*it)->Show();
+			}
+		}
 		if (pictures.size() > 0) {
 			for (std::vector<PictureBox *>::iterator it = pictures.begin(); it != pictures.end(); it++) {
 				(*it)->Show();
@@ -2219,6 +2399,26 @@ void PS4Forms::Form::Visible(bool Visible) {
 		}
 		if (labels.size() > 0) {
 			for (std::vector<Label *>::iterator it = labels.begin(); it != labels.end(); it++) {
+				(*it)->Hide();
+			}
+		}
+		if (button.size() > 0) {
+			for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+				(*it)->Hide();
+			}
+		}
+		if (sbar.size() > 0) {
+			for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+				(*it)->Hide();
+			}
+		}
+		if (checkB.size() > 0) {
+			for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+				(*it)->Hide();
+			}
+		}
+		if (textb.size() > 0) {
+			for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
 				(*it)->Hide();
 			}
 		}
@@ -2288,6 +2488,26 @@ void PS4Forms::Form::Draw(ssg::GraphicsContext *graphicsContext, ssg::SpriteRend
 				(*it)->Draw(graphicsContext, sprite);
 			}
 		}
+		if (button.size() > 0) {
+			for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+				(*it)->Draw(graphicsContext, sprite);
+			}
+		}
+		if (sbar.size() > 0) {
+			for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+				(*it)->Draw(graphicsContext, sprite);
+			}
+		}
+		if (checkB.size() > 0) {
+			for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+				(*it)->Draw(graphicsContext, sprite);
+			}
+		}
+		if (textb.size() > 0) {
+			for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
+				(*it)->Draw(graphicsContext, sprite);
+			}
+		}
 		if (pictures.size() > 0) {
 			for (std::vector<PictureBox *>::iterator it = pictures.begin(); it != pictures.end(); it++) {
 				(*it)->Draw(graphicsContext, sprite);
@@ -2325,6 +2545,38 @@ void PS4Forms::Form::Add(Label *child) {
 	if (child != nullptr) {
 		child->setParentPos(_position);
 		labels.push_back(child);
+	}
+}
+
+// Add a Button Object to this Form.
+void PS4Forms::Form::Add(Button *child) {
+	if (child != nullptr) {
+		child->setParentPos(_position);
+		button.push_back(child);
+	}
+}
+
+// Add a ScrollBar Object to this Form.
+void PS4Forms::Form::Add(ScrollBar *child) {
+	if (child != nullptr) {
+		child->setParentPos(_position);
+		sbar.push_back(child);
+	}
+}
+
+// Add a CheckBox Object to this Form.
+void PS4Forms::Form::Add(CheckBox *child) {
+	if (child != nullptr) {
+		child->setParentPos(_position);
+		checkB.push_back(child);
+	}
+}
+
+// Add a TextBox Object to this Form.
+void PS4Forms::Form::Add(TextBox *child) {
+	if (child != nullptr) {
+		child->setParentPos(_position);
+		textb.push_back(child);
 	}
 }
 
@@ -2370,6 +2622,34 @@ void PS4Forms::Form::Remove(Label *child) {
 	}
 }
 
+// Remove a Button Object from this Form.
+void PS4Forms::Form::Remove(Button *child) {
+	if (child != nullptr) {
+		button.erase(std::remove(button.begin(), button.end(), child), button.end());
+	}
+}
+
+// Remove a ScrollBar Object from this Form.
+void PS4Forms::Form::Remove(ScrollBar *child) {
+	if (child != nullptr) {
+		sbar.erase(std::remove(sbar.begin(), sbar.end(), child), sbar.end());
+	}
+}
+
+// Remove a CheckBox Object from this Form.
+void PS4Forms::Form::Remove(CheckBox *child) {
+	if (child != nullptr) {
+		checkB.erase(std::remove(checkB.begin(), checkB.end(), child), checkB.end());
+	}
+}
+
+// Remove a TextBox Object from this Form.
+void PS4Forms::Form::Remove(TextBox *child) {
+	if (child != nullptr) {
+		textb.erase(std::remove(textb.begin(), textb.end(), child), textb.end());
+	}
+}
+
 // Remove a PictureBox Object from this Form.
 void PS4Forms::Form::Remove(PictureBox *child) {
 	if (child != nullptr) {
@@ -2398,6 +2678,46 @@ PS4Forms::WidgetBase *PS4Forms::Form::getWidgetById(String id) {
 PS4Forms::Form *PS4Forms::Form::getFormById(String id) {
 	if (forms.size() > 0) {
 		for (std::vector<Form *>::iterator it = forms.begin(); it != forms.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
+// Get a Button based on his ID.
+PS4Forms::Button *PS4Forms::Form::getButtonById(String id) {
+	if (button.size() > 0) {
+		for (std::vector<Button *>::iterator it = button.begin(); it != button.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
+// Get a ScrollBar based on his ID.
+PS4Forms::ScrollBar *PS4Forms::Form::getScrollBarById(String id) {
+	if (sbar.size() > 0) {
+		for (std::vector<ScrollBar *>::iterator it = sbar.begin(); it != sbar.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
+// Get a CheckBox based on his ID.
+PS4Forms::CheckBox *PS4Forms::Form::getCheckBoxById(String id) {
+	if (checkB.size() > 0) {
+		for (std::vector<CheckBox *>::iterator it = checkB.begin(); it != checkB.end(); it++) {
+			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
+		}
+	}
+	return nullptr;
+}
+
+// Get a TextBox based on his ID.
+PS4Forms::TextBox *PS4Forms::Form::getTextBoxById(String id) {
+	if (textb.size() > 0) {
+		for (std::vector<TextBox *>::iterator it = textb.begin(); it != textb.end(); it++) {
 			if (!strcmp((*it)->getId(), id.c_str())) return (*it);
 		}
 	}
