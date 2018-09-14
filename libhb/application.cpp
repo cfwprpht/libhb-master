@@ -25,7 +25,6 @@ ssi::Button            LibHomebrew::Application::input = ssi::kButtonNone;
 ResourceManager        LibHomebrew::Application::resManager;
 SoundManager           LibHomebrew::Application::soundManager;
 EventDispatcher        LibHomebrew::Application::eventDispatcher;
-UserEntryManager       usrEntryManager;
 Config                 LibHomebrew::Application::conf;
 
 // Console informations.
@@ -345,7 +344,7 @@ int LibHomebrew::Application::initialize(void) {
 	// Initialize Sound Manager.
 	if (useSound) {
 		Logger::Debug("Initializing sound manager...\n");
-		soundManager.initialize(Audio(), &conf, &usrEntryManager, &eventDispatcher);
+		soundManager.initialize(Audio(), &conf, &eventDispatcher);
 		Logger::Debug("Initializing sound manager done.\n");		
 	}
 

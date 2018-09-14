@@ -5,7 +5,6 @@
 #include "event.h"
 #include "config.h"
 #include "resource_manager.h"
-#include "user_entry_manager.h"
 
 namespace common {
 	namespace Service {
@@ -33,7 +32,6 @@ namespace common {
 		public:
 			int initialize(sce::SampleUtil::Audio::AudioContext *audioContext,
 				Configuration::Config *config,
-				common::Service::UserEntryManager *userEntryManager,
 				common::Service::EventDispatcher *eventDispatcher);
 
 			int load(void);

@@ -13,7 +13,7 @@ namespace ssa = sce::SampleUtil::Audio;
 namespace sss = sce::SampleUtil::System;
 
 
-int SoundManager::initialize(AudioContext *audioContext, Config *config, UserEntryManager *userEntryManager, EventDispatcher *eventDispatcher) {
+int SoundManager::initialize(AudioContext *audioContext, Config *config, EventDispatcher *eventDispatcher) {
 	int ret;
 	_audioContext = audioContext;
 	_config = config;
@@ -56,17 +56,6 @@ int SoundManager::initialize(AudioContext *audioContext, Config *config, UserEnt
 		if (ret != SCE_OK) Logger::Debug("fail !\n");
 		else Logger::Debug("ok !\n");
 	}*/
-
-	Logger::Debug("Getting list of logged in users.\n");
-	Service::UserInfo users[SCE_SAMPLE_UTIL_MAX_LOGIN_USERS];
-	userEntryManager->getUsers(users);
-
-	Logger::Debug("Resolving logged in users now.\n");
-	for (uint32_t j = 0; j < SCE_SAMPLE_UTIL_MAX_LOGIN_USERS; j++) {
-		if (users[j]._userId == System::kInvalidUserId) { continue; }
-		sss::UserId userId = users[j]._userId;
-		onLogin(userId);
-	}
 
 	Logger::Debug("Register Sound Event Listener...");
 	ret = eventDispatcher->registerListener(this);
