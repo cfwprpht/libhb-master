@@ -63,11 +63,6 @@
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
-    <PostBuildEvent>
-      <Command>xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libc.prx" "$(ProjectDir)\sce_module\"
-xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectDir)\sce_module\"
-</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
     <ClCompile>

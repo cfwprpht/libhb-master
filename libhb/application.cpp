@@ -904,37 +904,58 @@ void LibHomebrew::Application::AVP_TriggerStop(void) {
 }
 
 // The App Loop.
-void *AppLoop(void *) {
-	int ret = 0;
-	(void)ret;
+/*void *AppLoop(void *app) {
+int ret = 0;
+(void)ret;
 
-	ret = app.initialize();
-	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
+ret = ((Application *)app)->initialize();
+SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
 
-	while (1) {
-		if (app.IsClosed()) break;
-		ret = app.update();
-		if (ret != SCE_OK) break;
-		app.render();
-	}
+while (1) {
+if (((Application *)app)->IsClosed()) break;
+ret = ((Application *)app)->update();
+if (ret != SCE_OK) break;
+((Application *)app)->render();
+}
 
-	ret = app.finalize();
-	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
+ret = ((Application *)app)->finalize();
+SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
 
-	return 0;
+return 0;
 }
 
 // Run the application loop in a own quite core.
 ScePthread appLoop;
-int LibHomebrew::Application::exec(void) {
-	// Set App Loop to run in Core 3.
-	scePthreadSetaffinity(appLoop, 3);
+int LibHomebrew::Application::exec(Application *app) {
+// Set App Loop to run in Core 3.
+scePthreadSetaffinity(appLoop, 3);
 
-	// Run the App Loop.
-	if (scePthreadCreate(&appLoop, NULL, AppLoop, NULL, "App Loop") == SCE_OK) {
-		// Wait for exit.
-		scePthreadJoin(appLoop, NULL);
+// Run the App Loop.
+if (scePthreadCreate(&appLoop, NULL, AppLoop, app, "App Loop") == SCE_OK) {
+// Wait for exit.
+scePthreadJoin(appLoop, NULL);
+}
+return 0;
+}*/
+
+// Run the application loop in a own quite core.
+ScePthread appLoop;
+int LibHomebrew::Application::exec(void) {
+	int ret = 0;
+	(void)ret;
+
+	ret = initialize();
+	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
+
+	while (1) {
+		if (IsClosed()) break;
+		ret = update();
+		if (ret != SCE_OK) break;
+		render();
 	}
+
+	ret = finalize();
+	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
 	return 0;
 }
 

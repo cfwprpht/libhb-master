@@ -118,6 +118,7 @@ namespace LibHomebrew {
 		virtual int  finalize(void);
 		virtual int  update(void);
 		virtual void render(void);
+		//int          exec(Application *app);
 		int          exec(void);
 		void         Title(const char *title);
 		void         TitlePos(Position pos);
@@ -251,5 +252,3 @@ namespace LibHomebrew {
 		void Play(void);		
 	};
 }
-
-Application app;
