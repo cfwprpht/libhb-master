@@ -463,8 +463,10 @@ int LibHomebrew::Application::update(void) {
 
 	// Update/Run player.
 	if (isPlaying) {
+#ifdef SDK_350
 		int32_t vhandle = Graphics()->getVideoOutHandle();
 		sceVideoOutWaitVblank(vhandle);
+#endif
 		if (player.isPlaying()) {
 			ret = player.update();
 			SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
@@ -841,8 +843,10 @@ void LibHomebrew::Application::Play(void) {
 		(void)ret;
 		if (strlen(videoPath) > 0) {
 			Logger::Debug("Trying to run Video...");
+#ifdef SDK_350
 			int32_t vhandle = Graphics()->getVideoOutHandle();
 			for (int i = 0; i < 3; i++) sceVideoOutWaitVblank(vhandle);
+#endif
 			ret = player.start(videoPath);
 			if (ret == SCE_OK) {
 				isPlaying = true;
@@ -860,8 +864,10 @@ int LibHomebrew::Application::Play(const char *path) {
 		(void)ret;
 		if (strlen(path) > 0) {
 			Logger::Debug("Trying to run Video...");
+#ifdef SDK_350
 			int32_t vhandle = Graphics()->getVideoOutHandle();
 			for (int i = 0; i < 3; i++) sceVideoOutWaitVblank(vhandle);
+#endif
 			ret = player.start(path);
 			if (ret == SCE_OK) {
 				isPlaying = true;

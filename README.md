@@ -196,4 +196,21 @@ PS4 LibHomebrew
      The PS4File and PS4Dir Classes got the Copy and CopyRecursive Function rewritten.
        Additional the "PS4File::Exists()" and "PS4Dir::Exists()" functions do use now sceFios2 library to check whether they exists or not.
      A ELF Loader was added to the libhb. (Still WIP)
- 
+     
+     Minor Fixes:
+       Fixed redefination of App instance.
+       Dropped to run App Loop in Core 3 since libLua and the cast
+       "lua_doFile()" will break and stop the initialisation process.
+
+       Removed User_Entry_Manager and NP-Toolkit from the Project since we not
+       gonna using them and they causing troubles between different SDK versions.
+       THX @ XDPX for pointing me onto.
+       
+       Fixed another SDK version trouble. Added a additional defination to
+       "defines.h" called "#define SDK_350" since 
+       "getVideoOutHandle()" is not supported any more.
+       There for, if you use a other SDK then 3.50 to compille
+       your app code, then just change that defination to something not "SDK_350".
+       May "SDK_XXX" is already ok.
+       Again Thx to XDPX for telling me about that bug.
+       

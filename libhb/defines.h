@@ -30,6 +30,7 @@
 #define TITLE_STR           ""
 #define VERSION_STR         ""
 #define APP_STR             "EMPTY_FILL_ME_UP"
+#define SDK_350
 
 /*E Definitions about charactor displayed */
 #define CHAR_COL			84
