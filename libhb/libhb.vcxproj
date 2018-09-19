@@ -16,7 +16,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -31,19 +31,22 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+    <LibraryPath>C:\Program Files %28x86%29\SCE\ORBIS SDKs\3.500\target\samples\sample_code\system\libhb\ORBIS_Debug;$(LibraryPath)</LibraryPath>
+    <TargetName>application</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\common\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\SCE\ORBIS SDKs\3.500\target\samples\sample_code\system\printf\printf;$(ProjectDir)\..\..\common\include</AdditionalIncludeDirectories>
       <CppExceptions>false</CppExceptions>
       <DisableSpecificWarnings>-Wno-unknown-pragmas;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies>-lSceUserService_stub_weak;-lSceSystemService_stub_weak;-lSceCommonDialog_stub_weak</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\SCE\ORBIS SDKs\3.500\target\samples\sample_code\system\zlib_test\ORBIS_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
@@ -76,61 +79,26 @@ xcopy /I /Y "$(SCE_ORBIS_SDK_DIR)\target\sce_module\libSceFios2.prx" "$(ProjectD
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
-    <ClCompile Include="console.cpp" />
-    <ClCompile Include="c_console.cpp" />
-    <ClCompile Include="file_info.cpp" />
-    <ClCompile Include="logger.cpp" />
-    <ClCompile Include="lv2.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
-    </ClCompile>
-    <ClCompile Include="ps4_elf_loader.cpp" />
-    <ClCompile Include="ps4_process.cpp" />
-    <ClCompile Include="ps4_directory.cpp" />
-    <ClCompile Include="ps4_file.cpp" />
-    <ClCompile Include="ps4_forms.cpp" />
-    <ClCompile Include="ps4_message_box.cpp" />
-    <ClCompile Include="ps4_network.cpp" />
-    <ClCompile Include="swiss_knife.cpp" />
-    <ClCompile Include="syscall.cpp" />
-    <ClCompile Include="syscalls.cpp" />
-    <ClCompile Include="unjail.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">CompileAsC</CompileAs>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\source\sampleutil\libSceSampleUtil.vcxproj">
       <Project>{30a1b994-c2c6-485f-911b-fb4674366da8}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\printf\printf\printf.vcxproj">
+      <Project>{3bff0d3c-e122-49ae-9cdd-f834e0b61966}</Project>
+    </ProjectReference>
+    <ProjectReference Include="libResources\libResources.vcxproj">
+      <Project>{0111126e-c38e-4524-9e79-c0a519d5c35e}</Project>
+    </ProjectReference>
     <ProjectReference Include="libUtil\libUtil.vcxproj">
       <Project>{09c2cd47-f62a-4b81-9170-dcb07e27ae2c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="prx\prx.vcxproj">
+      <Project>{4cf2bf0b-7e0a-447b-a709-55b1e7dcdbe2}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
-    <ClInclude Include="console.h" />
-    <ClInclude Include="c_console.h" />
-    <ClInclude Include="defines.h" />
-    <ClInclude Include="elf.h" />
-    <ClInclude Include="elf_common.h" />
-    <ClInclude Include="file_info.h" />
-    <ClInclude Include="fw.h" />
-    <ClInclude Include="ime_dialog_outer.h" />
-    <ClInclude Include="ime_keyboard.h" />
-    <ClInclude Include="logger.h" />
-    <ClInclude Include="lv2.h" />
-    <ClInclude Include="magics.h" />
-    <ClInclude Include="msg_dialog_outer.h" />
-    <ClInclude Include="ps4_directory.h" />
-    <ClInclude Include="ps4_elf_loader.h" />
-    <ClInclude Include="ps4_file.h" />
-    <ClInclude Include="ps4_forms.h" />
-    <ClInclude Include="ps4_message_box.h" />
-    <ClInclude Include="ps4_network.h" />
-    <ClInclude Include="ps4_process.h" />
-    <ClInclude Include="swiss_knife.h" />
-    <ClInclude Include="syscall.h" />
-    <ClInclude Include="syscalls.h" />
-    <ClInclude Include="unjail.h" />
   </ItemGroup>
   <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -4,9 +4,14 @@
 #include <scebase.h>
 #include <vector>
 #include <sampleutil.h>
-#include "util.h"
 
-#pragma comment( lib , "libSceNpToolkit_stub_weak.a" )
+#ifndef PRX_INTERFACE
+#ifdef LIBRARY_IMPL
+#define PRX_INTERFACE __declspec(dllexport)
+#else
+#define PRX_INTERFACE __declspec(dllimport)
+#endif
+#endif
 
 namespace common {
 	namespace Service {
@@ -51,13 +56,13 @@ namespace common {
 			} data;
 		};
 
-		class EventListener {
+		class PRX_INTERFACE EventListener {
 		public:
 			virtual void onEventArrived(const Event *event, const void *userData, int userFlag) = 0;
 			virtual ~EventListener(void) {}
 		};
 
-		class EventDispatcher {
+		class PRX_INTERFACE EventDispatcher {
 		private:
 			std::vector<EventListener*> _listeners;
 

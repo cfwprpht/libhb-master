@@ -13,6 +13,7 @@
 *
 */
 
+#define LIBRARY_IMPL  (1)
 #include "stdafx.h"
 #include "lua_util.h"
 
@@ -25,26 +26,19 @@ cu::LuaValue::Type cu::LuaValue::getType(void) const
 	return m_type;
 }
 
-double cu::LuaValue::asNumber(void) const
-{
-	SCE_SAMPLE_UTIL_ASSERT(m_type == kTypeNumber);
+double cu::LuaValue::asNumber(void) const {	
 	return val.numberValue;
 }
 
-bool cu::LuaValue::asBool(void) const
-{
-	SCE_SAMPLE_UTIL_ASSERT(m_type == kTypeBool);
+bool cu::LuaValue::asBool(void) const {	
 	return val.boolValue;
 }
 
-const std::string cu::LuaValue::asString(void) const
-{
-	SCE_SAMPLE_UTIL_ASSERT(m_type == kTypeString);
+const std::string cu::LuaValue::asString(void) const {
 	return *val.stringValue;
 }
 
-void cu::LuaValue::setNumber(double num)
-{
+void cu::LuaValue::setNumber(double num) {
 	m_type = kTypeNumber;
 	val.numberValue = num;
 }
@@ -62,7 +56,7 @@ void cu::LuaValue::setString(std::string str)
 }
 
 const cu::LuaValue *cu::LuaValue::getField(const std::string fieldName) const {
-	SCE_SAMPLE_UTIL_ASSERT(m_type == kTypeTable);
+	
 	Table::iterator it = val.tableValue->find(fieldName);
 	if (it == val.tableValue->end()) {
 		return NULL;
@@ -165,7 +159,7 @@ int cu::LuaValue::getFieldString(const char *field, std::string &str) const
 
 const cu::LuaValue *cu::LuaValue::getField(int index) const
 {
-	SCE_SAMPLE_UTIL_ASSERT(m_type == kTypeTable);
+	
 	char buf[sizeof(int) * 8 + 1];
 	snprintf(buf, sizeof(int) * 8 + 1, "%d", index);
 	std::string fieldName(buf);
@@ -233,11 +227,9 @@ const cu::LuaValue* cu::LuaValue::parse(lua_State *L)
 	{
 		break;
 	}
-	default:
-	{
+	default: {
 		int type = lua_type(L, -1);
 		printf("type=%d\n", type);
-		SCE_SAMPLE_UTIL_ASSERT(0);
 	}
 	}
 	lua_settop(L, top);
@@ -246,35 +238,33 @@ const cu::LuaValue* cu::LuaValue::parse(lua_State *L)
 
 cu::LuaValue::~LuaValue(void)
 {
-	switch (m_type)
-	{
-	case kTypeNumber:
-	{
-		break;
-	}
-	case kTypeBool:
-	{
-		break;
-	}
-	case kTypeString:
-	{
-		delete val.stringValue;
-		val.stringValue = NULL;
-		break;
-	}
-	case kTypeTable:
-	{
-		Table &t = *val.tableValue;
-		for (Table::iterator it = t.begin(); it != t.end(); it++) {
-			const LuaValue *l = it->second;
-			delete l;
+	switch (m_type) {
+		case kTypeNumber:
+		{
+			break;
 		}
-		delete val.tableValue;
-		val.tableValue = NULL;
-		break;
-	}
-	default:
-		SCE_SAMPLE_UTIL_ASSERT(0);
+		case kTypeBool:
+		{
+			break;
+		}
+		case kTypeString:
+		{
+			delete val.stringValue;
+			val.stringValue = NULL;
+			break;
+		}
+		case kTypeTable: {
+			Table &t = *val.tableValue;
+			for (Table::iterator it = t.begin(); it != t.end(); it++) {
+				const LuaValue *l = it->second;
+				delete l;
+			}
+			delete val.tableValue;
+			val.tableValue = NULL;
+			break;
+		}
+		default:
+			break;
 	}
 	m_type = kTypeNone;
 }
@@ -313,7 +303,7 @@ void cu::LuaValue::_dump(int indent) const
 		break;
 	}
 	default:
-		SCE_SAMPLE_UTIL_ASSERT(0);
+		break;
 	}
 }
 
@@ -332,15 +322,3 @@ const cu::LuaValue::Table *cu::LuaValue::asTable(void) const
 
 
 #pragma endregion // LuaValue
-
-void cu::convertStringTable(std::hash_map<std::string, std::string> &stringTable, const common::Util::LuaValue::Table *table)
-{
-	stringTable.clear();
-	common::Util::LuaValue::Table::const_iterator it;
-	for (it = table->begin(); it != table->end(); it++) {
-		std::string name = it->first;
-		const common::Util::LuaValue *lv = it->second;
-		SCE_SAMPLE_UTIL_ASSERT(lv->getType() == common::Util::LuaValue::kTypeString);//TODO:
-		stringTable[name] = lv->asString();
-	}
-}

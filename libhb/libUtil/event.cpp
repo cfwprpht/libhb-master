@@ -1,4 +1,4 @@
-
+#define LIBRARY_IMPL  (1)
 #include "stdafx.h"
 #include "event.h"
 

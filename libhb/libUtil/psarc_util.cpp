@@ -13,7 +13,7 @@
 *
 */
 
-
+#define LIBRARY_IMPL  (1)
 #include "stdafx.h"
 #include "psarc_util.h"
 #include <assert.h>

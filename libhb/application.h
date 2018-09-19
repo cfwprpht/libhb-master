@@ -15,58 +15,37 @@
 
 #pragma once
 
-// Included Library stubs.
-#pragma comment( lib , "libSceAvPlayer_stub_weak.a" )
-#pragma comment( lib , "libSceNet_stub_weak.a" )
-#pragma comment( lib , "libSceNetCtl_stub_weak.a" )
+#pragma comment( lib , "BaseService_stub_weak")
+#pragma comment( lib , "Resources_stub_weak")
+#pragma comment( lib , "Util_stub_weak")
+#pragma comment( lib , "hb_stub_weak")
 
-#include "fw.h"
+#include "prx/fw.h"
 #include <stdio.h>
 #include <vectormath.h>
 #include <vector>
 #include <string>
-#include <net.h>
-#include <libnetctl.h>
 #include <sampleutil.h>
-#include <user_service.h>
-#include <system_service.h>
-#include <libsysmodule.h>
-#include <common_dialog.h>
-#include <message_dialog.h>
-#include <video_out.h>
-#include <sys/dirent.h>
-#include "syscall.h"
-#include "syscalls.h"
-#include "defines.h"
-#include "console.h"
-#include "file_info.h"
-#include "ps4_directory.h"
-#include "ps4_process.h"
-#include "ps4_file.h"
-#include "ps4_forms.h"
-#include "ps4_network.h"
-#include "swiss_knife.h"
-#include "logger.h"
-#include "ime_dialog_outer.h"
-#include "msg_dialog_outer.h"
-#include "ps4_forms.h"
+#include "prx/defines.h"
+#include "prx/ps4_forms.h"
+#include "prx/ime_dialog_outer.h"
+#include "prx/msg_dialog_outer.h"
 #include "libUtil/av_util.h"
-#include "libUtil/resource_manager.h"
-#include "libUtil/sound_manager.h"
-#include "libUtil/config.h"
+#include "libUtil/event.h"
+#include "libResources/resource_manager.h"
+#include "libResources/sound_manager.h"
+#include "libResources/config.h"
 
+#ifndef PRX_INTERFACE
 #ifdef LIBRARY_IMPL
-#define __declspec(dllexport)
+#define PRX_INTERFACE __declspec(dllexport)
 #else
-#define __declspec(dllimport)
+#define PRX_INTERFACE __declspec(dllimport)
+#endif
 #endif
 
 // LibHomebrew !
-using namespace LibHomebrew;
 using namespace PS4Forms;
-using namespace LibHomebrew::Loot;
-using namespace LibHomebrew::PS4IO;
-using namespace common;
 using namespace common::Util;
 using namespace common::Configuration;
 using namespace common::Service;
@@ -74,7 +53,7 @@ namespace G = sce::SampleUtil::Graphics;
 namespace A = sce::SampleUtil::Audio;
 
 namespace LibHomebrew {
-	class Application : public sce::SampleUtil::SampleSkeleton {
+	class PRX_INTERFACE Application : public sce::SampleUtil::SampleSkeleton {
 	//E User information
 	//J ユーザー情報
 	struct UserInfo {
@@ -112,14 +91,14 @@ namespace LibHomebrew {
 		static SoundManager     soundManager;
 		static EventDispatcher  eventDispatcher;
 
-		Application() {}
-		virtual ~Application() { close = true; }
-		virtual int  initialize(void);
-		virtual int  finalize(void);
-		virtual int  update(void);
-		virtual void render(void);
-		//int          exec(Application *app);
-		int          exec(void);
+		~Application(void);
+		int  initialize(void);
+		int  finalize(void);
+		int  update(void);
+		void render(void);
+		int          exec(Application *app);
+		//int          exec(void);
+		void         SetTitleId(const char *titleId);
 		void         Title(const char *title);
 		void         TitlePos(Position pos);
 		void         TitlePos(float x, float y);
@@ -144,7 +123,6 @@ namespace LibHomebrew {
 		void         UseVideo(bool state);
 		void         UseSound(bool state);
 		void         UseResources(bool state);
-		void         UseDebug(void);
 		void         UseIme(void);
 		void         UseDialog(void);
 		void         Video(const char *path);
@@ -214,7 +192,6 @@ namespace LibHomebrew {
 		static bool                    useCursor;
 		static bool                    useResources;
 		static bool                    useSound;
-		static bool                    debug;
 		static bool                    useIme;
 		static bool                    useDialog;
 		bool                           start;
@@ -235,6 +212,7 @@ namespace LibHomebrew {
 		static float                   bannerSize;
 		static ssi::Button             input;
 		static wchar_t                 resultTextBuf[TEXT_MAX_LENGTH + 1];
+		static String                  titleId;
 		ImeDialogWrapper               *imeDialog;
 		MsgDialogWrapper               *msgDialog;
 		std::vector<void (*)()>        drawFuncs;

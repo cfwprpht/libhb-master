@@ -10,11 +10,19 @@
 #include <semaphore.h>
 #include <mspace.h>
 
+#ifndef PRX_INTERFACE
+#ifdef LIBRARY_IMPL
+#define PRX_INTERFACE __declspec(dllexport)
+#else
+#define PRX_INTERFACE __declspec(dllimport)
+#endif
+#endif
+
 //#define SCE_SAMPLE_UTIL_ASSERT_EQUAL(value, expected)	sce::SampleUtil::Internal::AssertEqual32(__FILE__, __LINE__, value, expected, "Assertion failed, values not equal. actual value=%#x, expected value=%#x\n", value, expected)
 
 namespace common {
     namespace Util {
-		class Mutex {
+		class PRX_INTERFACE Mutex {
 		private:
 			ScePthreadMutex m_mutex;
 		public:
@@ -24,7 +32,7 @@ namespace common {
 			~Mutex(void);
 		};
 
-		class Semaphore {
+		class PRX_INTERFACE Semaphore {
 		private:
 			SceKernelSema m_semaphore;
 		public:
@@ -35,7 +43,7 @@ namespace common {
 			int poll(int needCount);
 		};
 
-		class FocusLock {
+		class PRX_INTERFACE FocusLock {
 		private:
 			Mutex *m_mutex;
 		public:
@@ -43,7 +51,7 @@ namespace common {
 			~FocusLock(void);
 		};
 
-		class EventFlag {
+		class PRX_INTERFACE EventFlag {
 		private:
 			SceKernelEventFlag m_eventflag;
 		public:
@@ -53,7 +61,7 @@ namespace common {
 			void wait(void);
 		};
 
-		class Thread {
+		class PRX_INTERFACE Thread {
 		public:
 			typedef void* (*Entry)(void *arg);
 			static const uint32_t kStackSize = 16 * 1024 * 1024;
@@ -71,7 +79,7 @@ namespace common {
 			static void* fakeEntry(void *arg);
 		};
 
-		class DirectMemoryHeap {
+		class PRX_INTERFACE DirectMemoryHeap {
 		private:
 			class Heap {
 				friend class DirectMemoryHeap;

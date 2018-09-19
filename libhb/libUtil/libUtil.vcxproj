@@ -15,7 +15,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -45,20 +45,26 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
+    <LibraryPath>C:\Program Files %28x86%29\SCE\ORBIS SDKs\3.500\target\samples\sample_code\system\libhb\prx\ORBIS_Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;SCE_SAMPLE_UTIL_ASSERTS_ENABLED=1;ENABLE_PATCH=0;ENABLE_ADDCONT=1;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SCE_ORBIS_SDK_DIR)\target\include;$(ProjectDir)\..\..\..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\SCE\ORBIS SDKs\3.500\target\samples\sample_code\system\printf\printf;$(SCE_ORBIS_SDK_DIR)\target\include;$(ProjectDir)\..\..\..\common\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <DisableSpecificWarnings>-Wno-unknown-pragmas;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>-Wno-unknown-pragmas  -Wnull-conversion %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <CustomBuildStep>
       <Command>
       </Command>
     </CustomBuildStep>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\SCE\ORBIS SDKs\3.500\target\samples\sample_code\system\libhb\ORBIS_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
     <ClCompile>
@@ -69,31 +75,29 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="av_util.h" />
-    <ClInclude Include="config.h" />
     <ClInclude Include="event.h" />
     <ClInclude Include="lua_util.h" />
     <ClInclude Include="psarc_util.h" />
-    <ClInclude Include="resource_manager.h" />
-    <ClInclude Include="sound_manager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="thread_util.h" />
-    <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="av_util.cpp" />
-    <ClCompile Include="config.cpp" />
     <ClCompile Include="event.cpp" />
     <ClCompile Include="lua_util.cpp" />
     <ClCompile Include="psarc_util.cpp" />
-    <ClCompile Include="resource_manager.cpp" />
-    <ClCompile Include="sound_manager.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="thread_util.cpp" />
-    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\printf\printf\printf.vcxproj">
+      <Project>{3bff0d3c-e122-49ae-9cdd-f834e0b61966}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\libLua\libLua.vcxproj">
       <Project>{967ed826-d059-413f-9936-9bd876ed3794}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\prx\prx.vcxproj">
+      <Project>{4cf2bf0b-7e0a-447b-a709-55b1e7dcdbe2}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Condition="'$(ConfigurationType)' == 'Makefile' and Exists('$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets')" Project="$(VCTargetsPath)\Platforms\$(Platform)\SCE.Makefile.$(Platform).targets" />

@@ -6,15 +6,26 @@
 
 #pragma once
 
+#pragma comment( lib , "BaseService_stub_weak")
+
 #include <sampleutil.h>
 #include <mspace.h>
 #include <sceavplayer.h>
 #include <video_recording.h>
 #include "thread_util.h"
 
+
+#ifndef PRX_INTERFACE
+#ifdef LIBRARY_IMPL
+#define PRX_INTERFACE __declspec(dllexport)
+#else
+#define PRX_INTERFACE __declspec(dllimport)
+#endif
+#endif
+
 namespace common {
 	namespace Util {
-		class AvPlayer {
+		class PRX_INTERFACE AvPlayer {
 		public:
 			AvPlayer(void);
 			virtual ~AvPlayer(void);

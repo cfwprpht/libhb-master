@@ -1,15 +1,19 @@
-﻿#include "stdafx.h"
+﻿#pragma comment( lib , "libSceAvPlayer_stub_weak.a")
+#pragma comment( lib , "libhb_stub_weak.a")
+
+
 #include <stdio.h>
 #include <kernel.h>
 #include <scebase_common.h>
 #include <libsysmodule.h>
-#include "av_util.h"
 #include "sceavplayer_ex.h"
+
+#define LIBRARY_IMPL  (1)
+#include "stdafx.h"
 #include <ngs2.h>
-#include "../logger.h"
+#include "av_util.h"
 
 using namespace common::Util;
-using namespace LibHomebrew;
 namespace vecmath = sce::Vectormath::Simd::Aos;
 namespace ssg = sce::SampleUtil::Graphics;
 
@@ -22,12 +26,12 @@ int AvPlayer::TextureBuffer::initialize(ssg::GraphicsLoader *loader, uint32_t nu
 		ret = loader->createTexture(	&m_pairs[i].y,
 			ssg::kTextureFormatR8Unorm,
 			width, height, 1 );
-		SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
+		
 		
 		ret = loader->createTexture(	&m_pairs[i].cbcr,
 			ssg::kTextureFormatG8R8Unorm,
 			width/2, (height/2), 1 );
-		SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
+		
 	}
 	m_index = -1;
 	m_width = width;
@@ -56,7 +60,7 @@ int AvPlayer::TextureBuffer::finalize(void) {
 }
 
 static void fast_memcpy(void *dst, const void* src, size_t size) {
-	Logger::Debug("[AV-Player] memcpy(%p, %p, %lx\n", dst, src, size);
+	_printf("[AV-Player] memcpy(%p, %p, %lx\n", dst, src, size);
 
 	uint64_t *dst64 =(uint64_t *)dst;
 	const uint64_t *src64 =(const uint64_t *)src;
@@ -148,8 +152,7 @@ AvPlayer::~AvPlayer(void) {}
 int AvPlayer::initialize(ssg::GraphicsLoader *loader, ssg::SpriteRenderer *spriteRenderer, sce::SampleUtil::Audio::AudioContext *audioContext, DirectMemoryHeap *heap ) {
 	int ret;
 	(void)ret;
-	ret = sceSysmoduleLoadModule(SCE_SYSMODULE_AV_PLAYER);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
+	ret = sceSysmoduleLoadModule(SCE_SYSMODULE_AV_PLAYER);	
 
 	m_heap           = heap;
 	m_loader         = loader;
@@ -166,7 +169,7 @@ int AvPlayer::initialize(ssg::GraphicsLoader *loader, ssg::SpriteRenderer *sprit
 int AvPlayer::finalize(void) {
 	int ret;
 	ret = sceSysmoduleUnloadModule(SCE_SYSMODULE_AV_PLAYER);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
+	
 	return SCE_OK;
 }
 
@@ -175,45 +178,41 @@ void AvPlayer::eventCallback(void* p, int32_t argEventId, int32_t argSourceId, v
 	(void)ret;
 	AvPlayer *self = (AvPlayer*)p;
 	if(argEventId == SCE_AVPLAYER_STATE_READY) {
-		Logger::Debug("[AV-Player] TIMESTAMP0: %ld----------------------------------------\n",  sceAvPlayerCurrentTime(self->m_hSamplePlayer));
+		_printf("[AV-Player] TIMESTAMP0: %ld----------------------------------------\n",  sceAvPlayerCurrentTime(self->m_hSamplePlayer));
 
 		int numStream = sceAvPlayerStreamCount(self->m_hSamplePlayer);
 		for(uint32_t i=0;i<numStream; i++){
 			SceAvPlayerStreamInfo streamInfo;
 			memset(&streamInfo, 0, sizeof(streamInfo));
 
-			ret =  sceAvPlayerGetStreamInfo(self->m_hSamplePlayer, i, &streamInfo);
-			SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+			ret =  sceAvPlayerGetStreamInfo(self->m_hSamplePlayer, i, &streamInfo);			
 
 			if(streamInfo.type == SCE_AVPLAYER_AUDIO) {
 				ret = self->_audioContext->createRawVoice(&self->m_rawVoice, 1024*128, SCE_NGS2_WAVEFORM_TYPE_PCM_I16L, 
 					streamInfo.details.audio.channelCount, streamInfo.details.audio.sampleRate);
-				SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-				ret = self->m_rawVoice->play();
-				SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+				
+				ret = self->m_rawVoice->play();				
 
-				Logger::Debug("[AV-Player] enbale audio\n");
+				_printf("[AV-Player] enbale audio\n");
 				ret = sceAvPlayerEnableStream(self->m_hSamplePlayer, i);
-				SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+				
 			}
 			if (streamInfo.type == SCE_AVPLAYER_VIDEO) {
-				ret = self->m_textureBuffer.initialize(self->m_loader, 3, streamInfo.details.video.width, streamInfo.details.video.height);
-				SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+				ret = self->m_textureBuffer.initialize(self->m_loader, 3, streamInfo.details.video.width, streamInfo.details.video.height);				
 				
 				self->m_width  = streamInfo.details.video.width;
 				self->m_height = streamInfo.details.video.height;
 
-				Logger::Debug("[AV-Player] enbale video\n");
-				ret = sceAvPlayerEnableStream(self->m_hSamplePlayer, i);
-				SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+				_printf("[AV-Player] enbale video\n");
+				ret = sceAvPlayerEnableStream(self->m_hSamplePlayer, i);				
 			}
 		}
-		Logger::Debug("[AV-Player] TIMESTAMP0: %ld\n", sceAvPlayerCurrentTime(self->m_hSamplePlayer));
-		Logger::Debug("[AV-Player] start\n");
+		_printf("[AV-Player] TIMESTAMP0: %ld\n", sceAvPlayerCurrentTime(self->m_hSamplePlayer));
+		_printf("[AV-Player] start\n");
 
 		self->m_startTime = sceKernelGetProcessTime();	
 		ret = sceAvPlayerStart(self->m_hSamplePlayer);
-		SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
+		
 		self->m_isStarted = true;
 	}
 }
@@ -259,7 +258,7 @@ void* AvPlayer::audioThreadEntry(void *arg) {
 			memset( &audioFrame, 0, sizeof(SceAvPlayerFrameInfo) );
 			bool audioAvailable = sceAvPlayerGetAudioData( self->m_hSamplePlayer, &audioFrame );
 			if(!audioAvailable){
-				//Logger::Debug("audio not available\n");
+				//_printf("[AV-Player] audio not available\n");
 				sceKernelUsleep(100);
 				continue;
 			}
@@ -282,7 +281,7 @@ void* AvPlayer::audioThreadEntry(void *arg) {
 				}
 				continue;
 			}
-			Logger::Debug("audio time stamp=%ld\n", audioFrame.timeStamp);
+			_printf("[AV-Player] audio time stamp=%ld\n", audioFrame.timeStamp);
 			break;
 		}
 
@@ -314,10 +313,10 @@ void* AvPlayer::audioThreadEntry(void *arg) {
 		if(self->m_pendingAudioData.data != NULL){
 			ret = self->m_rawVoice->addData(self->m_pendingAudioData.data, self->m_pendingAudioData.size);
 			if(ret != SCE_OK){
-				Logger::Debug("[AV-Player : AudioThreadEntry] audio buffer is full\n");
+				_printf("[AV-Player : AudioThreadEntry] audio buffer is full\n");
 				break;
 			}
-			Logger::Debug("[AV-Player : AudioThreadEntry] audio buffer pushed\n");
+			_printf("[AV-Player : AudioThreadEntry] audio buffer pushed\n");
 
 			self->m_pendingAudioData.data = NULL;
 			self->m_pendingAudioData.size = 0;
@@ -331,7 +330,7 @@ void* AvPlayer::audioThreadEntry(void *arg) {
 		memset( &audioFrame, 0, sizeof(SceAvPlayerFrameInfo) );
 		bool audioAvailable = sceAvPlayerGetAudioData( self->m_hSamplePlayer, &audioFrame );
 		if(!audioAvailable){
-			Logger::Debug("[AV-Player : AudioThreadEntry] audio data is not available\n");
+			_printf("[AV-Player : AudioThreadEntry] audio data is not available\n");
 			break;
 		}
 
@@ -380,7 +379,6 @@ int AvPlayer::start(const char* fileName ) {
 	playerInit.basePriority                        = 0;
 	m_isStarted                                    = false;
 	m_hSamplePlayer                                = sceAvPlayerInit(&playerInit);
-	SCE_SAMPLE_UTIL_ASSERT(m_hSamplePlayer != NULL);
 
 	SceAvPlayerPostInitData playerPostInit;
 	memset(&playerPostInit, 0, sizeof(SceAvPlayerPostInitData));
@@ -391,7 +389,6 @@ int AvPlayer::start(const char* fileName ) {
 	playerPostInit.videoDecoderInit.decoderParams.avcSw2.computePipeId  = 0;
 	playerPostInit.videoDecoderInit.decoderParams.avcSw2.computeQueueId = 0;
 	ret = sceAvPlayerPostInit(m_hSamplePlayer, &playerPostInit);
-	SCE_SAMPLE_UTIL_ASSERT(ret == 0);
 
 	sceAvPlayerStop(m_hSamplePlayer);
 	m_isPlaying = true;
@@ -406,7 +403,7 @@ int AvPlayer::start(const char* fileName ) {
 	}
 
 	ret = m_audioThread.start("audiothread", audioThreadEntry, this);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
+	
 
 	//while(!m_isStarted){
 	//sceKernelUsleep(1000);
@@ -428,7 +425,7 @@ int AvPlayer::stop(void) {
 	}
 
 	ret = m_audioThread.join(NULL);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
+	
 
 	if (m_yBuffer!= NULL) {
 		sce::SampleUtil::destroy(m_yBuffer);
@@ -448,7 +445,7 @@ int AvPlayer::stop(void) {
 		m_cbcr= NULL;
 	}
 	ret = m_textureBuffer.finalize();
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
+	
 
 	m_pendingAudioData.data = NULL;
 	m_pendingAudioData.size = 0;
@@ -472,10 +469,10 @@ int AvPlayer::update(void) {
 		if(m_pendingAudioData.data != NULL){
 			ret = m_rawVoice->addData(m_pendingAudioData.data, m_pendingAudioData.size);
 			if(ret != SCE_OK){
-				//Logger::Debug("[AV-Player] audio buffer is full\n");
+				//_printf("[AV-Player] audio buffer is full\n");
 				break;
 			}
-			//Logger::Debug("audio buffer pushed\n");
+			//_printf("[AV-Player] audio buffer pushed\n");
 			m_pendingAudioData.data = NULL;
 			m_pendingAudioData.size = 0;
 			break;
@@ -484,7 +481,7 @@ int AvPlayer::update(void) {
 		memset( &audioFrame, 0, sizeof(SceAvPlayerFrameInfo) );
 		bool audioAvailable = sceAvPlayerGetAudioData( m_hSamplePlayer, &audioFrame );
 		if(!audioAvailable){
-			//Logger::Debug("[AV-Player] audio data is not available\n");
+			//_printf("[AV-Player] audio data is not available\n");
 			break;
 		}
 
@@ -499,10 +496,10 @@ int AvPlayer::update(void) {
 		memset(&videoFrame, 0, sizeof(SceAvPlayerFrameInfo));
 		
 		bool frameAvailable = sceAvPlayerGetVideoData(m_hSamplePlayer, &videoFrame);
-		Logger::Debug("[AV-Player] TIMESTAMP: a=%d, %ld, %ld\n",  frameAvailable, sceAvPlayerCurrentTime(m_hSamplePlayer), videoFrame.timeStamp);
+		_printf("[AV-Player] TIMESTAMP: a=%d, %ld, %ld\n",  frameAvailable, sceAvPlayerCurrentTime(m_hSamplePlayer), videoFrame.timeStamp);
 		if (frameAvailable) {
 			m_videoTimeStamp = videoFrame.timeStamp;
-			Logger::Debug("[AV-Player] video time stamp=%ld\n", videoFrame.timeStamp);
+			_printf("[AV-Player] video time stamp=%ld\n", videoFrame.timeStamp);
 	
 			void *y = videoFrame.pData;
 			void *cbcr = (((uint8_t*)videoFrame.pData) + (videoFrame.details.video.width * videoFrame.details.video.height));
@@ -531,22 +528,14 @@ int AvPlayer::update(void) {
 				ssg::kBufferAccessModeGpuReadCpuWrite,
 				ssg::kBufferBindFlagShaderResource,
 				ssg::kMultisampleNone, y);
-			SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
-			SCE_SAMPLE_UTIL_ASSERT(m_yBuffer != NULL);
+			
 			ret = m_loader->createTexture2dBufferUsingExistentBuffer(&m_cbcrBuffer, ssg::kBufferFormatX8X8, m_width/2, m_height/2,1,
 				ssg::kBufferAccessModeGpuReadCpuWrite,
 				ssg::kBufferBindFlagShaderResource,
 				ssg::kMultisampleNone, cbcr);
-			SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
-			SCE_SAMPLE_UTIL_ASSERT(m_cbcrBuffer != NULL);
 			
-			ret = m_loader->createTextureFromBuffer(&m_y, m_yBuffer, ssg::kTextureFormatR8Unorm);
-			SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
-			SCE_SAMPLE_UTIL_ASSERT(m_y != NULL);
-			
+			ret = m_loader->createTextureFromBuffer(&m_y, m_yBuffer, ssg::kTextureFormatR8Unorm);			
 			ret = m_loader->createTextureFromBuffer(&m_cbcr, m_cbcrBuffer, ssg::kTextureFormatG8R8Unorm);
-			SCE_SAMPLE_UTIL_ASSERT_EQUAL( ret, SCE_OK );
-			SCE_SAMPLE_UTIL_ASSERT(m_cbcr != NULL);
 			break;
 		}
 		break;
@@ -560,10 +549,10 @@ int AvPlayer::update(void) {
 			}
 			ret = m_rawVoice->addData(m_pendingAudioData.data, m_pendingAudioData.size);
 			if(ret != SCE_OK){
-				//Logger::Debug("[AV-Player] audio buffer is full\n");
+				//_printf("[AV-Player] audio buffer is full\n");
 				break;
 			}
-			//Logger::Debug("[AV-Player] audio buffer pushed\n");
+			//_printf("[AV-Player] audio buffer pushed\n");
 			m_pendingAudioData.data = NULL;
 			m_pendingAudioData.size = 0;
 		}
@@ -571,7 +560,7 @@ int AvPlayer::update(void) {
 		memset( &audioFrame, 0, sizeof(SceAvPlayerFrameInfo) );
 		bool audioAvailable = sceAvPlayerGetAudioData( m_hSamplePlayer, &audioFrame );
 		if(!audioAvailable){
-			//Logger::Debug("[AV-Player] audio data is not available\n");
+			//_printf("[AV-Player] audio data is not available\n");
 			break;
 		}
 		m_pendingAudioData.data = audioFrame.pData;

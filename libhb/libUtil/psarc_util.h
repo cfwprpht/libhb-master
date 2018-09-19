@@ -19,9 +19,17 @@
 #include <string>
 #include <fios2.h>
 
+#ifndef PRX_INTERFACE
+#ifdef LIBRARY_IMPL
+#define PRX_INTERFACE __declspec(dllexport)
+#else
+#define PRX_INTERFACE __declspec(dllimport)
+#endif
+#endif
+
 namespace common {
 	namespace Util {
-		class PsarcMount {
+		class PRX_INTERFACE PsarcMount {
 		private:
 			char m_dearchiverWorkBuffer[SCE_FIOS_PSARC_DEARCHIVER_WORK_BUFFER_SIZE]
 				__attribute__((aligned(SCE_FIOS_PSARC_DEARCHIVER_WORK_BUFFER_ALIGNMENT)));

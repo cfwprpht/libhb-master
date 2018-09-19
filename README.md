@@ -214,3 +214,23 @@ PS4 LibHomebrew
        May "SDK_XXX" is already ok.
        Again Thx to XDPX for telling me about that bug.
        
+## Update 18
+     The whole Project is now build as Dynamic Linked Library.
+     useDebug() and Logger::Debug() would be dismissed since libhb is now using my printf driver to write
+       debug messages from userland to the Systems UART line.
+     SampleUtil aka BaseService lib got non working printf functions changed to _printf.
+        With that, libhb will now write out SDK debug messages, just like on a official Debug/Test Console.
+     There is now a template for new projects which includes main.cpp, program.cpp/.h.
+       It's ready to use. After you createt a new project add thoes templates, then just add
+       the libhb project file to it and set a depense to your project.
+       That's basicly just the application.cpp source which is the Core.
+       If you want to use libhb Tools, add the project prx from libhb folder
+       and set a depense.
+       finalize_pkg app will copy all prxs from libhb/ORBIS_Debug and the one from the 
+       projects folder into /YourProject/data/app0/sce_module/.
+       A video explanation can be found on my youtube channel.
+     Rearanged the de-/initialisation functions and now we have the Application Loop running in Core 3.
+       So: UserEntry == Core 1.
+           AppLoop   == Core 3.
+     TinyXml static library stub is included within the "libs" folder, which the SampleUtil will need to compile correctly.
+       Just copy the stub to /SDK/target/lib/.

@@ -13,9 +13,28 @@
 *
 */
 
-#define LIBRARY_IMPL  (1)
-#include "application.h"
+// Included Library stubs.
+#pragma comment( lib , "SceSysmodule_stub_weak")
+#pragma comment( lib , "SceSystemService_stub_weak")
+#pragma comment( lib , "SceVideoOut_stub_weak")
+#pragma comment( lib , "SceAvPlayer_stub_weak" )
+
+#define LIBRARY_IMPL (1)
 #include <algorithm>
+#include <video_out.h>
+#include <system_service.h>
+#include "printf.h"
+#include "application.h"
+#include "prx/console.h"
+#include "prx/file_info.h"
+#include "prx/ps4_process.h"
+#include "prx/syscall.h"
+#include "prx/syscalls.h"
+
+using namespace LibHomebrew;
+using namespace LibHomebrew::Loot;
+using namespace LibHomebrew::PS4IO;
+using namespace common;
 
 // AV Player.
 common::Util::AvPlayer player;
@@ -48,9 +67,9 @@ bool LibHomebrew::Application::useTitle      = false;
 bool LibHomebrew::Application::useBanner     = false;
 bool LibHomebrew::Application::useResources  = false;
 bool LibHomebrew::Application::useSound      = false;
-bool LibHomebrew::Application::debug         = false;
 bool LibHomebrew::Application::useIme        = false;
 bool LibHomebrew::Application::useDialog     = false;
+String LibHomebrew::Application::titleId("");
 EventDataUserInfo LibHomebrew::Application::data;
 PictureBox LibHomebrew::Application::bgi;
 Position LibHomebrew::Application::titlePos  = Position(0.0, 0.0);
@@ -79,8 +98,6 @@ int blinked;
 static int interval       = 80;
 //static int intervalShowen = 3;
 static bool bannerEffect  = true;
-
-size_t sceLibcHeapSize = 256 * 1024 * 1024;
 
 // The user Main Entry.
 void *(*UsrEntry)(void*) = 0;
@@ -257,6 +274,8 @@ void LibHomebrew::Application::UserInfo::render(ssg::GraphicsContext *graphicsCo
 	}
 }
 
+LibHomebrew::Application::~Application(void) { close = true; }
+
 // Initialize the Application Instance.
 int LibHomebrew::Application::initialize(void) {
 	int ret = 0;
@@ -264,122 +283,80 @@ int LibHomebrew::Application::initialize(void) {
 
 	//E Initialize SampleUtil. Graphics feature and SpriteRenderer feature of SampleUtil are enabled.
 	//J SampleUtilの初期化。SampleUtilのGraphics機能とSpriteRenderer機能を有効化。
-	ret = initializeUtil(kFunctionFlagGraphics | kFunctionFlagSpriteRenderer | kFunctionFlagFios2 | kFunctionFlagAudio);
+	ret = initializeUtil(kFunctionFlagGraphics | kFunctionFlagSpriteRenderer | kFunctionFlagAudio);
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
 
 	//E Initialize UserService.
 	//J UserService の初期化。
 	ret = sceUserServiceInitialize(NULL);
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
-
+		
 	// Create a internal Renderer.
 	sprite = NULL;
 	ssg::GraphicsContext *graphicsContext = getGraphicsContext();
 	ssg::createSpriteRenderer(&sprite, graphicsContext);
 	uint32_t width = graphicsContext->getNextRenderTarget()->getWidth();
 	uint32_t height = graphicsContext->getNextRenderTarget()->getHeight();
-	sprite->setRenderTargetSize(Size(width, height));
+	sprite->setRenderTargetSize(Size(width, height));	
+		
+	// Shall we use Ime Dialog ?
+	if (useIme) {
+		wcsncpy(resultTextBuf, L"Edit", sizeof(resultTextBuf) / sizeof(wchar_t));
+
+		imeDialog = new ImeDialogWrapper();
+		SCE_SAMPLE_UTIL_ASSERT(imeDialog != NULL);
+		imeDialog->initialize();
+	}
+
+	// Shall we use Message Dialog ?
+	if (useDialog) {
+		msgDialog = new MsgDialogWrapper();
+		SCE_SAMPLE_UTIL_ASSERT(msgDialog != NULL);
+		ret = msgDialog->initialize();
+		if (ret == SCE_OK) msgDialog->doNotTerminate(true);    // Needed so we can re-use the dialog without the need to initialize it over and over again.
+	}
 
 	// Get Freedom for this Process.
 	int uid = Sys::getuid();
 	if (uid != 0) Proc::Freedom();
 
-	// Shall we use Debugging ?
-	if (debug) {
-		// Get Connected usb drive.
-		String path = SwissKnife::GetUsb();
-		path += "debug_";
-		path += SwissKnife::GetTimeString();
-		path += ".log";
-
-		// Initialize debug log.
-		Logger::UseDebug();
-		Logger::InitDbg(path.c_str());
-
-		// Debug Logg Header.
-		Logger::Debug("Debugging startet...\n");
-	}
-
-	// Shall we use Ime Dialog ?
-	if (useIme) {
-		Logger::Debug("### ime_dialog : Initialize --> ");
-		wcsncpy(resultTextBuf, L"Edit", sizeof(resultTextBuf) / sizeof(wchar_t));
-
-		imeDialog = new ImeDialogWrapper();
-		SCE_SAMPLE_UTIL_ASSERT(imeDialog != NULL);
-		ret = imeDialog->initialize();
-		if (ret != 0) Logger::Debug("error ###\n");
-		else Logger::Debug("ok ###\n");
-	}
-
-	// Shall we use Message Dialog ?
-	if (useDialog) {
-		Logger::Debug("### msg_dialog : Initialize --> ");
-		msgDialog = new MsgDialogWrapper();
-		ret = msgDialog->initialize();
-		if (ret < 0) Logger::Debug("error ###\n");
-		else {
-			Logger::Debug("ok ###\n");
-			msgDialog->doNotTerminate(true);    // Needed so we can re-use the dialog without the need to initialize it over and over again.
-		}
-	}
+	// Get App path.
+	String appPath("/mnt/sandbox/pfsmnt/");
+	appPath += titleId;
+	appPath += "-app0/";
 
 	// Initialize config.
-	Logger::Debug("Initializing config...\n");
-	if (useResources | useSound) conf.initialize("/mnt/sandbox/pfsmnt/ADD_YOUR_TITLE_ID_HERE-app0/game_data/config.lua", "english_us");
-	Logger::Debug("Initializing config...done.\n");
+	String configLua(appPath);
+	configLua += "game_data/config.lua";
+	if (useResources | useSound) conf.initialize(configLua.c_str(), "english_us");
 	
 	// Initialize Resource Manager.
-	Logger::Debug("Initializing resource manager...\n");
 	resManager.initialize(Graphics(), sprite, &conf, width, height);
-	Logger::Debug("Initializing resource manager done.\n");
 
 	// Shall we load resources from the app folder ?
-	if (useResources) {
-		Logger::Debug("Loading resources...\n");
-		resManager.load();
-		Logger::Debug("Loading resources done.\n");
-	}
+	if (useResources) resManager.load();
 
 	// Initialize Sound Manager.
-	if (useSound) {
-		Logger::Debug("Initializing sound manager...\n");
-		soundManager.initialize(Audio(), &conf, &eventDispatcher);
-		Logger::Debug("Initializing sound manager done.\n");		
-	}
+	if (useSound) soundManager.initialize(Audio(), &conf, &eventDispatcher);
 
 	// Initialize AV Player.
-	Logger::Debug("Initializing av player...\n");
-	player.initialize(Graphics(), sprite, Audio(), &resManager.directMemoryHeap);
-	Logger::Debug("Initializing av player done.\n");
+	player.initialize(Graphics(), sprite, Audio(), &resManager.directMemoryHeap);	
 
 	// Clear Buffer before using.
 	memset(messageBuffer, 0, sizeof(messageBuffer));
 	memset(titleBuffer, 0, sizeof(titleBuffer));
 	memset(timeBuffer, 0, sizeof(timeBuffer));
 	memset(timeBuffer2, 0, sizeof(timeBuffer2));
-	Logger::Debug("Buffers cleared.\n");
 
 	// Generate Titel string with version.
 	if (useTitle) {
 		snprintf(titleBuffer, sizeof(titleBuffer), "%s", title);
 		titlePos = Position(getCenteredPosX(strlen(titleBuffer)), MARGIN_Y);
-		Logger::Debug("Title set.\n");
 	}
 
 	// Set start and close flags.
 	start = true;
-	Logger::Debug("Flags set.\n");
-
-	// Setting Importend paths.
-	Logger::Debug("Setting Importend paths...");
-	pathToLibc = String("/mnt/sandbox/pfsmnt/");
-	pathToLibc += APP_STR;
-	pathToLibc += "-app0/sce_module/libc.sprx";
-	pathToLibSceFios2 = String("/mnt/sandbox/pfsmnt/");
-	pathToLibSceFios2 += APP_STR;
-	pathToLibSceFios2 += "-app0/sce_module/libSceFios2.sprx";
-	Logger::Debug("done.\n");
+	close = false;
 
 	// Set Background Image properties.
 	bgi.setFillMode(bgi.kFillModeDotByDot);
@@ -389,12 +366,10 @@ int LibHomebrew::Application::initialize(void) {
 	bgi.setSize(Size(1.0f, 1.0f));
 	bgi.Visible(true);
 	bgi.Hide();
-	Logger::Debug("Background image properties set.\n");
 	
-	// Clear SplashScreen
-	Logger::Debug("Hidding splash screen...");
+	// Clear SplashScreen	
 	sceSystemServiceHideSplashScreen();
-	Logger::Debug("done.\n");
+	_printf("[Application] Initializing done.\n");
 
 	return SCE_OK;
 }
@@ -463,7 +438,7 @@ int LibHomebrew::Application::update(void) {
 
 	// Update/Run player.
 	if (isPlaying) {
-#ifdef SDK_350
+#ifdef FW_350
 		int32_t vhandle = Graphics()->getVideoOutHandle();
 		sceVideoOutWaitVblank(vhandle);
 #endif
@@ -483,7 +458,7 @@ int LibHomebrew::Application::update(void) {
 	if (!isPlaying) {
 		if (useIme) {
 			if (imeDialog->everyFrame() == ImeDialogWrapper::STATUS_DIALOG_FINISH) {
-				Logger::Debug("IME set resultTextBuf to \"%ls\"\n", resultTextBuf);
+				_printf("[Application] IME set resultTextBuf to \"%ls\"\n", resultTextBuf);
 			}
 		}
 		if (useDialog) msgDialog->everyFrame();
@@ -586,12 +561,15 @@ int LibHomebrew::Application::finalize(void) {
 
 	// Finalize Dialogs.
 	if (useIme && imeDialog) {
-		imeDialog->finalize();
+		const int unloadModuleResult = sceSysmoduleUnloadModule(SCE_SYSMODULE_IME_DIALOG);
+		if (unloadModuleResult != SCE_OK) _printf("[Application] Error unloading IME Dialog PRX: 0x%8X\n", unloadModuleResult);
 		delete imeDialog;
 		imeDialog = NULL;
 	}
 	if (useDialog && msgDialog) {
 		msgDialog->finalize();
+		const int unloadModuleResult = sceSysmoduleUnloadModule(SCE_SYSMODULE_MESSAGE_DIALOG);
+		if (unloadModuleResult != SCE_OK) _printf("[Application] Error unloading Message Dialog PRX: 0x%8X\n", unloadModuleResult);
 		delete msgDialog;
 		msgDialog = NULL;
 	}
@@ -842,17 +820,17 @@ void LibHomebrew::Application::Play(void) {
 		int ret;
 		(void)ret;
 		if (strlen(videoPath) > 0) {
-			Logger::Debug("Trying to run Video...");
-#ifdef SDK_350
+			_printf("[Application] Trying to run Video...");
+#ifdef FW_350
 			int32_t vhandle = Graphics()->getVideoOutHandle();
 			for (int i = 0; i < 3; i++) sceVideoOutWaitVblank(vhandle);
 #endif
 			ret = player.start(videoPath);
 			if (ret == SCE_OK) {
 				isPlaying = true;
-				Logger::Debug("Ok !\n");
-			} else Logger::Debug("Error !\n");
-		} else Logger::Debug("No video, no path defined !\nNeed some coffee ?\n");
+				_printf("Ok !\n");
+			} else _printf("Error !\n");
+		} else _printf("[Application] No video, no path defined !\n[Application] Need some coffee ?\n");
 	}
 }
 
@@ -863,17 +841,17 @@ int LibHomebrew::Application::Play(const char *path) {
 	if (!isPlaying) {
 		(void)ret;
 		if (strlen(path) > 0) {
-			Logger::Debug("Trying to run Video...");
-#ifdef SDK_350
+			_printf("[Application] Trying to run Video...");
+#ifdef FW_350
 			int32_t vhandle = Graphics()->getVideoOutHandle();
 			for (int i = 0; i < 3; i++) sceVideoOutWaitVblank(vhandle);
 #endif
 			ret = player.start(path);
 			if (ret == SCE_OK) {
 				isPlaying = true;
-				Logger::Debug("Ok !\n");
-			} else Logger::Debug("Error !\n");
-		} else Logger::Debug("No video, no path defined !\nNeed some coffee ?\n");
+				_printf("Ok !\n");
+			} else _printf("Error !\n");
+		} else _printf("[Application] No video, no path defined !\nNeed some coffee ?\n");
 	}
 
 	return ret;
@@ -909,43 +887,47 @@ void LibHomebrew::Application::AVP_TriggerStop(void) {
 }
 
 // The App Loop.
-/*void *AppLoop(void *app) {
-int ret = 0;
-(void)ret;
+void *AppLoop(void *app) {
+	int ret = 0;
+	(void)ret;
 
-ret = ((Application *)app)->initialize();
-SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
-
-while (1) {
-if (((Application *)app)->IsClosed()) break;
-ret = ((Application *)app)->update();
-if (ret != SCE_OK) break;
-((Application *)app)->render();
-}
-
-ret = ((Application *)app)->finalize();
-SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
-
-return 0;
+	while (1) {
+		if (((Application *)app)->IsClosed()) break;
+		ret = ((Application *)app)->update();
+		if (ret != SCE_OK) break;
+		((Application *)app)->render();
+	}
+	return 0;
 }
 
 // Run the application loop in a own quite core.
 ScePthread appLoop;
 int LibHomebrew::Application::exec(Application *app) {
-// Set App Loop to run in Core 3.
-scePthreadSetaffinity(appLoop, 3);
+	int ret = 0;
+	(void)ret;
 
-// Run the App Loop.
-if (scePthreadCreate(&appLoop, NULL, AppLoop, app, "App Loop") == SCE_OK) {
-// Wait for exit.
-scePthreadJoin(appLoop, NULL);
+	// Initialize the app before we gonna loop.
+	ret = ((Application *)app)->initialize();
+	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
+
+	// Set App Loop to run in Core 3.
+	scePthreadSetaffinity(appLoop, 3);
+
+	// Run the App Loop.
+	if (scePthreadCreate(&appLoop, NULL, AppLoop, app, "App Loop") == SCE_OK) {
+		// Wait for exit.
+		scePthreadJoin(appLoop, NULL);
+	}
+
+	// Finalize, clear all used resources.
+	ret = ((Application *)app)->finalize();
+	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
+
+    return 0;
 }
-return 0;
-}*/
 
 // Run the application loop in a own quite core.
-ScePthread appLoop;
-int LibHomebrew::Application::exec(void) {
+/*int LibHomebrew::Application::exec(void) {
 	int ret = 0;
 	(void)ret;
 
@@ -962,7 +944,10 @@ int LibHomebrew::Application::exec(void) {
 	ret = finalize();
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
 	return 0;
-}
+}*/
+
+// Set the Title ID of this running Program.
+void LibHomebrew::Application::SetTitleId(const char *titleID) { titleId = titleID; }
 
 // Set Application Title Text.
 void LibHomebrew::Application::Title(const char *_title) { title = strdup(_title); }
@@ -1033,12 +1018,6 @@ void LibHomebrew::Application::UseVideo(bool state) { useVid = state; }
 // Enable to use Sound Effects.
 void LibHomebrew::Application::UseSound(bool state) { useSound = state; }
 
-// Enable early debugging.
-void LibHomebrew::Application::UseDebug(void) {
-	if (debug) debug = false;
-	else debug = true;
-}
-
 // Enable to use and load Application Resources.
 void LibHomebrew::Application::UseResources(bool state) { useResources = state; }
 
@@ -1056,7 +1035,7 @@ wchar_t *LibHomebrew::Application::ShowIme(wchar_t *title, wchar_t *placeholder)
 		
 		const int32_t showDialogResult = imeDialog->show_ime_dialog(title, placeholder, resultTextBuf, TEXT_MAX_LENGTH);
 		if (showDialogResult != SCE_OK) {
-			Logger::Debug("Error in show_ime_dialog(): 0x%8X\n", showDialogResult);
+			_printf("[Application] Error in show_ime_dialog(): 0x%8X\n", showDialogResult);
 			return resultTextBuf;
 		}
 
@@ -1080,7 +1059,7 @@ DialogResult LibHomebrew::Application::ShowMsg(const char *message) {
 		// Show the dialog.
 		const int32_t showDialogResult = msgDialog->show_msg_dialog(message);
 		if (showDialogResult != SCE_OK) {
-			Logger::Debug("Error in show_msg_dialog(): 0x%8X\n", showDialogResult);
+			_printf("[Application] Error in show_msg_dialog(): 0x%8X\n", showDialogResult);
 			goto done;
 		}
 
@@ -1121,7 +1100,7 @@ DialogResult LibHomebrew::Application::ShowMsg(const char *message, Buttons butt
 		// Show the dialog.
 		const int32_t showDialogResult = msgDialog->show_msg_dialog(message, button, button1, button2);
 		if (showDialogResult != SCE_OK) {
-			Logger::Debug("Error in show_msg_dialog(): 0x%8X\n", showDialogResult);
+			_printf("[Application] Error in show_msg_dialog(): 0x%8X\n", showDialogResult);
 			goto done;
 		}
 
@@ -1353,7 +1332,7 @@ int LibHomebrew::Application::onLogin(SceUserServiceUserId userId) {
 
 	usersInfo.push_back(userInfo);
 
-	Logger::Debug("user \"%s\" (0x%x) logged in\n", userName, userId);
+	_printf("[Application] user \"%s\" (0x%x) logged in\n", userName, userId);
 
 	return SCE_OK;
 }
@@ -1374,7 +1353,7 @@ int LibHomebrew::Application::onLogout(SceUserServiceUserId userId) {
 		}
 	}
 
-	Logger::Debug("user \"%s\" (0x%x) logged out\n", userInfo->userName.c_str(), userInfo->userId);
+	_printf("user \"%s\" (0x%x) logged out\n", userInfo->userName.c_str(), userInfo->userId);
 
 	ret = userInfo->finalize();
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);

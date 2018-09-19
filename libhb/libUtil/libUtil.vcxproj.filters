@@ -20,22 +20,10 @@
     <ClInclude Include="thread_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="psarc_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="lua_util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sound_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="event.h">
@@ -52,22 +40,10 @@
     <ClCompile Include="thread_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="resource_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="psarc_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="lua_util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sound_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="event.cpp">

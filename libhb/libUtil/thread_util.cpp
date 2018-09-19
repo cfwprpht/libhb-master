@@ -4,6 +4,7 @@
  * All Rights Reserved.
  */
 
+#define LIBRARY_IMPL  (1)
 #include "stdafx.h"
 #include "thread_util.h"
 #include "sampleutil.h"
@@ -13,11 +14,7 @@ common::Util::Mutex::Mutex(const char *name)
 	ScePthreadMutexattr mutexAttr;
 	scePthreadMutexattrInit(&mutexAttr);
 	int ret = scePthreadMutexattrSettype(&mutexAttr, SCE_PTHREAD_MUTEX_RECURSIVE);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
-	ret = scePthreadMutexInit(&m_mutex,
-		&mutexAttr,
-		name);
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
+	ret = scePthreadMutexInit(&m_mutex, &mutexAttr, name);	
 	scePthreadMutexattrDestroy(&mutexAttr);
 }
 
@@ -66,14 +63,12 @@ common::Util::FocusLock::FocusLock(common::Util::Mutex *mutex)
 	m_mutex = mutex;
 	int ret = m_mutex->lock();
 	(void)ret;
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 }
 
 common::Util::FocusLock::~FocusLock(void)
 {
 	int ret = m_mutex->unlock();
 	(void)ret;
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 }
 
 common::Util::EventFlag::EventFlag(const char *name)
@@ -84,21 +79,18 @@ common::Util::EventFlag::EventFlag(const char *name)
 									   0x0,
 									   NULL);
 	(void)ret;
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 }
 
 common::Util::EventFlag::~EventFlag(void)
 {
 	int ret = sceKernelDeleteEventFlag(m_eventflag);
 	(void)ret;
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 }
 
 void common::Util::EventFlag::set(void)
 {
 	int ret = sceKernelSetEventFlag(m_eventflag, 0x1);
 	(void)ret;
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 }
 
 void common::Util::EventFlag::wait(void)
@@ -109,7 +101,6 @@ void common::Util::EventFlag::wait(void)
 									 NULL,
 									 NULL);
 	(void)ret;
-	SCE_SAMPLE_UTIL_ASSERT_EQUAL(ret, SCE_OK);
 }
 
 // ------------------------------------------------------------------------------------------

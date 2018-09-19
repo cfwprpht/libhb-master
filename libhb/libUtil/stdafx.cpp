@@ -4,5 +4,6 @@
 * All Rights Reserved.
 */
 
+#define LIBRARY_IMPL  (1)
 #include "stdafx.h"
 

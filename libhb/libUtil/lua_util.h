@@ -20,12 +20,18 @@
 #include <hash_map>
 #include "../libLua/lua.hpp"
 
+#ifdef LIBRARY_IMPL
+#define PRX_INTERFACE __declspec(dllexport)
+#else
+#define PRX_INTERFACE __declspec(dllimport)
+#endif
+
 struct LuaValue;
 struct lua_State;
 
 namespace common {
 	namespace Util {
-		class LuaValue {
+		class PRX_INTERFACE LuaValue {
 		public:
 			typedef std::hash_map<const std::string, const LuaValue*> Table;
 			enum Type { kTypeNumber, kTypeBool, kTypeString, kTypeTable, kTypeNone, };
@@ -105,7 +111,15 @@ namespace common {
 			return (l != NULL) && (l->getType() == common::Util::LuaValue::kTypeBool);
 		}
 
-		void convertStringTable(std::hash_map<std::string, std::string> &stringTable, const common::Util::LuaValue::Table *table);
+		PRX_INTERFACE void convertStringTable(std::hash_map<std::string, std::string> &stringTable, const common::Util::LuaValue::Table *table) {
+			stringTable.clear();
+			common::Util::LuaValue::Table::const_iterator it;
+			for (it = table->begin(); it != table->end(); it++) {
+				std::string name = it->first;
+				const common::Util::LuaValue *lv = it->second;
+				stringTable[name] = lv->asString();
+			}
+		}
 	};
 
 }

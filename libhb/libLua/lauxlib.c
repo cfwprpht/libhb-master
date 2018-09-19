@@ -22,8 +22,8 @@
 ** Any function declared here could be written as an application function.
 */
 
+#define LIBRARY_IMPL  (1)
 #include "lua.h"
-
 #include "lauxlib.h"
 
 
