@@ -163,7 +163,7 @@ PS4 LibHomebrew
      Resources can now handled with libhb.
        Modify resources.lua and config.lua to add your pictures, sounds, translations or what ever.
        Add images to the Resource Manager class of the libUtil and sound files to the Sound Manager.
-       A Detailed information video can be found on my youtube channel.
+       A Detailed information video can be found on my youtube channel.*
        To enable them use "app.UseResources()" and "app.UseSounds()".
      Event class would be added to the libUtil.
      The Applications initalisation process where we, till now, couldn't debug it proper without to use UART,
@@ -213,7 +213,9 @@ PS4 LibHomebrew
        your app code, then just change that defination to something not "SDK_350".
        May "SDK_XXX" is already ok.
        Again Thx to XDPX for telling me about that bug.
-       
+
+ * [Update 17](https://www.youtube.com/watch?v=-s3ilyo7bnI&t= "How to use Resources")
+
 ## Update 18
      The whole Project is now build as Dynamic Linked Library.
      useDebug() and Logger::Debug() would be dismissed since libhb is now using my printf driver to write
