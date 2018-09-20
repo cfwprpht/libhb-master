@@ -229,7 +229,7 @@ PS4 LibHomebrew
        If you want to use libhb Tools, add the project prx from libhb folder
        and set a depense.
        finalize_pkg app will copy all prxs from libhb/ORBIS_Debug and the one from the 
-       projects folder into /YourProject/data/app0/sce_module/.
+       projects folder into /YourProject/data/app/sce_module/.
        A video explanation can be found on my youtube channel.*
      Rearanged the de-/initialisation functions and now we have the Application Loop running in Core 3.
        So: UserEntry == Core 1.
