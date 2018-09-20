@@ -228,9 +228,11 @@ PS4 LibHomebrew
        and set a depense.
        finalize_pkg app will copy all prxs from libhb/ORBIS_Debug and the one from the 
        projects folder into /YourProject/data/app0/sce_module/.
-       [A video explanation can be found on my youtube channel](https://www.youtube.com/watch?v=mg3RBstJ__8)
+       A video explanation can be found on my youtube channel.*
      Rearanged the de-/initialisation functions and now we have the Application Loop running in Core 3.
        So: UserEntry == Core 1.
            AppLoop   == Core 3.
      TinyXml static library stub is included within the "libs" folder, which the SampleUtil will need to compile correctly.
        Just copy the stub to /SDK/target/lib/.
+
+ * [Update 18](https://www.youtube.com/watch?v=mg3RBstJ__8 "Libhb Update 18")
