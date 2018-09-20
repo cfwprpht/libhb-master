@@ -216,7 +216,7 @@ PS4 LibHomebrew
 
  * [Update 17](https://www.youtube.com/watch?v=-s3ilyo7bnI&t= "How to use Resources")
 
-## Update 18
+## Update 18.1
      The whole Project is now build as Dynamic Linked Library.
      useDebug() and Logger::Debug() would be dismissed since libhb is now using my printf driver to write
        debug messages from userland to the Systems UART line.
@@ -236,5 +236,8 @@ PS4 LibHomebrew
            AppLoop   == Core 3.
      TinyXml static library stub is included within the "libs" folder, which the SampleUtil will need to compile correctly.
        Just copy the stub to /SDK/target/lib/.
+     
+     Added ps4_vs_template_hack.exe which will install libhbs main.cpp, program.cpp and program.h as templates for
+       PS4 ELF Projects.
 
  * [Update 18](https://www.youtube.com/watch?v=mg3RBstJ__8 "Libhb Update 18")
