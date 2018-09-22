@@ -1,6 +1,9 @@
-=================
-PS4 LibHomebrew
-=================
+             =================
+              PS4 LibHomebrew
+             =================
+
+![image1](https://user-images.githubusercontent.com/1683181/45920389-9d220800-bea3-11e8-9ea6-56d9412584b4.png)
+![image2](https://user-images.githubusercontent.com/1683181/45920409-de1a1c80-bea3-11e8-84b1-957bd7ce8f54.png)
 
 ## What's that ?
      A Homebrew Library based on the Official SDK.
@@ -34,12 +37,12 @@ PS4 LibHomebrew
      LibHB-Sample-PKGs: http://www.mediafire.com/file/kyb27dfubtidqbu/libhb-sample-pkgs.rar
 
 
-## Updates:
+###Updates:
       Basic Image class written. May not functional right now. Need to look into about the texter loading.
       Added a global accessable Application instance. This way all code can use the same instance working with overloads is much easyer.
       Testing type definations for better readability.
 
-## Update 2:
+###Update 2:
     Added a basic console output stream to write messages to the screen rich text like, for our application code. For that i added a new form to the application main loop.
     Which let me come to the new Forms added: PictureBox, RichTextBox and a Image class to handle various images. So the Application got a RichTextBox form added,
     where all the messages will be drawen to screen. For that i added a static function called "Console::WriteLine(const char *message)" to write formated 
@@ -54,10 +57,10 @@ PS4 LibHomebrew
      DIR as 'DIR'
      vector of class FileInfo (std::vector<FileInfo *>) as 'FileInfoList'
  
-## Update 3:
+###Update 3:
      Need to add
   
-## Update 4:
+###Update 4:
      Added AV Player.
      Added Resource Manager.
      Added Fios2 and Sound Flag to the Application initialisation process.
@@ -66,30 +69,30 @@ PS4 LibHomebrew
      Added unjail.c source.
      Added Process Class.
  
-## Update 5:
+###Update 5:
      Added libLV2.
      Added FW selector within fw.h. (set your FW to use there and libHB will use this setting)
      Automaticly Jailbreak on App initializing.
      Broke Libc and Libkernel. Need to fix.
  
-## Update 6:
+###Update 6:
      Fixed LibLV2.
  
-## Update 7:
+###Update 7:
      Fixed Clear screen finally.
      Fixed Usb Resolving to use a totaly unusual test name.
  
-## Update 8:
+###Update 8:
      Fixed File Reading.
  
-## Update 9:
+###Update 9:
      Added ReadLine(), ReadAllLines(), WriteLine()
      Fixed Logger.
  
-## Update 10:
+###Update 10:
      Finished Application class.
  
-## Update 11:
+###Update 11:
      Fixed missalign of the shader for the Banner.
      Added Abbility to stop a video when running by pressing button X.
      Added Functions drawRect() and fillRect() to the applications class. You can now draw from outside the Application code.
@@ -98,13 +101,13 @@ PS4 LibHomebrew
      Added compilled samples for FW 4.55.
      Added a LineBreak() function to the static console class.
  
-## Update 12:
+###Update 12:
      Fixed Console::LineBreak().
      Added a sample "SaveDataMasterKeyDumper" on how to use libHB with your own kernel function.
      Moved the pkgs and the samples into the libhb-master.rar archive. Can be downloaded on the releases button.
      Will look into the FileSystem Dumper and fix it as next.
  
-## Update 13:
+###Update 13:
      Added nmount, fstatat, and readlink System calls to the Sys Class. (credits @IDC)
      Fixed lseek Systemcall. (Wrong number, credits @IDC)
      Added GetLocalIP() Function to SwissKnife class. (credits @Vortex)
@@ -140,19 +143,19 @@ PS4 LibHomebrew
        Added SaveDataMasterKey Dumper v2. Since FW 5.05, getSealedKeySecret() changed and hase now flags to use (1-4).
        Splitted Sample PKGs into a own upload.
  
-## Update 14:
+###Update 14:
      Fixed lv2 offsets for FW 5.05.
      All Samples are back working now.
  
-## Update 15:
+###Update 15:
      Added Functions GetSsid() & GetLanguage() to the SwissKnife class.
 
-## Update 16:
+###Update 16:
      Fixed icc_nvs_read() and icc_nvs_write() offsets for 5.05.
      Added Line highlighting abbility to the Console.
      Added functions GetSelectedLine() & SetSelectedLine() as well as Clear() to the Console Class.
  
-## Update 17:
+###Update 17:
      Apllication Lopp will now run in Core 3 which is less interrupted by the system then others. UserEntry Loop will run in Core 1.
      Added c language wrappers for the c++ Console Class. If you have some c source and you want to write to the screen, inlcude "c_console.h" and just do it.
      Added a BitConverter to SwissKnife to bit swapp bytes.
@@ -220,7 +223,7 @@ PS4 LibHomebrew
 
  * [Update 17](https://www.youtube.com/watch?v=-s3ilyo7bnI&t= "How to use Resources")
 
-## Update 18.2
+###Update 18.0
      The whole Project is now build as Dynamic Linked Library.
      useDebug() and Logger::Debug() would be dismissed since libhb is now using my printf driver to write
        debug messages from userland to the Systems UART line.
