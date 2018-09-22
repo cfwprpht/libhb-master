@@ -97,8 +97,6 @@ namespace LibHomebrew {
 		int  update(void);
 		void render(void);
 		int          exec(Application *app);
-		//int          exec(void);
-		void         SetTitleId(const char *titleId);
 		void         Title(const char *title);
 		void         TitlePos(Position pos);
 		void         TitlePos(float x, float y);
@@ -212,7 +210,6 @@ namespace LibHomebrew {
 		static float                   bannerSize;
 		static ssi::Button             input;
 		static wchar_t                 resultTextBuf[TEXT_MAX_LENGTH + 1];
-		static String                  titleId;
 		ImeDialogWrapper               *imeDialog;
 		MsgDialogWrapper               *msgDialog;
 		std::vector<void (*)()>        drawFuncs;

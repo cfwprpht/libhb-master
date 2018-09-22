@@ -69,7 +69,6 @@ bool LibHomebrew::Application::useResources  = false;
 bool LibHomebrew::Application::useSound      = false;
 bool LibHomebrew::Application::useIme        = false;
 bool LibHomebrew::Application::useDialog     = false;
-String LibHomebrew::Application::titleId("");
 EventDataUserInfo LibHomebrew::Application::data;
 PictureBox LibHomebrew::Application::bgi;
 Position LibHomebrew::Application::titlePos  = Position(0.0, 0.0);
@@ -298,7 +297,8 @@ int LibHomebrew::Application::initialize(void) {
 	uint32_t width = graphicsContext->getNextRenderTarget()->getWidth();
 	uint32_t height = graphicsContext->getNextRenderTarget()->getHeight();
 	sprite->setRenderTargetSize(Size(width, height));	
-		
+	_printf("[Application] Graphics Initialized.\n");
+
 	// Shall we use Ime Dialog ?
 	if (useIme) {
 		wcsncpy(resultTextBuf, L"Edit", sizeof(resultTextBuf) / sizeof(wchar_t));
@@ -316,19 +316,8 @@ int LibHomebrew::Application::initialize(void) {
 		if (ret == SCE_OK) msgDialog->doNotTerminate(true);    // Needed so we can re-use the dialog without the need to initialize it over and over again.
 	}
 
-	// Get Freedom for this Process.
-	int uid = Sys::getuid();
-	if (uid != 0) Proc::Freedom();
-
-	// Get App path.
-	String appPath("/mnt/sandbox/pfsmnt/");
-	appPath += titleId;
-	appPath += "-app0/";
-
 	// Initialize config.
-	String configLua(appPath);
-	configLua += "game_data/config.lua";
-	if (useResources | useSound) conf.initialize(configLua.c_str(), "english_us");
+	if (useResources | useSound) conf.initialize("/app0/game_data/config.lua", "english_us");
 	
 	// Initialize Resource Manager.
 	resManager.initialize(Graphics(), sprite, &conf, width, height);
@@ -347,6 +336,7 @@ int LibHomebrew::Application::initialize(void) {
 	memset(titleBuffer, 0, sizeof(titleBuffer));
 	memset(timeBuffer, 0, sizeof(timeBuffer));
 	memset(timeBuffer2, 0, sizeof(timeBuffer2));
+	_printf("[Application] Buffers cleared.\n");
 
 	// Generate Titel string with version.
 	if (useTitle) {
@@ -366,6 +356,16 @@ int LibHomebrew::Application::initialize(void) {
 	bgi.setSize(Size(1.0f, 1.0f));
 	bgi.Visible(true);
 	bgi.Hide();
+	_printf("[Application] Background Image prepared\n");
+
+	// Get Freedom for this Process.
+	int uid = Sys::getuid();
+	if (uid != 0) {
+		_printf("[Application] Process is jailed.\n");
+		_printf("[Application] Applying Django Unchained...");
+		Proc::Freedom();
+		_printf("OK !");
+	} else _printf("[Application] Already Escaped from the Sandbox...\n");
 	
 	// Clear SplashScreen	
 	sceSystemServiceHideSplashScreen();
@@ -945,9 +945,6 @@ int LibHomebrew::Application::exec(Application *app) {
 	SCE_SAMPLE_UTIL_ASSERT(ret == SCE_OK);
 	return 0;
 }*/
-
-// Set the Title ID of this running Program.
-void LibHomebrew::Application::SetTitleId(const char *titleID) { titleId = titleID; }
 
 // Set Application Title Text.
 void LibHomebrew::Application::Title(const char *_title) { title = strdup(_title); }

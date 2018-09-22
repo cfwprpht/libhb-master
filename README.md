@@ -8,7 +8,11 @@ PS4 LibHomebrew
      If you want to change the FW version to compile for (needed for jb & kernel aka lv2 stuff),
      then set your consoles FW within fw.h like: FW_455 or FW_500 as example.
      Copy libhb Folder (not the -master one) and his samples into "/target/samples/sample_code/system" of your SDK.
+     Extract the libs and dlls from the download of github page (under the tab 'releases') into 
+     "/target/samples/sample_code/system/libhb/ORBIS_Debug" or compile the library on your machine.
      Move the "controller.h" from the libhb-master folder to: "/target/samples/sample_code/common/include/sampleUtil/input"
+     Use the Visual Studio Integration installer to add two Template Projects for libhb to the official PS4 SDK entry,
+     under the Visual C++ Category.
      That's it your Set Up !
  
 ## Thanks and used sources:
@@ -216,7 +220,7 @@ PS4 LibHomebrew
 
  * [Update 17](https://www.youtube.com/watch?v=-s3ilyo7bnI&t= "How to use Resources")
 
-## Update 18.1
+## Update 18.2
      The whole Project is now build as Dynamic Linked Library.
      useDebug() and Logger::Debug() would be dismissed since libhb is now using my printf driver to write
        debug messages from userland to the Systems UART line.
@@ -237,7 +241,15 @@ PS4 LibHomebrew
      TinyXml static library stub is included within the "libs" folder, which the SampleUtil will need to compile correctly.
        Just copy the stub to /SDK/target/lib/.
      
+     [18.1]
      Added ps4_vs_template_hack.exe which will install libhbs main.cpp, program.cpp and program.h as templates for
        PS4 ELF Projects.
+     
+     [18.2]
+     Added a Visual Studio Integration for libhb.
+     Rearanged the Escape of the Sandbox process to avoid the usage of absolute paths for 
+       the initialisation process.
+       This way, paths from the Resources need not to know the TitleID of your application.
+     Removed the function "setTitleId()" from the application loop.
 
  * [Update 18](https://www.youtube.com/watch?v=mg3RBstJ__8 "Libhb Update 18")
