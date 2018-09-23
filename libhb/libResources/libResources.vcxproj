@@ -14,9 +14,6 @@
     <ProjectReference Include="..\..\printf\printf\printf.vcxproj">
       <Project>{3bff0d3c-e122-49ae-9cdd-f834e0b61966}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\libLua\libLua.vcxproj">
-      <Project>{967ed826-d059-413f-9936-9bd876ed3794}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\libUtil\libUtil.vcxproj">
       <Project>{09c2cd47-f62a-4b81-9170-dcb07e27ae2c}</Project>
     </ProjectReference>
@@ -79,7 +76,8 @@
       <AdditionalOptions>-Wno-unknown-pragmas  -Wnull-conversion %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\SCE\ORBIS SDKs\3.500\target\samples\sample_code\system\libhb\ORBIS_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\ORBIS_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>-llua</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">

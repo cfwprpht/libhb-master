@@ -254,5 +254,21 @@
        the initialisation process.
        This way, paths from the Resources need not to know the TitleID of your application.
      Removed the function "setTitleId()" from the application loop.
+     
+     [18.3]
+     Added hacked controller.h to the SampleUtil mod for SDK 4.50.
+     Removed the conrtoller.h from the libhb-master.
+     Added SampleUtil Mod for SDK 4.50. (Will now use "_printf()" and write all debug message on retail cons into the system UART)
+     Added libs and bins for SDK 4.50 developers to the download section.
+     Changed some include/lib Paths to use Macros.
+     Removd PSVita entrys from the SampleUtil project file, for both Mods 350 & 450.
+     Since i found the library stubs for liblua and tinyxml within the sdk included,
+       i've copyed them into the libhbs lib directory for SDK 3.50 & 4.50.
+       LibLua is removed from libhb project. I'll release the source and libs of 
+       the liblua build of me as a seperated project if some one is interested.
+       From now on just copy one time liblua.a and tinyxml.a, depending your SDK version,
+       into "/SDK/target/lib".
+     Moved the external static librarys into the download section. (liblua.a & tinyxml.a)
+     Update the Visual Studio Integration and removed liblua from initiale, prx loading process.
 
  * [Update 18](https://www.youtube.com/watch?v=mg3RBstJ__8 "Libhb Update 18")

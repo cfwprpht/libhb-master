@@ -63,7 +63,8 @@
       </Command>
     </CustomBuildStep>
     <Link>
-      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\SCE\ORBIS SDKs\3.500\target\samples\sample_code\system\libhb\ORBIS_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\ORBIS_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>-llua</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">
@@ -92,9 +93,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\printf\printf\printf.vcxproj">
       <Project>{3bff0d3c-e122-49ae-9cdd-f834e0b61966}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\libLua\libLua.vcxproj">
-      <Project>{967ed826-d059-413f-9936-9bd876ed3794}</Project>
     </ProjectReference>
     <ProjectReference Include="..\prx\prx.vcxproj">
       <Project>{4cf2bf0b-7e0a-447b-a709-55b1e7dcdbe2}</Project>

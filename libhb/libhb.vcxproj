@@ -46,7 +46,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>-lSceUserService_stub_weak;-lSceSystemService_stub_weak;-lSceCommonDialog_stub_weak</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\Test\ORBIS_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)ORBIS_Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
