@@ -413,7 +413,7 @@ String LibHomebrew::Loot::SwissKnife::GetUsb(void) {
 			_printf("got usb0.\n");
 			usb_path = String("/mnt/usb0/");
 			break;
-		} else if (PS4Dir::Exists("/mnt/usb0")) {
+		} else if (PS4Dir::Exists("/mnt/usb1")) {
 			if (verbose) Console::WriteLine("got usb1.\n");
 			_printf("got usb1.\n");
 			usb_path = String("/mnt/usb1/");

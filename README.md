@@ -270,5 +270,8 @@
        into "/SDK/target/lib".
      Moved the external static librarys into the download section. (liblua.a & tinyxml.a)
      Update the Visual Studio Integration and removed liblua from initiale, prx loading process.
+     
+     [18.4]
+     Bug Fix: GetUsb() only did check usb0 but not usb1. Credits kkk111
 
  * [Update 18](https://www.youtube.com/watch?v=mg3RBstJ__8 "Libhb Update 18")
