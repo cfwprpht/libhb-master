@@ -9,7 +9,7 @@
 ## Note to the Scene:
      LightningMods is the biggesd Faker this Scene has ever seen. Still he tries to take my work and present it as his by just to delete
      the Readme and replace some files. Just that he then can claim "I made that".
-     PS4 LibHomebrew was, is and will ever be a work of Harald Swoboda, a student of the HTL Ottakrieng aka cfwprpht.
+     PS4 LibHomebrew was, is and will ever be a work of Harald Swoboda, a student of the HTL Ottakring aka cfwprpht.
 
 ## What's that ?
      A Homebrew Library based on the Official SDK.
