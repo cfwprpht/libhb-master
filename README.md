@@ -2,8 +2,14 @@
                                         PS4 LibHomebrew
                                        =================
 
-![image1](https://user-images.githubusercontent.com/1683181/45920389-9d220800-bea3-11e8-9ea6-56d9412584b4.png)
-![image2](https://user-images.githubusercontent.com/1683181/45920409-de1a1c80-bea3-11e8-84b1-957bd7ce8f54.png)
+![image1](https://user-images.githubusercontent.com/1683181/67478429-57aeac00-f65c-11e9-9c64-4370cb01539e.png)
+![image2](https://user-images.githubusercontent.com/1683181/45920389-9d220800-bea3-11e8-9ea6-56d9412584b4.png)
+![image3](https://user-images.githubusercontent.com/1683181/45920409-de1a1c80-bea3-11e8-84b1-957bd7ce8f54.png)
+
+## Note to the Scene:
+     LightningMods is the biggesd Faker this Scene has ever seen. Still he tries to take my work and present it as his by just to delete
+     the Readme and replace some files. Just that he then can claim "I made that".
+     PS4 LibHomebrew was, is and will ever be a work of Harald Swoboda, a student of the HTL Ottakrieng aka cfwprpht.
 
 ## What's that ?
      A Homebrew Library based on the Official SDK.
